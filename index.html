@@ -1163,11 +1163,12 @@ async function handleReset() {
 }
 
 async function handleLogout() {
-  await db.auth.signOut();
+  const { error } = await db.auth.signOut();
+  if (error) { console.error('Logout error:', error); return; }
   completedDays = new Set();
   currentUser   = null;
-  goTo('screen-auth');
   showToast('Erfolgreich abgemeldet.', 'success');
+  goTo('screen-auth');
 }
 
 // ════════════════════════════════════════════════════════
@@ -1176,24 +1177,38 @@ async function handleLogout() {
 
 async function loadProgress() {
   if (!currentUser) return;
-  const { data, error } = await db
-    .from('progress')
-    .select('day_number')
-    .eq('user_id', currentUser.id);
-  if (error) { console.error('loadProgress error:', error); return; }
-  completedDays = new Set(data.map(r => r.day_number));
+  try {
+    const { data, error } = await db
+      .from('progress')
+      .select('day_number, completed_at')
+      .eq('user_id', currentUser.id)
+      .order('completed_at', { ascending: true });
+    if (error) throw error;
+    completedDays = new Set(data.map(r => r.day_number));
+    window.completionDates = {};
+    data.forEach(r => { window.completionDates[r.day_number] = r.completed_at; });
+  } catch(e) {
+    console.error('loadProgress error:', e);
+    completedDays = new Set();
+    window.completionDates = {};
+  }
 }
 
 async function saveProgress(dayNum) {
   if (!currentUser) return false;
-  // Upsert so we don't get duplicate entries
-  const { error } = await db.from('progress').upsert({
-    user_id:    currentUser.id,
-    day_number: dayNum,
-    completed_at: new Date().toISOString()
-  }, { onConflict: 'user_id,day_number' });
-  if (error) { console.error('saveProgress error:', error); return false; }
-  return true;
+  try {
+    const { error } = await db.from('progress').insert({
+      user_id:      currentUser.id,
+      day_number:   dayNum,
+      completed_at: new Date().toISOString()
+    });
+    // Error code 23505 = duplicate, already saved = that's fine
+    if (error && error.code !== '23505') throw error;
+    return true;
+  } catch(e) {
+    console.error('saveProgress error:', e);
+    return false;
+  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -1214,9 +1229,24 @@ function goTo(screenId) {
 }
 
 function getActiveDay() {
-  // Returns the next uncompleted day (1–28)
+  // Returns the highest day that is unlocked today based on calendar dates
+  // Day 1 is always unlocked
+  // Day N is unlocked if Day N-1 was completed on a previous calendar day
+  const today = new Date().toDateString();
+
   for (let i = 1; i <= 28; i++) {
-    if (!completedDays.has(i)) return i;
+    if (!completedDays.has(i)) {
+      // This day is not completed yet - check if it's unlocked
+      if (i === 1) return 1; // Day 1 always unlocked
+      const prevCompleted = window.completionDates && window.completionDates[i - 1];
+      if (!prevCompleted) return i - 1; // previous not done yet
+      const prevDate = new Date(prevCompleted).toDateString();
+      if (prevDate === today) {
+        // Previous day was completed TODAY - not yet unlocked
+        return i - 1;
+      }
+      return i; // previous day completed on earlier date - unlocked!
+    }
   }
   return 28; // all done
 }
@@ -1358,20 +1388,35 @@ setInterval(() => {
 // ════════════════════════════════════════════════════════
 // INIT – AUTH STATE LISTENER
 // ════════════════════════════════════════════════════════
+// Single auth handler - no parallel calls
+let appReady = false;
+
 db.auth.onAuthStateChange(async (event, session) => {
   const overlay = document.getElementById('loadingOverlay');
 
-  if (session?.user) {
+  if (event === 'INITIAL_SESSION') {
+    // First load - check if user is already logged in
+    if (session?.user) {
+      currentUser = session.user;
+      overlay.querySelector('p').textContent = 'Fortschritt wird geladen…';
+      await loadProgress();
+      buildDashboard();
+    }
+    overlay.classList.add('hidden');
+    goTo(session?.user ? 'screen-dashboard' : 'screen-auth');
+    appReady = true;
+
+  } else if (event === 'SIGNED_IN' && appReady) {
+    // User just logged in
     currentUser = session.user;
-    overlay.querySelector('p').textContent = 'Fortschritt wird geladen…';
     await loadProgress();
     buildDashboard();
-    overlay.classList.add('hidden');
     goTo('screen-dashboard');
-  } else {
+
+  } else if (event === 'SIGNED_OUT') {
     currentUser = null;
     completedDays = new Set();
-    overlay.classList.add('hidden');
+    window.completionDates = {};
     goTo('screen-auth');
   }
 });
