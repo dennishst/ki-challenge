@@ -126,9 +126,10 @@
   .highlight-box{background:linear-gradient(135deg,rgba(94,234,212,.07),rgba(129,140,248,.07));border:1px solid rgba(94,234,212,.18);border-radius:12px;padding:1.2rem 1.4rem;margin:1rem 0;font-size:.95rem;color:var(--text);line-height:1.65;}
   .highlight-box strong{color:var(--accent);font-family:'Syne',sans-serif;display:block;margin-bottom:.3rem;font-size:.85rem;letter-spacing:.05em;}
   .prompt-box{background:#080b14;border:1px solid rgba(129,140,248,.25);border-left:3px solid var(--accent2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Courier New',monospace;font-size:1rem;color:#c4b5fd;line-height:1.75;position:relative;}
-  .prompt-box .copy-btn{position:absolute;top:.6rem;right:.6rem;background:rgba(129,140,248,.15);border:1px solid rgba(129,140,248,.25);border-radius:6px;color:#818cf8;font-size:.7rem;font-family:'Syne',sans-serif;font-weight:700;padding:.25rem .55rem;cursor:pointer;transition:background .2s,color .2s;letter-spacing:.05em;}
-  .prompt-box .copy-btn:hover{background:rgba(129,140,248,.3);color:#c4b5fd;}
+  .prompt-box .copy-btn{position:absolute;top:.5rem;right:.5rem;background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.2);border-radius:6px;color:#818cf8;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,color .2s;flex-shrink:0;padding:0;}
+  .prompt-box .copy-btn:hover{background:rgba(129,140,248,.28);color:#c4b5fd;}
   .prompt-box .copy-btn.copied{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#22c55e;}
+  .prompt-box{padding-right:2.4rem !important;}
   .prompt-box .label{font-family:'Syne',sans-serif;font-size:.68rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.6rem;display:block;}
   .task-list{list-style:none;}
   .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:1rem;color:var(--text);line-height:1.6;}
@@ -330,6 +331,8 @@
 
     /* Day header title wraps on mobile */
     .day-header { flex-wrap: wrap !important; }
+    h1, h2, h3, h4 { word-break: break-word !important; overflow-wrap: break-word !important; }
+    .welcome-banner h2 { word-break: break-word !important; }
     .day-header-meta { min-width: 0; flex: 1; }
     .day-header-meta .day-title-h {
       font-size: .9rem !important;
@@ -559,7 +562,6 @@
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
       <button class="auth-tab" onclick="switchTab('register')">Registrieren</button>
-      <button class="auth-tab" onclick="switchTab('reset')">Passwort vergessen</button>
     </div>
 
     <!-- LOGIN FORM -->
@@ -685,11 +687,16 @@
     </div>
 
     <div class="welcome-banner">
-      <div>
-        <h2 id="welcomeHeadline">Hey, los geht's! 🚀</h2>
+      <div style="flex:1;min-width:0;">
+        <h2 id="welcomeHeadline" style="word-break:break-word;">Hey, los geht's! 🚀</h2>
         <p id="welcomeSub">Deine 28-Tage-KI-Challenge. Tag 1 wartet auf dich.</p>
+        <div id="groupBannerStat" style="display:none;margin-top:.75rem;padding:.5rem .8rem;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.15);border-radius:8px;font-size:.78rem;color:var(--muted);display:inline-flex;align-items:center;gap:.4rem;">
+          <span style="color:var(--accent2);">👥</span>
+          <span id="groupBannerText">Lädt…</span>
+          <span id="groupBannerPct" style="color:var(--accent2);font-family:'Syne',sans-serif;font-weight:700;margin-left:.2rem;"></span>
+        </div>
       </div>
-      <div class="progress-ring-wrap">
+      <div class="progress-ring-wrap" style="flex-shrink:0;">
         <svg width="60" height="60" viewBox="0 0 44 44">
           <circle class="ring-bg" cx="22" cy="22" r="20"/>
           <circle class="ring-fill" cx="22" cy="22" r="20" id="ringFill"/>
@@ -1843,7 +1850,8 @@ function openDay(day) {
       if (box.querySelector('.copy-btn')) return; // already has one
       const btn = document.createElement('button');
       btn.className = 'copy-btn';
-      btn.textContent = 'Kopieren';
+      btn.title = 'Kopieren';
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
       btn.onclick = () => {
         // Get text content without the label span and button
         const label = box.querySelector('.label');
@@ -1851,9 +1859,9 @@ function openDay(day) {
         clone.querySelectorAll('.label, .copy-btn').forEach(el => el.remove());
         const text = clone.innerText || clone.textContent;
         navigator.clipboard.writeText(text.trim()).then(() => {
-          btn.textContent = '✓ Kopiert!';
+          btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
           btn.classList.add('copied');
-          setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+          setTimeout(() => { btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>'; btn.classList.remove('copied'); }, 2000);
         });
       };
       box.appendChild(btn);
@@ -1950,6 +1958,15 @@ async function loadGroupProgress() {
       document.getElementById('groupProgressBar').style.width = pct + '%';
     }, 200);
 
+    // Update welcome banner stat
+    const bannerStat = document.getElementById('groupBannerStat');
+    if (bannerStat) {
+      bannerStat.style.display = 'inline-flex';
+      document.getElementById('groupBannerText').textContent =
+        `${todayUsers} von ${totalUsers} Teilnehmenden heute aktiv`;
+      document.getElementById('groupBannerPct').textContent = `· ${pct}%`;
+    }
+
   } catch(e) {
     console.error('Group progress error:', e);
   }
@@ -1984,20 +2001,30 @@ function updateKiLabels() {
 
 function openKiTool() {
   const ki = getSelectedKi();
-  // Show redirect notice
-  const existing = document.getElementById('kiRedirectNotice');
-  if (existing) existing.remove();
+  // Show confirm sheet
+  const existing = document.getElementById('kiConfirmSheet');
+  if (existing) { existing.remove(); return; }
 
-  const notice = document.createElement('div');
-  notice.id = 'kiRedirectNotice';
-  notice.style.cssText = 'position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:#141828;border:1px solid rgba(94,234,212,.3);border-radius:12px;padding:.8rem 1.2rem;font-size:.85rem;color:#e2e8f0;z-index:200;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:fadeUp .3s ease;';
-  notice.innerHTML = `🔗 Du wirst zu <strong style="color:#5eead4;">${ki.name}</strong> weitergeleitet…`;
-  document.body.appendChild(notice);
-
-  setTimeout(() => {
-    window.open(ki.url, '_blank');
-    setTimeout(() => notice.remove(), 1500);
-  }, 800);
+  const sheet = document.createElement('div');
+  sheet.id = 'kiConfirmSheet';
+  sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:flex;align-items:flex-end;justify-content:center;';
+  sheet.innerHTML = `
+    <div style="background:#141828;border:1px solid rgba(94,234,212,.2);border-radius:20px 20px 0 0;padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom));width:100%;max-width:500px;animation:slideUp .2s ease;">
+      <div style="text-align:center;margin-bottom:1.25rem;">
+        <div style="font-size:2rem;margin-bottom:.5rem;">🔗</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.3rem;">Zu ${ki.name} wechseln?</div>
+        <div style="font-size:.82rem;color:var(--muted);">Du verlässt die KI-Challenge und wirst zu <strong style="color:var(--accent);">${ki.url.replace('https://','')}</strong> weitergeleitet.</div>
+      </div>
+      <div style="display:flex;gap:.6rem;">
+        <button onclick="document.getElementById('kiConfirmSheet').remove()" style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.8rem;cursor:pointer;">Abbrechen</button>
+        <button onclick="document.getElementById('kiConfirmSheet').remove();window.open('${ki.url}','_blank')" style="flex:2;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border:none;border-radius:10px;padding:.8rem;cursor:pointer;">Weiter zu ${ki.name} →</button>
+      </div>
+      <div style="text-align:center;margin-top:.75rem;">
+        <button onclick="openKiSettings();document.getElementById('kiConfirmSheet').remove()" style="background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;">Anderes KI-Tool wählen</button>
+      </div>
+    </div>`;
+  sheet.addEventListener('click', e => { if (e.target === sheet) sheet.remove(); });
+  document.body.appendChild(sheet);
 }
 
 function openKiSettings() {
@@ -2205,9 +2232,9 @@ async function showProfileSheet(name, done, pct) {
       <button onclick="saveProfile()" style="width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;border:none;border-radius:10px;padding:.85rem;cursor:pointer;margin-bottom:.5rem;">Profil speichern</button>
       <button onclick="handleLogout();document.getElementById('profileSheet').remove();" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;">Abmelden</button>
       <div style="text-align:center;padding-top:.75rem;margin-top:.5rem;border-top:1px solid rgba(255,255,255,.06);">
-        <button onclick="showLegal('privacy')" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Datenschutz</button>
+        <button onclick="document.getElementById('profileSheet').remove();setTimeout(()=>showLegal('privacy'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Datenschutz</button>
         <span style="color:#334155;font-size:.75rem;">·</span>
-        <button onclick="showLegal('imprint')" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Impressum</button>
+        <button onclick="document.getElementById('profileSheet').remove();setTimeout(()=>showLegal('imprint'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Impressum</button>
       </div>
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
@@ -2250,7 +2277,7 @@ async function loadProfileData() {
 }
 
 // ─── AVATAR PICKER ───────────────────────────────────────────────────
-const AVATAR_ICONS = ['🧑','👩','👨','🧑‍💻','👩‍💻','👨‍💼','🧑‍🎓','🚀','🤖','🦊','🐼','🌟','⚡','🎯','💡','🔥'];
+const AVATAR_ICONS = ['🧑','👩','👨','🧑‍💻','👩‍💻','👨‍💼','🧑‍🎓','👩‍🎓','🧑‍🏫','👩‍🏫','🧑‍🚀','👩‍🚀','🚀','🤖','🦊','🐼','🦁','🐯','🦋','🌟','⚡','🎯','💡','🔥','💎','🏆','✨','🎨','📚','🎸','⚽','🌍','🌈','🍀','🌺','🦄'];
 
 function openAvatarPicker(currentAvatar) {
   const existing = document.getElementById('avatarPicker');
@@ -2267,9 +2294,9 @@ function openAvatarPicker(currentAvatar) {
       </div>
 
       <p style="font-size:.78rem;color:var(--muted);margin:0 0 1rem;">Icon wählen:</p>
-      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;margin-bottom:1.25rem;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:.4rem;margin-bottom:1.25rem;">
         ${AVATAR_ICONS.map(icon => `
-          <button onclick="selectAvatarIcon('${icon}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:1.4rem;padding:.4rem;cursor:pointer;transition:border-color .15s;aspect-ratio:1;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">${icon}</button>
+          <button onclick="selectAvatarIcon('${icon}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:1.3rem;padding:.35rem;cursor:pointer;transition:border-color .15s;aspect-ratio:1;min-width:0;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">${icon}</button>
         `).join('')}
       </div>
 
