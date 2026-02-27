@@ -30,6 +30,10 @@
 
   /* ─── AUTH CARD ───────────────────────────────────── */
   .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem;width:100%;max-width:440px;box-shadow:0 0 80px rgba(94,234,212,.05);animation:fadeUp .5s ease;}
+  .auth-logo{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-bottom:.5rem;}
+  .auth-logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+  .auth-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);}
+  .auth-logo-text span{color:var(--accent);}
   .auth-badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;letter-spacing:.15em;padding:.35rem .9rem;border-radius:100px;margin-bottom:1.5rem;text-transform:uppercase;}
   .auth-card h1{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;line-height:1.1;margin-bottom:.5rem;}
   .auth-card h1 span{color:var(--accent);}
@@ -117,14 +121,14 @@
   .day-intro{color:var(--muted);font-size:1rem;line-height:1.65;margin-bottom:2rem;}
   .content-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.2rem;}
   .content-card h3{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.9rem;text-transform:uppercase;}
-  .content-card p{color:#94a3b8;line-height:1.75;font-size:.95rem;}
+  .content-card p{color:#94a3b8;line-height:1.8;font-size:1rem;}
   .content-card p+p{margin-top:.8rem;}
   .highlight-box{background:linear-gradient(135deg,rgba(94,234,212,.07),rgba(129,140,248,.07));border:1px solid rgba(94,234,212,.18);border-radius:12px;padding:1.2rem 1.4rem;margin:1rem 0;font-size:.95rem;color:var(--text);line-height:1.65;}
   .highlight-box strong{color:var(--accent);font-family:'Syne',sans-serif;display:block;margin-bottom:.3rem;font-size:.85rem;letter-spacing:.05em;}
-  .prompt-box{background:#080b14;border:1px solid rgba(129,140,248,.25);border-left:3px solid var(--accent2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Courier New',monospace;font-size:.88rem;color:#c4b5fd;line-height:1.65;}
+  .prompt-box{background:#080b14;border:1px solid rgba(129,140,248,.25);border-left:3px solid var(--accent2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Courier New',monospace;font-size:1rem;color:#c4b5fd;line-height:1.75;}
   .prompt-box .label{font-family:'Syne',sans-serif;font-size:.68rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.6rem;display:block;}
   .task-list{list-style:none;}
-  .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.7rem 0;border-bottom:1px solid var(--border);font-size:.92rem;color:var(--text);line-height:1.5;}
+  .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:1rem;color:var(--text);line-height:1.6;}
   .task-list li:last-child{border-bottom:none;}
   .task-icon{color:var(--accent);flex-shrink:0;font-size:.9rem;}
   .reflection-box{background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2);border-radius:12px;padding:1.2rem 1.4rem;margin-top:.8rem;}
@@ -200,42 +204,50 @@
       display: flex !important;
       align-items: center;
       justify-content: space-around;
-      padding: .6rem .5rem calc(.6rem + env(safe-area-inset-bottom));
-      background: rgba(12,15,26,.97);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid var(--border);
+      padding: .5rem .3rem calc(.5rem + env(safe-area-inset-bottom));
+      background: #141828;
+      border-top: 2px solid rgba(94,234,212,.15);
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 10;
+      z-index: 50;
+      width: 100%;
     }
     .mobile-nav-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: .2rem;
+      gap: .15rem;
       background: none;
       border: none;
-      color: var(--muted);
+      color: #4a5568;
       font-family: 'DM Sans', sans-serif;
-      font-size: .6rem;
+      font-size: .58rem;
       cursor: pointer;
-      padding: .4rem .5rem;
+      padding: .35rem .4rem;
       border-radius: 10px;
-      transition: color .2s, background .2s;
-      min-width: 52px;
+      transition: color .2s;
+      flex: 1;
+      max-width: 64px;
     }
-    .mobile-nav-btn:hover, .mobile-nav-btn.active { color: var(--accent); }
-    .mobile-nav-btn .nav-icon { font-size: 1.2rem; line-height: 1; }
-    .mobile-nav-btn .nav-label { letter-spacing: .02em; }
+    .mobile-nav-btn:hover { color: #5eead4; }
+    .mobile-nav-btn.active { color: #5eead4; }
+    .mobile-nav-btn .nav-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      filter: grayscale(30%);
+    }
+    .mobile-nav-btn.active .nav-icon { filter: none; }
+    .mobile-nav-btn .nav-label { letter-spacing: .01em; color: inherit; }
 
-    /* KI link button */
+    /* KI link button – same style, no special treatment */
     .mobile-nav-btn.ki-btn {
-      background: rgba(94,234,212,.08);
-      border: 1px solid rgba(94,234,212,.2);
-      color: var(--accent);
+      background: none;
+      border: none;
+      color: #4a5568;
     }
+    .mobile-nav-btn.ki-btn:hover { color: #5eead4; }
 
     /* Current day card */
     .mobile-current-day {
@@ -290,16 +302,26 @@
     .day-chip .d-num { font-size: .75rem !important; min-width: 60px; }
     .day-chip .d-title { font-size: .9rem !important; }
 
-    /* Week label bigger */
+    /* Week label: Woche X on own line, theme below */
     .week-label {
-      font-size: .85rem !important;
-      font-weight: 700 !important;
-      color: var(--accent2) !important;
-      margin-top: .5rem;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: .15rem !important;
+      margin-top: 1rem !important;
+      padding-bottom: .5rem;
     }
+    .week-label::after { display: none !important; }
     .week-label em {
-      font-size: 1rem !important;
+      font-size: 1.1rem !important;
       color: var(--accent) !important;
+      font-style: normal !important;
+      display: block;
+      font-weight: 800 !important;
+    }
+    .week-label-sub {
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 400;
     }
 
     /* Pad content above bottom nav */
@@ -462,6 +484,23 @@
   </div>
 </div>
 
+
+<!-- COOKIE BANNER -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;padding:1rem;background:rgba(12,15,26,.98);border-top:1px solid rgba(94,234,212,.2);backdrop-filter:blur(12px);">
+  <div style="max-width:800px;margin:0 auto;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div style="flex:1;min-width:250px;">
+      <p style="font-size:.82rem;color:#94a3b8;margin:0;line-height:1.6;">
+        🍪 Wir verwenden ausschließlich technisch notwendige Cookies für die Authentifizierung. Keine Tracking- oder Marketing-Cookies.
+        <button onclick="showLegal('privacy')" style="background:none;border:none;color:#818cf8;font-size:.82rem;cursor:pointer;text-decoration:underline;padding:0;font-family:'DM Sans',sans-serif;">Datenschutzerklärung</button>
+      </p>
+    </div>
+    <div style="display:flex;gap:.5rem;flex-shrink:0;">
+      <button onclick="acceptCookies()" style="background:linear-gradient(135deg,#5eead4,#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;border:none;border-radius:8px;padding:.55rem 1.2rem;cursor:pointer;">Verstanden</button>
+      <button onclick="acceptCookies()" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;border-radius:8px;padding:.55rem 1rem;cursor:pointer;">Nur notwendige</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOADING OVERLAY -->
 <div id="loadingOverlay">
   <div class="spinner"></div>
@@ -476,9 +515,14 @@
 <!-- ═══════════════════════════════════════════════ -->
 <div id="screen-auth" class="screen">
   <div class="auth-card">
-    <div class="auth-badge">28-Tage KI-Challenge</div>
-    <h1>Willkommen<br><span>zur Challenge.</span></h1>
-    <p class="auth-sub">Melde dich an oder erstelle einen kostenlosen Account, um deinen Fortschritt zu speichern.</p>
+    <div style="text-align:center;margin-bottom:1.2rem;">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🤖</div>
+        <div class="auth-logo-text">KI<span>Challenge</span></div>
+      </div>
+    </div>
+    <h1 style="text-align:center;">Willkommen<br><span>zur Challenge.</span></h1>
+    <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um deinen Fortschritt zu speichern.</p>
 
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
@@ -499,6 +543,9 @@
       <button class="btn-primary" onclick="handleLogin()" id="btn-login">
         <span>Einloggen →</span>
       </button>
+      <div style="text-align:center;margin-top:.75rem;">
+        <button onclick="switchTab('reset')" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='var(--muted)'">Passwort vergessen?</button>
+      </div>
       <div class="auth-msg" id="login-msg"></div>
     </div>
 
@@ -550,11 +597,17 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <div class="mobile-header-brand">KI<span>Challenge</span></div>
+    <div class="mobile-header-brand" style="display:flex;align-items:center;gap:.4rem;">
+      <div style="width:24px;height:24px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">🤖</div>
+      KI<span>Challenge</span>
+    </div>
   </div>
 
   <div class="topbar">
-    <div class="topbar-brand">KI<span>Challenge</span></div>
+    <div class="topbar-brand" style="display:flex;align-items:center;gap:.5rem;">
+      <div style="width:28px;height:28px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;">🤖</div>
+      KI<span>Challenge</span>
+    </div>
     <div class="topbar-right">
       <div class="topbar-user">
         <div class="avatar" id="userAvatar">?</div>
@@ -637,7 +690,10 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <div class="mobile-header-brand">KI<span>Challenge</span></div>
+    <div class="mobile-header-brand" style="display:flex;align-items:center;gap:.4rem;">
+      <div style="width:24px;height:24px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">🤖</div>
+      KI<span>Challenge</span>
+    </div>
   </div>
 
   <!-- MOBILE BOTTOM NAV (Day screen) -->
@@ -1675,7 +1731,7 @@ function buildDashboard() {
   WEEKS.forEach(week => {
     const sec  = document.createElement('div');
     sec.className = 'week-section';
-    sec.innerHTML = `<div class="week-label"><em>${week.label}</em>${week.sub}</div><div class="day-grid"></div>`;
+    sec.innerHTML = `<div class="week-label"><em>${week.label}</em><span class="week-label-sub">${week.sub}</span></div><div class="day-grid"></div>`;
     const grid = sec.querySelector('.day-grid');
     week.days.forEach(day => {
       const chip = document.createElement('div');
@@ -1810,9 +1866,21 @@ function updateKiLabels() {
 }
 
 function openKiTool() {
-  // Long press / second tap opens settings, single tap opens tool
   const ki = getSelectedKi();
-  window.open(ki.url, '_blank');
+  // Show redirect notice
+  const existing = document.getElementById('kiRedirectNotice');
+  if (existing) existing.remove();
+
+  const notice = document.createElement('div');
+  notice.id = 'kiRedirectNotice';
+  notice.style.cssText = 'position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:#141828;border:1px solid rgba(94,234,212,.3);border-radius:12px;padding:.8rem 1.2rem;font-size:.85rem;color:#e2e8f0;z-index:200;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:fadeUp .3s ease;';
+  notice.innerHTML = `🔗 Du wirst zu <strong style="color:#5eead4;">${ki.name}</strong> weitergeleitet…`;
+  document.body.appendChild(notice);
+
+  setTimeout(() => {
+    window.open(ki.url, '_blank');
+    setTimeout(() => notice.remove(), 1500);
+  }, 800);
 }
 
 function openKiSettings() {
@@ -1940,25 +2008,146 @@ function openProfile() {
 }
 
 function showProfileSheet(name, done, pct) {
-  // Remove existing if any
   const existing = document.getElementById('profileSheet');
   if (existing) existing.remove();
 
+  const interests = ['Neues Lernen', 'Produktivität', 'Marketing', 'Programmierung', 'Design', 'Finanzen', 'Gesundheit', 'Führung', 'Vertrieb', 'KI & Automatisierung'];
+  const saved = JSON.parse(localStorage.getItem('profile_data') || '{}');
+
   const sheet = document.createElement('div');
   sheet.id = 'profileSheet';
-  sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease;';
+  sheet.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:flex-end;justify-content:center;overflow-y:auto;';
   sheet.innerHTML = `
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom));width:100%;max-width:500px;animation:slideUp .25s ease;">
-      <div style="text-align:center;margin-bottom:1.25rem;">
-        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;margin:0 auto .75rem;">${name[0]?.toUpperCase()}</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text);">${name}</div>
-        <div style="font-size:.8rem;color:var(--muted);margin-top:.2rem;">${done} von 28 Tagen · ${pct}% abgeschlossen</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:1.5rem 1.5rem calc(2rem + env(safe-area-inset-bottom));width:100%;max-width:500px;animation:slideUp .25s ease;max-height:90vh;overflow-y:auto;">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase;margin:0;">Mein Profil</h3>
+        <button onclick="document.getElementById('profileSheet').remove();" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">×</button>
       </div>
-      <button onclick="handleLogout();document.getElementById('profileSheet').remove();" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.85rem;cursor:pointer;margin-bottom:.5rem;">Abmelden</button>
-      <button onclick="document.getElementById('profileSheet').remove();" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;">Schließen</button>
+
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;margin:0 auto .6rem;">${name[0]?.toUpperCase()}</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);">${name}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">${done} von 28 Tagen · ${pct}%</div>
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Alter</label>
+        <input type="number" id="prof-age" min="16" max="99" value="${saved.age||''}" placeholder="z.B. 34" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;">
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Unternehmen</label>
+        <input type="text" id="prof-company" value="${saved.company||''}" placeholder="z.B. Musterfirma GmbH" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;">
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Branche</label>
+        <select id="prof-industry" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;appearance:none;">
+          <option value="">Branche wählen…</option>
+          ${['Technologie','Marketing & Kommunikation','Gesundheit & Medizin','Bildung','Finanzen & Versicherung','Handel & E-Commerce','Industrie & Produktion','Beratung','Kreativwirtschaft','Öffentlicher Dienst','Sonstiges'].map(b=>`<option value="${b}" ${saved.industry===b?'selected':''}>${b}</option>`).join('')}
+        </select>
+      </div>
+
+      <div style="margin-bottom:1.25rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;">Interessen <span style="color:#475569;font-size:.65rem;text-transform:none;">(Mehrfachauswahl)</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem;" id="interestTags">
+          ${interests.map(i=>`<button type="button" onclick="toggleInterest(this,'${i}')" style="background:${(saved.interests||[]).includes(i)?'rgba(94,234,212,.15)':'var(--surface2)'};border:1px solid ${(saved.interests||[]).includes(i)?'rgba(94,234,212,.4)':'var(--border)'};color:${(saved.interests||[]).includes(i)?'var(--accent)':'var(--muted)'};font-size:.78rem;border-radius:20px;padding:.3rem .75rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;" data-interest="${i}">${i}</button>`).join('')}
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:0 0 1rem;">
+
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Neues Passwort</label>
+        <input type="password" id="prof-newpass" placeholder="Mindestens 8 Zeichen" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;">
+      </div>
+
+      <div style="margin-bottom:1.25rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Neue E-Mail-Adresse</label>
+        <input type="email" id="prof-newemail" placeholder="neue@email.de" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;">
+      </div>
+
+      <div id="prof-msg" style="display:none;padding:.6rem .9rem;border-radius:8px;font-size:.82rem;margin-bottom:.75rem;"></div>
+
+      <button onclick="saveProfile()" style="width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;border:none;border-radius:10px;padding:.85rem;cursor:pointer;margin-bottom:.5rem;">Profil speichern</button>
+      <button onclick="handleLogout();document.getElementById('profileSheet').remove();" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;">Abmelden</button>
     </div>`;
   sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
   document.body.appendChild(sheet);
+}
+
+function toggleInterest(btn, interest) {
+  const saved = JSON.parse(localStorage.getItem('profile_data') || '{}');
+  if (!saved.interests) saved.interests = [];
+  const idx = saved.interests.indexOf(interest);
+  if (idx > -1) {
+    saved.interests.splice(idx, 1);
+    btn.style.background = 'var(--surface2)';
+    btn.style.borderColor = 'var(--border)';
+    btn.style.color = 'var(--muted)';
+  } else {
+    saved.interests.push(interest);
+    btn.style.background = 'rgba(94,234,212,.15)';
+    btn.style.borderColor = 'rgba(94,234,212,.4)';
+    btn.style.color = 'var(--accent)';
+  }
+  localStorage.setItem('profile_data', JSON.stringify(saved));
+}
+
+async function saveProfile() {
+  const msg = document.getElementById('prof-msg');
+  const age = document.getElementById('prof-age').value;
+  const company = document.getElementById('prof-company').value;
+  const industry = document.getElementById('prof-industry').value;
+  const newPass = document.getElementById('prof-newpass').value;
+  const newEmail = document.getElementById('prof-newemail').value;
+
+  // Save local profile data
+  const saved = JSON.parse(localStorage.getItem('profile_data') || '{}');
+  saved.age = age; saved.company = company; saved.industry = industry;
+  localStorage.setItem('profile_data', JSON.stringify(saved));
+
+  // Update password if provided
+  if (newPass) {
+    if (newPass.length < 8) {
+      msg.style.display = 'block';
+      msg.style.background = 'rgba(248,113,113,.1)';
+      msg.style.border = '1px solid rgba(248,113,113,.25)';
+      msg.style.color = 'var(--error)';
+      msg.textContent = 'Passwort muss mindestens 8 Zeichen haben.';
+      return;
+    }
+    const { error } = await db.auth.updateUser({ password: newPass });
+    if (error) {
+      msg.style.display = 'block';
+      msg.style.background = 'rgba(248,113,113,.1)';
+      msg.style.border = '1px solid rgba(248,113,113,.25)';
+      msg.style.color = 'var(--error)';
+      msg.textContent = 'Passwort-Fehler: ' + error.message;
+      return;
+    }
+  }
+
+  // Update email if provided
+  if (newEmail) {
+    const { error } = await db.auth.updateUser({ email: newEmail });
+    if (error) {
+      msg.style.display = 'block';
+      msg.style.background = 'rgba(248,113,113,.1)';
+      msg.style.border = '1px solid rgba(248,113,113,.25)';
+      msg.style.color = 'var(--error)';
+      msg.textContent = 'E-Mail-Fehler: ' + error.message;
+      return;
+    }
+  }
+
+  msg.style.display = 'block';
+  msg.style.background = 'rgba(34,197,94,.1)';
+  msg.style.border = '1px solid rgba(34,197,94,.25)';
+  msg.style.color = 'var(--done)';
+  msg.textContent = '✅ Gespeichert!';
+  setTimeout(() => { if (newEmail) msg.textContent = '✅ Gespeichert! Bitte bestätige deine neue E-Mail.'; }, 500);
 }
 
 // Close modals on backdrop click
@@ -1971,6 +2160,25 @@ document.getElementById('kiSettingsModal').addEventListener('click', function(e)
 
 // Init mobile
 updateKiLabels();
+
+
+// ════════════════════════════════════════════════════════
+// COOKIE BANNER
+// ════════════════════════════════════════════════════════
+function initCookieBanner() {
+  if (!localStorage.getItem('cookies_accepted')) {
+    setTimeout(() => {
+      document.getElementById('cookieBanner').style.display = 'block';
+    }, 1500);
+  }
+}
+
+function acceptCookies() {
+  localStorage.setItem('cookies_accepted', '1');
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+
+initCookieBanner();
 
 // ════════════════════════════════════════════════════════
 // LEGAL MODAL
