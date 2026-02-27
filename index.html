@@ -21,15 +21,12 @@
   body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
   body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(94,234,212,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 
-  /* ─── SCREENS ─────────────────────────────────────── */
+
   .screen{display:none;position:relative;z-index:1;}
-  .screen.active{display:block;}
-  #screen-auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
-  #screen-auth.active{display:flex;}
+  #screen-auth.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:2rem;}
   #screen-dashboard.active{display:flex;flex-direction:column;min-height:100vh;}
   #screen-day.active{display:flex;flex-direction:column;min-height:100vh;}
-  #screen-success{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;}
-  #screen-success.active{display:flex;}
+  #screen-success.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:2rem;text-align:center;}
 
   /* ─── AUTH CARD ───────────────────────────────────── */
   .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem;width:100%;max-width:440px;box-shadow:0 0 80px rgba(94,234,212,.05);animation:fadeUp .5s ease;}
@@ -1284,33 +1281,31 @@ function buildDashboard() {
 
 function openDay(day) {
   currentDayNum = day.num;
+  const activeDay = getActiveDay();
+  const isLocked  = day.num > activeDay; // locked = not yet reached
+
+  // Locked days: show brief notice, don't navigate
+  if (isLocked) {
+    showToast(`Tag ${day.num} wird freigeschaltet, wenn du Tag ${day.num - 1} abgeschlossen hast.`, 'error');
+    return;
+  }
+
   const week = WEEKS.find(w => w.days.some(d => d.num === day.num));
   document.getElementById('weekHint').textContent    = `${week.label.toUpperCase()} · ${week.sub.toUpperCase()}`;
   document.getElementById('dayTitleH').textContent   = `Tag ${day.num} – ${day.title}`;
 
   const body    = document.getElementById('dayBodyContent');
-  const activeDay = getActiveDay();
-  const isLocked  = day.num > activeDay; // locked = not yet reached
 
   let html = '';
-  if (isLocked) {
-    html += `<div class="preview-notice">👁️ <strong>Vorschau-Modus</strong> – Dieser Tag wird freigeschaltet, sobald du alle vorherigen Tage abgeschlossen hast.</div>`;
-  }
   html += DAY_CONTENT[day.num] || `<p>Inhalt für Tag ${day.num} folgt.</p>`;
   body.innerHTML = html;
 
   // Update complete button state
   const btn = document.getElementById('completeBtn');
-  if (btn) {
-    if (completedDays.has(day.num)) {
-      btn.textContent = '✓ Bereits abgeschlossen';
-      btn.classList.add('completed');
-      btn.disabled = true;
-    } else if (isLocked) {
-      btn.textContent = '🔒 Noch nicht freigeschaltet';
-      btn.classList.add('completed');
-      btn.disabled = true;
-    }
+  if (btn && completedDays.has(day.num)) {
+    btn.textContent = '✓ Bereits abgeschlossen';
+    btn.classList.add('completed');
+    btn.disabled = true;
   }
   goTo('screen-day');
 }
