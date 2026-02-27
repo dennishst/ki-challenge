@@ -113,7 +113,7 @@
   .back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;}
   .back-btn:hover{color:var(--text);border-color:var(--accent);}
   .day-header-meta .week-hint{font-size:.72rem;color:var(--accent2);letter-spacing:.08em;}
-  .day-header-meta .day-title-h{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100vw - 140px);}
+  .day-header-meta .day-title-h{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
   .day-body{flex:1;padding:2.5rem 2rem;max-width:720px;margin:0 auto;width:100%;overflow-x:hidden;}
   .day-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.2);color:var(--accent);font-size:.75rem;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.1em;padding:.35rem .8rem;border-radius:100px;margin-bottom:1.2rem;text-transform:uppercase;}
   .day-body h1{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1.15;margin-bottom:.5rem;}
@@ -125,7 +125,10 @@
   .content-card p+p{margin-top:.8rem;}
   .highlight-box{background:linear-gradient(135deg,rgba(94,234,212,.07),rgba(129,140,248,.07));border:1px solid rgba(94,234,212,.18);border-radius:12px;padding:1.2rem 1.4rem;margin:1rem 0;font-size:.95rem;color:var(--text);line-height:1.65;}
   .highlight-box strong{color:var(--accent);font-family:'Syne',sans-serif;display:block;margin-bottom:.3rem;font-size:.85rem;letter-spacing:.05em;}
-  .prompt-box{background:#080b14;border:1px solid rgba(129,140,248,.25);border-left:3px solid var(--accent2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Courier New',monospace;font-size:1rem;color:#c4b5fd;line-height:1.75;}
+  .prompt-box{background:#080b14;border:1px solid rgba(129,140,248,.25);border-left:3px solid var(--accent2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Courier New',monospace;font-size:1rem;color:#c4b5fd;line-height:1.75;position:relative;}
+  .prompt-box .copy-btn{position:absolute;top:.6rem;right:.6rem;background:rgba(129,140,248,.15);border:1px solid rgba(129,140,248,.25);border-radius:6px;color:#818cf8;font-size:.7rem;font-family:'Syne',sans-serif;font-weight:700;padding:.25rem .55rem;cursor:pointer;transition:background .2s,color .2s;letter-spacing:.05em;}
+  .prompt-box .copy-btn:hover{background:rgba(129,140,248,.3);color:#c4b5fd;}
+  .prompt-box .copy-btn.copied{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3);color:#22c55e;}
   .prompt-box .label{font-family:'Syne',sans-serif;font-size:.68rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.6rem;display:block;}
   .task-list{list-style:none;}
   .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:1rem;color:var(--text);line-height:1.6;}
@@ -323,6 +326,18 @@
       color: var(--muted);
       font-weight: 400;
     }
+
+
+    /* Day header title wraps on mobile */
+    .day-header { flex-wrap: wrap !important; }
+    .day-header-meta { min-width: 0; flex: 1; }
+    .day-header-meta .day-title-h {
+      font-size: .9rem !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+      line-height: 1.3 !important;
+    }
+    .day-header-meta .week-hint { font-size: .65rem !important; }
 
     /* Pad content above bottom nav */
     .dashboard-content { padding-bottom: 5rem !important; }
@@ -686,6 +701,21 @@
       <div class="stat-card"><div class="val" id="statDone">0</div><div class="lbl">Abgeschlossen</div></div>
       <div class="stat-card"><div class="val" id="statStreak">0🔥</div><div class="lbl">Streak</div></div>
       <div class="stat-card"><div class="val" id="statLeft">28</div><div class="lbl">Verbleibend</div></div>
+      <div class="stat-card"><div class="val" id="statParticipants">–</div><div class="lbl">Teilnehmende</div></div>
+    </div>
+
+    <!-- GROUP PROGRESS -->
+    <div id="groupProgressWrap" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.4rem;margin-bottom:1.5rem;display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem;">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:.7rem;letter-spacing:.1em;color:var(--accent2);text-transform:uppercase;margin-bottom:.2rem;">Heutige Abschlüsse – Gruppe</div>
+          <div style="font-size:.82rem;color:var(--muted);" id="groupProgressSub">Lädt…</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);" id="groupProgressPct">–%</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:100px;height:6px;overflow:hidden;">
+        <div id="groupProgressBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1s ease;"></div>
+      </div>
     </div>
     <div id="weekSections"></div>
   </div>
@@ -1717,6 +1747,7 @@ function buildDashboard() {
   const firstName = currentUser?.user_metadata?.full_name?.split(' ')[0] || 'Hey';
   const avatarLetter = firstName[0]?.toUpperCase() || '?';
   document.getElementById('userAvatar').textContent = avatarLetter;
+  updateAvatarDisplay();
   document.getElementById('userNameDisplay').textContent =
     currentUser?.user_metadata?.full_name || currentUser?.email || '';
 
@@ -1770,6 +1801,7 @@ function buildDashboard() {
     cont.appendChild(sec);
   });
   updateMobileCurrentCard();
+  loadGroupProgress();
 }
 
 function openDay(day) {
@@ -1805,6 +1837,28 @@ function openDay(day) {
     btn.disabled = true;
   }
   goTo('screen-day');
+  // Add copy buttons to all prompt boxes
+  setTimeout(() => {
+    document.querySelectorAll('#dayBodyContent .prompt-box').forEach(box => {
+      if (box.querySelector('.copy-btn')) return; // already has one
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Kopieren';
+      btn.onclick = () => {
+        // Get text content without the label span and button
+        const label = box.querySelector('.label');
+        const clone = box.cloneNode(true);
+        clone.querySelectorAll('.label, .copy-btn').forEach(el => el.remove());
+        const text = clone.innerText || clone.textContent;
+        navigator.clipboard.writeText(text.trim()).then(() => {
+          btn.textContent = '✓ Kopiert!';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+        });
+      };
+      box.appendChild(btn);
+    });
+  }, 100);
 }
 
 async function completeDay(num) {
@@ -1855,6 +1909,51 @@ setInterval(() => {
 // ════════════════════════════════════════════════════════
 // INIT – AUTH STATE LISTENER
 
+
+
+// ════════════════════════════════════════════════════════
+// GROUP PROGRESS
+// ════════════════════════════════════════════════════════
+async function loadGroupProgress() {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // Count total distinct users in progress table
+    const { data: allUsers, error: e1 } = await db
+      .from('progress')
+      .select('user_id');
+    if (e1) throw e1;
+
+    const uniqueUsers = new Set(allUsers.map(r => r.user_id));
+    const totalUsers = uniqueUsers.size;
+
+    // Count users who completed at least one day today
+    const { data: todayData, error: e2 } = await db
+      .from('progress')
+      .select('user_id')
+      .gte('completed_at', today + 'T00:00:00.000Z')
+      .lte('completed_at', today + 'T23:59:59.999Z');
+    if (e2) throw e2;
+
+    const todayUsers = new Set(todayData.map(r => r.user_id)).size;
+    const pct = totalUsers > 0 ? Math.round(todayUsers / totalUsers * 100) : 0;
+
+    // Update UI
+    document.getElementById('statParticipants').textContent = totalUsers;
+
+    const wrap = document.getElementById('groupProgressWrap');
+    wrap.style.display = 'block';
+    document.getElementById('groupProgressPct').textContent = pct + '%';
+    document.getElementById('groupProgressSub').textContent =
+      `${todayUsers} von ${totalUsers} Teilnehmenden aktiv heute`;
+    setTimeout(() => {
+      document.getElementById('groupProgressBar').style.width = pct + '%';
+    }, 200);
+
+  } catch(e) {
+    console.error('Group progress error:', e);
+  }
+}
 
 // ════════════════════════════════════════════════════════
 // MOBILE NAVIGATION
@@ -2025,12 +2124,18 @@ function openProfile() {
   showProfileSheet(userName, done, pct);
 }
 
-function showProfileSheet(name, done, pct) {
+async function showProfileSheet(name, done, pct) {
   const existing = document.getElementById('profileSheet');
   if (existing) existing.remove();
 
   const interests = ['Neues Lernen', 'Produktivität', 'Marketing', 'Programmierung', 'Design', 'Finanzen', 'Gesundheit', 'Führung', 'Vertrieb', 'KI & Automatisierung'];
-  const saved = JSON.parse(localStorage.getItem('profile_data') || '{}');
+
+  // Load from Supabase first, fall back to localStorage
+  const remote = await loadProfileData();
+  const local  = JSON.parse(localStorage.getItem('profile_data') || '{}');
+  const saved  = { ...local, ...remote, interests: remote.interests || local.interests || [] };
+  // Also sync back to localStorage
+  localStorage.setItem('profile_data', JSON.stringify(saved));
 
   const sheet = document.createElement('div');
   sheet.id = 'profileSheet';
@@ -2044,7 +2149,10 @@ function showProfileSheet(name, done, pct) {
       </div>
 
       <div style="text-align:center;margin-bottom:1.5rem;">
-        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;margin:0 auto .6rem;">${name[0]?.toUpperCase()}</div>
+        <div id="avatarPreview" onclick="openAvatarPicker()" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin:0 auto .6rem;cursor:pointer;border:2px solid transparent;transition:border-color .2s;position:relative;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'">
+          ${(()=>{ const av=JSON.parse(localStorage.getItem('user_avatar')||'null'); return av?.type==='icon'?av.value:(av?.type==='image'?'':name[0]?.toUpperCase()); })()}
+          <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;border:1px solid var(--border);">✏️</div>
+        </div>
         <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text);">${name}</div>
         <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem;">${done} von 28 Tagen · ${pct}%</div>
       </div>
@@ -2124,24 +2232,163 @@ function toggleInterest(btn, interest) {
   localStorage.setItem('profile_data', JSON.stringify(saved));
 }
 
+// ─── PROFILE LOAD FROM SUPABASE ─────────────────────────────────────
+async function loadProfileData() {
+  if (!currentUser) return {};
+  try {
+    const { data, error } = await db
+      .from('profiles')
+      .select('*')
+      .eq('id', currentUser.id)
+      .single();
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+    return data || {};
+  } catch(e) {
+    console.error('loadProfileData error:', e);
+    return {};
+  }
+}
+
+// ─── AVATAR PICKER ───────────────────────────────────────────────────
+const AVATAR_ICONS = ['🧑','👩','👨','🧑‍💻','👩‍💻','👨‍💼','🧑‍🎓','🚀','🤖','🦊','🐼','🌟','⚡','🎯','💡','🔥'];
+
+function openAvatarPicker(currentAvatar) {
+  const existing = document.getElementById('avatarPicker');
+  if (existing) existing.remove();
+
+  const picker = document.createElement('div');
+  picker.id = 'avatarPicker';
+  picker.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  picker.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.5rem;width:100%;max-width:400px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;margin:0;">Profilbild wählen</h3>
+        <button onclick="document.getElementById('avatarPicker').remove()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">×</button>
+      </div>
+
+      <p style="font-size:.78rem;color:var(--muted);margin:0 0 1rem;">Icon wählen:</p>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;margin-bottom:1.25rem;">
+        ${AVATAR_ICONS.map(icon => `
+          <button onclick="selectAvatarIcon('${icon}')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:1.4rem;padding:.4rem;cursor:pointer;transition:border-color .15s;aspect-ratio:1;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">${icon}</button>
+        `).join('')}
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem;">
+        <p style="font-size:.78rem;color:var(--muted);margin:0 0 .75rem;">Oder Bild hochladen / aufnehmen:</p>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          <label style="flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem;cursor:pointer;font-size:.82rem;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;text-align:center;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">
+            📁 Hochladen
+            <input type="file" accept="image/*" onchange="handleAvatarUpload(event)" style="display:none;">
+          </label>
+          <label style="flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem;cursor:pointer;font-size:.82rem;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;text-align:center;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(255,255,255,.07)'">
+            📷 Aufnehmen
+            <input type="file" accept="image/*" capture="user" onchange="handleAvatarUpload(event)" style="display:none;">
+          </label>
+        </div>
+      </div>
+    </div>`;
+  picker.addEventListener('click', e => { if (e.target === picker) picker.remove(); });
+  document.body.appendChild(picker);
+}
+
+function selectAvatarIcon(icon) {
+  localStorage.setItem('user_avatar', JSON.stringify({ type: 'icon', value: icon }));
+  updateAvatarDisplay();
+  document.getElementById('avatarPicker')?.remove();
+  // Refresh profile sheet avatar preview
+  const prev = document.getElementById('avatarPreview');
+  if (prev) { prev.textContent = icon; prev.style.fontSize = '1.6rem'; prev.style.background = 'var(--surface2)'; }
+  showToast('Profilbild gespeichert ✓', 'success');
+}
+
+function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    localStorage.setItem('user_avatar', JSON.stringify({ type: 'image', value: dataUrl }));
+    updateAvatarDisplay();
+    document.getElementById('avatarPicker')?.remove();
+    const prev = document.getElementById('avatarPreview');
+    if (prev) {
+      prev.style.backgroundImage = `url(${dataUrl})`;
+      prev.style.backgroundSize = 'cover';
+      prev.style.backgroundPosition = 'center';
+      prev.textContent = '';
+    }
+    showToast('Profilbild gespeichert ✓', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateAvatarDisplay() {
+  const stored = JSON.parse(localStorage.getItem('user_avatar') || 'null');
+  const avatarEl = document.getElementById('userAvatar');
+  if (!avatarEl) return;
+
+  if (stored?.type === 'icon') {
+    avatarEl.textContent = stored.value;
+    avatarEl.style.backgroundImage = '';
+    avatarEl.style.fontSize = '1rem';
+  } else if (stored?.type === 'image') {
+    avatarEl.textContent = '';
+    avatarEl.style.backgroundImage = `url(${stored.value})`;
+    avatarEl.style.backgroundSize = 'cover';
+    avatarEl.style.backgroundPosition = 'center';
+  } else {
+    // Default: first letter of name
+    const name = currentUser?.user_metadata?.full_name || currentUser?.email || '?';
+    avatarEl.textContent = name[0].toUpperCase();
+    avatarEl.style.backgroundImage = '';
+    avatarEl.style.fontSize = '.75rem';
+  }
+}
+
+// ─── SAVE PROFILE TO SUPABASE ────────────────────────────────────────
 async function saveProfile() {
   const msg = document.getElementById('prof-msg');
-  const age = document.getElementById('prof-age').value;
-  const city = document.getElementById('prof-city')?.value || '';
-  const company = document.getElementById('prof-company').value;
-  const industry = document.getElementById('prof-industry').value;
-  const newPass = document.getElementById('prof-newpass').value;
-  const newEmail = document.getElementById('prof-newemail').value;
+  const age = document.getElementById('prof-age')?.value || null;
+  const city = document.getElementById('prof-city')?.value || null;
+  const company = document.getElementById('prof-company')?.value || null;
+  const industry = document.getElementById('prof-industry')?.value || null;
+  const newPass = document.getElementById('prof-newpass')?.value || '';
+  const newEmail = document.getElementById('prof-newemail')?.value || '';
 
-  // Save local profile data
+  // Collect selected interests
   const saved = JSON.parse(localStorage.getItem('profile_data') || '{}');
-  saved.age = age; saved.city = city; saved.company = company; saved.industry = industry;
-  localStorage.setItem('profile_data', JSON.stringify(saved));
+  const interests = saved.interests || [];
 
-  // Update password if provided
+  // Show loading state
+  msg.style.display = 'block';
+  msg.style.background = 'rgba(94,234,212,.08)';
+  msg.style.border = '1px solid rgba(94,234,212,.2)';
+  msg.style.color = 'var(--accent)';
+  msg.textContent = 'Wird gespeichert…';
+
+  // ── Save to Supabase profiles table ──
+  const { error: profileError } = await db.from('profiles').upsert({
+    id:          currentUser.id,
+    full_name:   currentUser.user_metadata?.full_name || null,
+    age:         age ? parseInt(age) : null,
+    city:        city || null,
+    company:     company || null,
+    industry:    industry || null,
+    interests:   interests,
+    updated_at:  new Date().toISOString()
+  }, { onConflict: 'id' });
+
+  if (profileError) {
+    msg.style.background = 'rgba(248,113,113,.1)';
+    msg.style.border = '1px solid rgba(248,113,113,.25)';
+    msg.style.color = 'var(--error)';
+    msg.textContent = 'Fehler: ' + profileError.message;
+    return;
+  }
+
+  // ── Update password if provided ──
   if (newPass) {
     if (newPass.length < 8) {
-      msg.style.display = 'block';
       msg.style.background = 'rgba(248,113,113,.1)';
       msg.style.border = '1px solid rgba(248,113,113,.25)';
       msg.style.color = 'var(--error)';
@@ -2150,7 +2397,6 @@ async function saveProfile() {
     }
     const { error } = await db.auth.updateUser({ password: newPass });
     if (error) {
-      msg.style.display = 'block';
       msg.style.background = 'rgba(248,113,113,.1)';
       msg.style.border = '1px solid rgba(248,113,113,.25)';
       msg.style.color = 'var(--error)';
@@ -2159,11 +2405,10 @@ async function saveProfile() {
     }
   }
 
-  // Update email if provided
+  // ── Update email if provided ──
   if (newEmail) {
     const { error } = await db.auth.updateUser({ email: newEmail });
     if (error) {
-      msg.style.display = 'block';
       msg.style.background = 'rgba(248,113,113,.1)';
       msg.style.border = '1px solid rgba(248,113,113,.25)';
       msg.style.color = 'var(--error)';
@@ -2172,12 +2417,14 @@ async function saveProfile() {
     }
   }
 
-  msg.style.display = 'block';
+  // Also keep local copy for interests (not stored in Supabase as easily queryable)
+  saved.age = age; saved.city = city; saved.company = company; saved.industry = industry;
+  localStorage.setItem('profile_data', JSON.stringify(saved));
+
   msg.style.background = 'rgba(34,197,94,.1)';
   msg.style.border = '1px solid rgba(34,197,94,.25)';
   msg.style.color = 'var(--done)';
-  msg.textContent = '✅ Gespeichert!';
-  setTimeout(() => { if (newEmail) msg.textContent = '✅ Gespeichert! Bitte bestätige deine neue E-Mail.'; }, 500);
+  msg.textContent = newEmail ? '✅ Gespeichert! Bitte bestätige deine neue E-Mail.' : '✅ In Supabase gespeichert!';
 }
 
 // Close modals on backdrop click
