@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28-Tage KI-Challenge</title>
+
+<!-- Supabase JS SDK (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ─── RESET & TOKENS ─────────────────────────────── */
+  :root{
+    --bg:#0c0f1a; --surface:#141828; --surface2:#1c2235;
+    --border:rgba(255,255,255,0.07); --accent:#5eead4; --accent2:#818cf8;
+    --text:#e2e8f0; --muted:#64748b; --done:#22c55e; --locked:#1a2030;
+    --warn:#fb923c; --error:#f87171;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(94,234,212,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+  /* ─── SCREENS ─────────────────────────────────────── */
+  .screen{display:none;position:relative;z-index:1;}
+  .screen.active{display:block;}
+  #screen-auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+  #screen-auth.active{display:flex;}
+  #screen-dashboard.active{display:flex;flex-direction:column;min-height:100vh;}
+  #screen-day.active{display:flex;flex-direction:column;min-height:100vh;}
+  #screen-success{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;}
+  #screen-success.active{display:flex;}
+
+  /* ─── AUTH CARD ───────────────────────────────────── */
+  .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem;width:100%;max-width:440px;box-shadow:0 0 80px rgba(94,234,212,.05);animation:fadeUp .5s ease;}
+  .auth-badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:800;font-size:.7rem;letter-spacing:.15em;padding:.35rem .9rem;border-radius:100px;margin-bottom:1.5rem;text-transform:uppercase;}
+  .auth-card h1{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;line-height:1.1;margin-bottom:.5rem;}
+  .auth-card h1 span{color:var(--accent);}
+  .auth-card>.auth-sub{color:var(--muted);font-size:.92rem;margin-bottom:2rem;line-height:1.5;}
+
+  /* Tabs */
+  .auth-tabs{display:flex;gap:.5rem;background:var(--surface2);border-radius:10px;padding:.3rem;margin-bottom:1.75rem;}
+  .auth-tab{flex:1;background:none;border:none;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;padding:.55rem;border-radius:7px;cursor:pointer;transition:background .2s,color .2s;}
+  .auth-tab.active{background:var(--surface);color:var(--text);}
+
+  /* Forms */
+  .auth-form{display:none;}
+  .auth-form.active{display:block;}
+  .form-field{margin-bottom:1rem;}
+  .form-field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.4rem;letter-spacing:.06em;text-transform:uppercase;}
+  .form-field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;}
+  .form-field input:focus{border-color:var(--accent);}
+  .form-field input::placeholder{color:var(--muted);}
+
+  .btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;padding:.9rem;cursor:pointer;margin-top:.5rem;transition:opacity .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+  .btn-primary:hover:not(:disabled){opacity:.9;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+  .auth-msg{margin-top:1rem;padding:.75rem 1rem;border-radius:10px;font-size:.85rem;display:none;}
+  .auth-msg.error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);display:block;}
+  .auth-msg.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--done);display:block;}
+
+  .forgot-link{text-align:right;margin-top:.3rem;}
+  .forgot-link button{background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .2s;}
+  .forgot-link button:hover{color:var(--accent);}
+
+  .auth-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--muted);font-size:.8rem;}
+  .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* ─── TOPBAR ──────────────────────────────────────── */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10;}
+  .topbar-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+  .topbar-brand span{color:var(--accent);}
+  .topbar-right{display:flex;align-items:center;gap:1rem;}
+  .topbar-user{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:var(--muted);}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;color:#fff;flex-shrink:0;}
+  .btn-logout{background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:.35rem .75rem;cursor:pointer;transition:color .2s,border-color .2s;}
+  .btn-logout:hover{color:var(--error);border-color:var(--error);}
+
+  /* ─── DASHBOARD ───────────────────────────────────── */
+  .dashboard-content{flex:1;padding:2.5rem 2rem;max-width:960px;margin:0 auto;width:100%;}
+  .welcome-banner{background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(129,140,248,.08));border:1px solid rgba(94,234,212,.15);border-radius:20px;padding:2rem;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .welcome-banner h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.3rem;}
+  .welcome-banner p{color:var(--muted);font-size:.9rem;}
+  .progress-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex-shrink:0;}
+  .progress-ring-wrap svg{transform:rotate(-90deg);}
+  .progress-ring-wrap circle{fill:none;stroke-width:5;stroke-linecap:round;}
+  .ring-bg{stroke:var(--surface2);}
+  .ring-fill{stroke:var(--accent);stroke-dasharray:126;stroke-dashoffset:126;transition:stroke-dashoffset 1s ease;}
+  .ring-label{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:var(--accent);}
+  .streak-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem 1.4rem;flex:1;min-width:110px;}
+  .stat-card .val{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent);line-height:1;}
+  .stat-card .lbl{font-size:.75rem;color:var(--muted);margin-top:.25rem;}
+  .week-section{margin-bottom:2rem;}
+  .week-label{display:flex;align-items:center;gap:.75rem;font-family:'Syne',sans-serif;font-size:.72rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.75rem;}
+  .week-label::after{content:'';flex:1;height:1px;background:var(--border);}
+  .week-label em{color:var(--accent2);font-style:normal;}
+  .day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.6rem;}
+  .day-chip{border-radius:14px;padding:.85rem .9rem;display:flex;flex-direction:column;gap:.3rem;cursor:pointer;border:1px solid transparent;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;}
+  .day-chip:hover{transform:translateY(-2px);}
+  .day-chip .d-num{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;opacity:.5;letter-spacing:.08em;}
+  .day-chip .d-title{font-size:.78rem;font-weight:500;line-height:1.3;}
+  .day-chip.done{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.25);color:var(--done);}
+  .day-chip.done::after{content:'✓';position:absolute;top:7px;right:9px;font-size:.65rem;color:var(--done);}
+  .day-chip.active-day{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(129,140,248,.12));border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(94,234,212,.15);}
+  .day-chip.active-day .d-num{opacity:.8;}
+  .day-chip.locked{background:var(--locked);border-color:rgba(255,255,255,.04);color:var(--muted);}
+
+  /* ─── DAY CONTENT ─────────────────────────────────── */
+  .day-header{padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;}
+  .back-btn:hover{color:var(--text);border-color:var(--accent);}
+  .day-header-meta .week-hint{font-size:.72rem;color:var(--accent2);letter-spacing:.08em;}
+  .day-header-meta .day-title-h{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+  .day-body{flex:1;padding:2.5rem 2rem;max-width:720px;margin:0 auto;width:100%;}
+  .day-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.2);color:var(--accent);font-size:.75rem;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.1em;padding:.35rem .8rem;border-radius:100px;margin-bottom:1.2rem;text-transform:uppercase;}
+  .day-body h1{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1.15;margin-bottom:.5rem;}
+  .day-body h1 span{color:var(--accent);}
+  .day-intro{color:var(--muted);font-size:1rem;line-height:1.65;margin-bottom:2rem;}
+  .content-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.2rem;}
+  .content-card h3{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.9rem;text-transform:uppercase;}
+  .content-card p{color:#94a3b8;line-height:1.75;font-size:.95rem;}
+  .content-card p+p{margin-top:.8rem;}
+  .highlight-box{background:linear-gradient(135deg,rgba(94,234,212,.07),rgba(129,140,248,.07));border:1px solid rgba(94,234,212,.18);border-radius:12px;padding:1.2rem 1.4rem;margin:1rem 0;font-size:.95rem;color:var(--text);line-height:1.65;}
+  .highlight-box strong{color:var(--accent);font-family:'Syne',sans-serif;display:block;margin-bottom:.3rem;font-size:.85rem;letter-spacing:.05em;}
+  .prompt-box{background:#080b14;border:1px solid rgba(129,140,248,.25);border-left:3px solid var(--accent2);border-radius:10px;padding:1.2rem 1.4rem;margin:1rem 0;font-family:'Courier New',monospace;font-size:.88rem;color:#c4b5fd;line-height:1.65;}
+  .prompt-box .label{font-family:'Syne',sans-serif;font-size:.68rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.6rem;display:block;}
+  .task-list{list-style:none;}
+  .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.7rem 0;border-bottom:1px solid var(--border);font-size:.92rem;color:var(--text);line-height:1.5;}
+  .task-list li:last-child{border-bottom:none;}
+  .task-icon{color:var(--accent);flex-shrink:0;font-size:.9rem;}
+  .reflection-box{background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2);border-radius:12px;padding:1.2rem 1.4rem;margin-top:.8rem;}
+  .reflection-box p{color:#94a3b8;font-size:.9rem;line-height:1.7;font-style:italic;}
+  .complete-section{margin-top:2rem;background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(94,234,212,.06));border:1px solid rgba(34,197,94,.15);border-radius:16px;padding:1.75rem;text-align:center;}
+  .complete-section p{color:var(--muted);font-size:.88rem;margin-bottom:1.2rem;}
+  .btn-complete{background:linear-gradient(135deg,var(--done),#16a34a);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;padding:1rem 2.5rem;cursor:pointer;transition:opacity .2s,transform .1s;display:inline-flex;align-items:center;gap:.5rem;}
+  .btn-complete:hover:not(.completed):not(:disabled){opacity:.9;transform:translateY(-2px);}
+  .btn-complete.completed{background:var(--surface2);color:var(--done);border:1px solid rgba(34,197,94,.3);cursor:default;}
+  .btn-complete:disabled{opacity:.6;cursor:wait;}
+  .content-divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
+  .preview-notice{background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);border-radius:10px;padding:.8rem 1.1rem;font-size:.82rem;color:var(--warn);margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;}
+
+  /* ─── SUCCESS ─────────────────────────────────────── */
+  .success-card{max-width:460px;}
+  .success-emoji{font-size:4rem;margin-bottom:1rem;animation:pop .4s cubic-bezier(.34,1.56,.64,1);display:block;}
+  .success-card h1{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:.75rem;}
+  .success-card h1 span{color:var(--accent);}
+  .success-card>p{color:var(--muted);margin-bottom:2rem;line-height:1.65;}
+  .next-info{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-bottom:1.5rem;}
+  .next-info strong{color:var(--accent);display:block;margin-bottom:.3rem;font-family:'Syne',sans-serif;font-size:.85rem;}
+  .next-info .next-day-title{color:var(--text);font-size:.95rem;}
+  .next-info .cd{margin-top:.5rem;font-size:1rem;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;}
+  .btn-back-dash{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;border-radius:12px;padding:.85rem 2rem;cursor:pointer;transition:border-color .2s;}
+  .btn-back-dash:hover{border-color:var(--accent);}
+
+  /* ─── LOADING OVERLAY ─────────────────────────────── */
+  #loadingOverlay{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;}
+  #loadingOverlay .spinner{width:36px;height:36px;border:3px solid var(--surface2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+  #loadingOverlay p{color:var(--muted);font-size:.9rem;}
+  #loadingOverlay.hidden{display:none;}
+
+  /* ─── TOAST ───────────────────────────────────────── */
+  #toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.75rem 1.4rem;font-size:.88rem;color:var(--text);z-index:200;transition:transform .3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4);}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #toast.toast-success{border-color:rgba(34,197,94,.3);color:var(--done);}
+  #toast.toast-error{border-color:rgba(248,113,113,.3);color:var(--error);}
+
+  /* ─── ANIMATIONS ──────────────────────────────────── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes pop{from{transform:scale(0);}to{transform:scale(1);}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .fade-in{animation:fadeUp .4s ease;}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Wird geladen…</p>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- AUTH SCREEN                                     -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="screen-auth" class="screen">
+  <div class="auth-card">
+    <div class="auth-badge">28-Tage KI-Challenge</div>
+    <h1>Willkommen<br><span>zur Challenge.</span></h1>
+    <p class="auth-sub">Melde dich an oder erstelle einen kostenlosen Account, um deinen Fortschritt zu speichern.</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
+      <button class="auth-tab" onclick="switchTab('register')">Registrieren</button>
+      <button class="auth-tab" onclick="switchTab('reset')">Passwort vergessen</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="auth-form active" id="form-login">
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="login-email" placeholder="deine@email.de" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label>Passwort</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()" id="btn-login">
+        <span>Einloggen →</span>
+      </button>
+      <div class="auth-msg" id="login-msg"></div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="auth-form" id="form-register">
+      <div class="form-field">
+        <label>Dein Name</label>
+        <input type="text" id="reg-name" placeholder="Anna Beispiel" autocomplete="name">
+      </div>
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="reg-email" placeholder="deine@email.de" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label>Passwort <span style="color:var(--muted);font-size:.75rem">(min. 8 Zeichen)</span></label>
+        <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" onclick="handleRegister()" id="btn-register">
+        <span>Kostenlosen Account erstellen →</span>
+      </button>
+      <div class="auth-msg" id="register-msg"></div>
+    </div>
+
+    <!-- RESET FORM -->
+    <div class="auth-form" id="form-reset">
+      <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;line-height:1.6">Gib deine E-Mail ein. Du bekommst einen Link, um dein Passwort zurückzusetzen.</p>
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="reset-email" placeholder="deine@email.de" autocomplete="email">
+      </div>
+      <button class="btn-primary" onclick="handleReset()" id="btn-reset">
+        <span>Reset-Link senden →</span>
+      </button>
+      <div class="auth-msg" id="reset-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DASHBOARD SCREEN                               -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen">
+  <div class="topbar">
+    <div class="topbar-brand">KI<span>Challenge</span></div>
+    <div class="topbar-right">
+      <div class="topbar-user">
+        <div class="avatar" id="userAvatar">?</div>
+        <span id="userNameDisplay"></span>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()">Abmelden</button>
+    </div>
+  </div>
+  <div class="dashboard-content fade-in">
+    <div class="welcome-banner">
+      <div>
+        <h2 id="welcomeHeadline">Hey, los geht's! 🚀</h2>
+        <p id="welcomeSub">Deine 28-Tage-KI-Challenge. Tag 1 wartet auf dich.</p>
+      </div>
+      <div class="progress-ring-wrap">
+        <svg width="60" height="60" viewBox="0 0 44 44">
+          <circle class="ring-bg" cx="22" cy="22" r="20"/>
+          <circle class="ring-fill" cx="22" cy="22" r="20" id="ringFill"/>
+        </svg>
+        <div class="ring-label" id="ringPercent">0%</div>
+      </div>
+    </div>
+    <div class="streak-row">
+      <div class="stat-card"><div class="val" id="statDone">0</div><div class="lbl">Abgeschlossen</div></div>
+      <div class="stat-card"><div class="val" id="statStreak">0🔥</div><div class="lbl">Streak</div></div>
+      <div class="stat-card"><div class="val" id="statLeft">28</div><div class="lbl">Verbleibend</div></div>
+    </div>
+    <div id="weekSections"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DAY CONTENT SCREEN                             -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="screen-day" class="screen">
+  <div class="day-header">
+    <button class="back-btn" onclick="goTo('screen-dashboard')">← Zurück</button>
+    <div class="day-header-meta">
+      <div class="week-hint" id="weekHint"></div>
+      <div class="day-title-h" id="dayTitleH"></div>
+    </div>
+  </div>
+  <div class="day-body fade-in" id="dayBodyContent"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- SUCCESS SCREEN                                 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="screen-success" class="screen">
+  <div class="success-card fade-in">
+    <span class="success-emoji">🎉</span>
+    <h1>Tag <span id="successDayNum">1</span> geschafft!</h1>
+    <p id="successMsg"></p>
+    <div class="next-info">
+      <strong id="nextLabel"></strong>
+      <div class="next-day-title" id="nextTitle"></div>
+      <div class="cd" id="countdown">23:59:59</div>
+    </div>
+    <button class="btn-back-dash" onclick="goTo('screen-dashboard')">← Zurück zum Dashboard</button>
+  </div>
+</div>
+
+<script>
+const DAY_CONTENT = {
+
+// ════════════════════════════════════════
+// WOCHE 1: CHATGPT ALS SMARTER ASSISTENT
+// ════════════════════════════════════════
+
+1:`<div class="day-tag">📅 TAG 1 VON 28 · WOCHE 1</div>
+<h1>Der <span>Rollen-Trick</span></h1>
+<p class="day-intro">Warum ChatGPT manchmal enttäuscht – und wie eine einzige Zeile am Anfang deines Prompts alles verändert.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>ChatGPT reagiert auf Anweisungen. Das Problem: Die meisten Menschen geben ihm gar keine Rolle. Sie schreiben einfach drauf los – und bekommen generische Antworten zurück. Der Rollen-Trick löst das: Du weist der KI eine klare Expertenpersönlichkeit zu, und sie antwortet spezifischer, tiefer, nützlicher.</p></div>
+<div class="content-card"><h3>💡 Das Prinzip erklärt</h3>
+<p>Stell dir vor, du fragst auf der Straße einen Passanten: „Wie soll ich mein Geld anlegen?" Vage Antwort. Jetzt fragst du einen erfahrenen Finanzberater – ganz anderes Ergebnis. Genau das tut der Rollen-Trick.</p>
+<div class="highlight-box"><strong>Das Grundprinzip</strong>Beginne jeden Prompt mit: „Du bist Expert:in für [Themenfeld] mit [X] Jahren Erfahrung. Deine Stärke liegt besonders in [Spezialisierung]." – alles danach wird durch diese Linse beantwortet.</div></div>
+<div class="content-card"><h3>📝 Ohne vs. Mit Rollen-Trick</h3>
+<div class="prompt-box"><span class="label">❌ OHNE ROLLE – generisch</span>„Wie schreibe ich eine gute E-Mail an einen Kunden?"</div>
+<p style="color:var(--muted);font-size:.88rem;margin:.4rem 0 1rem">→ Allgemeine Tipps. Nutzbar, aber nicht besonders.</p>
+<div class="prompt-box"><span class="label">✅ MIT ROLLE – präzise</span>Du bist Expert:in für B2B-Unternehmenskommunikation mit 12 Jahren Erfahrung. Deine Stärke liegt in empathischer, ergebnisorientierter Kundenkommunikation.<br><br>Schreibe mir eine herzliche Folge-E-Mail an einen Interessenten, der sich letzte Woche unser Demo angeschaut hat und seitdem schweigt.</div></div>
+<div class="content-card"><h3>🔧 Vorlage zum Kopieren</h3>
+<div class="prompt-box"><span class="label">DEIN STARTER-PROMPT</span>Du bist Expert:in für [Themenfeld] mit [X] Jahren Erfahrung. Deine Stärke liegt besonders in [Spezialisierung].<br><br>Aufgabe: [Was du brauchst]<br>Ziel: [Was das Ergebnis bewirken soll]<br>Format: [Aufzählung / E-Mail / Fließtext / …]</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Öffne ChatGPT, Claude oder ein KI-Tool deiner Wahl.</li>
+<li><span class="task-icon">2.</span>Denk an eine echte Aufgabe aus deinem Alltag.</li>
+<li><span class="task-icon">3.</span>Formuliere den Prompt <strong>einmal ohne Rolle</strong> – notiere die Antwort.</li>
+<li><span class="task-icon">4.</span>Formuliere denselben Prompt <strong>mit der Expertenrollen-Formel</strong> – vergleiche das Ergebnis.</li>
+<li><span class="task-icon">5.</span>Teile dein Lieblingsergebnis in der Community!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„In welchen 3 Situationen meines Berufsalltags könnte ich ab sofort automatisch eine Expertenrolle vergeben – und was würde das für meine Ergebnisse bedeuten?"</p></div></div>
+<div class="complete-section"><p>Hast du beide Prompt-Versionen verglichen und den Unterschied gespürt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(1)">✓ Tag 1 abschließen</button></div>`,
+
+2:`<div class="day-tag">📅 TAG 2 VON 28 · WOCHE 1</div>
+<h1>Die <span>Zusammenfassungs-Maschine</span></h1>
+<p class="day-intro">Lange Artikel, Protokolle, Reports – in 3 Bulletpoints auf den Punkt. So sparst du täglich bis zu 30 Minuten.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Information kommt heute in Massen. E-Mails, Artikel, Meeting-Protokolle, PDFs – du kannst nicht alles lesen. Die KI kann. Mit der richtigen Prompt-Struktur destillierst du jeden Text auf das Wesentliche: Kernaussagen, Handlungsfelder, offene Fragen.</p></div>
+<div class="content-card"><h3>💡 Die 3-Bulletpoint-Formel</h3>
+<p>Das Geheimnis liegt nicht nur im „Fasse zusammen", sondern in der <strong>Struktur der Ausgabe</strong>. Wenn du sagst, was du willst – und der KI eine Expertenrolle gibst – bekommst du es auch.</p>
+<div class="highlight-box"><strong>Die Formel</strong>Beginne mit der Expertenrolle, dann: „Fasse zusammen, strukturiere so: 1) 3 wichtigste Aussagen, 2) Eine Handlungsempfehlung, 3) Offene Fragen."</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">FÜR LANGE ARTIKEL</span>Du bist Expert:in für Wissensmanagement und Executive Summaries mit 10 Jahren Erfahrung. Deine Stärke liegt darin, komplexe Inhalte präzise auf das Wesentliche zu reduzieren.<br><br>Fasse diesen Artikel in maximal 5 Sätzen zusammen. Betone die praktischen Erkenntnisse, nicht die Theorie. Text: [Text einfügen]</div>
+<div class="prompt-box"><span class="label">FÜR MEETING-PROTOKOLLE</span>Du bist Expert:in für Projektmanagement und Teamkommunikation. Deine Stärke liegt in der strukturierten Aufbereitung von Besprechungsergebnissen.<br><br>Extrahiere aus diesem Protokoll: (1) Getroffene Entscheidungen, (2) Aufgaben mit Verantwortlichen, (3) Nächste Schritte mit Deadline. Protokoll: [Text]</div>
+<div class="prompt-box"><span class="label">FÜR E-MAIL-THREADS</span>Du bist Expert:in für Geschäftskommunikation und Priorisierung. Lies diesen E-Mail-Thread und beantworte: Was ist das Kernproblem? Was wurde entschieden? Was muss ich als nächstes tun? Thread: [Text]</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Suche einen langen Artikel oder ein Dokument aus deinem Alltag.</li>
+<li><span class="task-icon">2.</span>Nutze die Zusammenfassungs-Vorlage mit der Expertenrolle.</li>
+<li><span class="task-icon">3.</span>Vergleiche: Wie lange hättest du gebraucht, das selbst zu lesen?</li>
+<li><span class="task-icon">4.</span>Teste die Meeting-Protokoll-Vorlage mit einem echten Protokoll.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche regelmäßigen Dokumente in meinem Beruf könnte ich ab sofort zuerst durch die Zusammenfassungs-Maschine schicken – bevor ich sie selbst lese?"</p></div></div>
+<div class="complete-section"><p>Hast du mindestens einen Text erfolgreich zusammengefasst?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(2)">✓ Tag 2 abschließen</button></div>`,
+
+3:`<div class="day-tag">📅 TAG 3 VON 28 · WOCHE 1</div>
+<h1>Bessere <span>E-Mails schreiben</span></h1>
+<p class="day-intro">Von „streng" zu „herzlich", von „zu lang" zu „auf den Punkt" – die KI als dein persönlicher Kommunikationscoach.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>E-Mails sind das meistgenutzte Kommunikationsmittel im Beruf – und gleichzeitig das, worüber die meisten am meisten nachdenken. Den richtigen Ton treffen, nicht zu lang werden, professionell aber nicht kalt klingen. Die KI kann das für dich in Sekunden.</p></div>
+<div class="content-card"><h3>💡 Tonalität als Superkraft</h3>
+<p>Der stärkste Hebel: Die <strong>Tonalitäts-Anweisung</strong> kombiniert mit der Expertenrolle. Du beschreibst dein Anliegen – die KI passt Ton und Form präzise an deine Situation an.</p>
+<div class="highlight-box"><strong>Verfügbare Tonalitäten</strong>Formell-professionell · Herzlich-persönlich · Direkt-knapp · Diplomatisch-weich · Motivierend · Sachlich-neutral · Entschuldigend-empathisch</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">TONALITÄT ANPASSEN</span>Du bist Expert:in für professionelle Geschäftskommunikation mit Fokus auf Tonalität und Wirkung. Deine Stärke liegt darin, Botschaften präzise auf die Beziehung zwischen Sender und Empfänger abzustimmen.<br><br>Hier ist meine E-Mail: [Rohversion]. Schreibe sie in einem [herzlichen / professionellen / direkten] Ton um. Empfänger: [Beschreibung].</div>
+<div class="prompt-box"><span class="label">E-MAIL VON GRUND AUF</span>Du bist Expert:in für B2B-Kommunikation und überzeugende Korrespondenz. Schreibe eine E-Mail mit folgendem Anliegen: [Anliegen]. Tonalität: [Ton]. Empfänger: [wer]. Ziel: [was soll passieren]. Maximal [X] Sätze.</div>
+<div class="prompt-box"><span class="label">SCHWIERIGE E-MAIL ENTSCHÄRFEN</span>Du bist Expert:in für konstruktive Kommunikation und Konfliktlösung. Schreibe diese E-Mail so um, dass sie lösungsorientiert klingt, ohne die Kernaussage zu verändern: [E-Mail einfügen]</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Nimm eine E-Mail, die du zuletzt geschrieben hast oder gerade schreiben musst.</li>
+<li><span class="task-icon">2.</span>Teste mindestens 2 verschiedene Töne mit der Vorlage.</li>
+<li><span class="task-icon">3.</span>Nutze die „Entschärfen"-Vorlage für eine knifflige Situation.</li>
+<li><span class="task-icon">4.</span>Speichere deinen liebsten Prompt für die Zukunft.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Gibt es eine bestimmte Art von E-Mail, die mir immer besonders viel Energie kostet – und wie würde ich der KI den richtigen Ton dafür beschreiben?"</p></div></div>
+<div class="complete-section"><p>Hast du mindestens eine E-Mail mit KI-Unterstützung überarbeitet?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(3)">✓ Tag 3 abschließen</button></div>`,
+
+4:`<div class="day-tag">📅 TAG 4 VON 28 · WOCHE 1</div>
+<h1><span>Brainstorming-Partner</span></h1>
+<p class="day-intro">10 Ideen für ein Projekt in 2 Minuten. Die KI als kreativer Sparringspartner – nicht als Antwortmaschine.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Brainstorming mit sich selbst hat Grenzen – du denkst in deinen gewohnten Mustern. Die KI denkt anders. Sie hat Zugang zu tausenden von Konzepten, Branchen und Ideen gleichzeitig. Richtig eingesetzt ist sie der kreativste Kollege, den du je hattest.</p></div>
+<div class="content-card"><h3>💡 Menge vor Qualität – die Iterationsformel</h3>
+<div class="highlight-box"><strong>3 Runden Brainstorming</strong>Runde 1: 15 Ideen generieren → Runde 2: Die 3 besten vertiefen → Runde 3: Elemente kombinieren und die stärkste Variante ausarbeiten.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">IDEEN GENERIEREN</span>Du bist Expert:in für kreative Strategie und Innovation mit 15 Jahren Erfahrung. Deine Stärke liegt darin, ungewöhnliche Verbindungen herzustellen und blinde Flecken aufzudecken.<br><br>Ich brauche kreative Ideen für [Thema]. Zielgruppe: [Beschreibung]. Ziel: [Ziel]. Gib mir 15 verschiedene Ansätze – von realistisch bis gewagt. Keine Selbstzensur.</div>
+<div class="prompt-box"><span class="label">IDEEN BEWERTEN</span>Du bist Expert:in für Business-Strategie und Umsetzbarkeitsanalyse. Bewerte diese 5 Ideen: [Liste]. Kriterien: (1) Umsetzbarkeit, (2) Originalität, (3) Relevanz für [Zielgruppe]. Empfehle, welche ich zuerst verfolgen sollte.</div>
+<div class="prompt-box"><span class="label">GEGEN DEN STROM</span>Du bist Expert:in für Querdenken und disruptive Innovation. Was würde ein Branchenfremder / ein Kind / ein direkter Wettbewerber an meinem Projekt [Beschreibung] komplett anders machen? Gib mir 5 unerwartete Perspektiven.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle ein aktuelles Projekt oder eine Herausforderung.</li>
+<li><span class="task-icon">2.</span>Nutze die 3-Runden-Iterationsformel.</li>
+<li><span class="task-icon">3.</span>Lass die KI deine Top-3-Ideen bewerten.</li>
+<li><span class="task-icon">4.</span>Fordere mindestens eine „gegen den Strom"-Perspektive an.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Wo in meiner Arbeit fehlt mir regelmäßig frischer Input – und wie könnte ich die KI als festen Brainstorming-Partner in meinen Prozess einbauen?"</p></div></div>
+<div class="complete-section"><p>Hast du eine vollständige Brainstorming-Session durchgeführt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(4)">✓ Tag 4 abschließen</button></div>`,
+
+5:`<div class="day-tag">📅 TAG 5 VON 28 · WOCHE 1</div>
+<h1>Die <span>"Erkläre wie 5"</span>-Methode</h1>
+<p class="day-intro">Komplexe Fachthemen sofort verstehen – und anderen erklären können. Der schnellste Weg zu echtem Verständnis.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Richard Feynman sagte: Wenn du etwas nicht einfach erklären kannst, hast du es nicht wirklich verstanden. Die Methode ist nicht nur zum Lernen – sie ist das mächtigste Werkzeug, um Wissen in Präsentationen, mit Kunden oder im Team zu vermitteln.</p></div>
+<div class="content-card"><h3>💡 Die Methode in drei Stufen</h3>
+<div class="highlight-box"><strong>Stufe 1: Vereinfachen</strong>Keine Fachbegriffe, nur das Wesentliche. Für jemanden ohne Vorwissen.</div>
+<div class="highlight-box"><strong>Stufe 2: Anpassen</strong>Für eine bestimmte Person oder Branche – mit relevanten Beispielen aus ihrem Alltag.</div>
+<div class="highlight-box"><strong>Stufe 3: Präsentieren</strong>Eine 2-Minuten-Version für eine konkrete Zielgruppe, mit Struktur und Merksatz.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">FACHBEGRIFF ENTSCHLÜSSELN</span>Du bist Expert:in für Wissenstransfer und Didaktik mit Erfahrung darin, komplexe Sachverhalte für unterschiedlichste Zielgruppen verständlich zu machen.<br><br>Erkläre mir [Begriff / Konzept] in einfachen Worten. Dann gib ein Alltagsbeispiel, das ich mir merken kann. Dann erkläre, warum das für [meinen Beruf] relevant ist.</div>
+<div class="prompt-box"><span class="label">FÜR KUNDEN ÜBERSETZEN</span>Du bist Expert:in für kundenzentrierte Kommunikation in der [Branche]-Branche. Deine Stärke liegt darin, Fachinhalte so zu vermitteln, dass Kunden ohne Fachkenntnisse sie sofort verstehen und den Nutzen erkennen.<br><br>Schreibe eine 3-satzige Erklärung von [Thema] für einen Kunden ohne technisches Vorwissen.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle ein Fachthema, das du immer schwer zu erklären findest.</li>
+<li><span class="task-icon">2.</span>Lass es dir in allen drei Stufen erklären.</li>
+<li><span class="task-icon">3.</span>Erstelle eine Version für einen Kunden ohne Fachkenntnisse.</li>
+<li><span class="task-icon">4.</span>Teste: Erkläre das Thema jemandem – nur mit dem, was du behalten hast.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welches Thema in meinem Berufsfeld wäre für Kunden oder Kollegen am wertvollsten zu verstehen – und wie würde eine 5-Jährigen-Erklärung davon klingen?"</p></div></div>
+<div class="complete-section"><p>Hast du die drei Stufen mit einem echten Fachthema durchgespielt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(5)">✓ Tag 5 abschließen</button></div>`,
+
+6:`<div class="day-tag">📅 TAG 6 VON 28 · WOCHE 1</div>
+<h1><span>Struktur-Tag:</span> Wochenagenda</h1>
+<p class="day-intro">Eine perfekte Agenda in 5 Minuten – nie wieder Meetings ohne klares Ziel. Die KI als Struktur-Experte.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Strukturierte Meetings sind das Fundament produktiver Teams. Eine gute Agenda definiert Ziele, Zeitfenster und Entscheidungspunkte – bevor das erste Wort gesprochen wird. Heute lernst du, wie du Agenden und Wochenpläne in Minuten mit KI erstellst.</p></div>
+<div class="content-card"><h3>💡 Das Agenda-Schema</h3>
+<div class="highlight-box"><strong>Das Fundament</strong>Ziel des Meetings → Teilnehmer & Rollen → Punkte mit Zeitfenstern → Entscheidungspunkte → Nächste Schritte. Klar beschrieben, liefert die KI genau das.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">MEETING-AGENDA</span>Du bist Expert:in für Meeting-Design und produktive Teamkommunikation. Deine Stärke liegt darin, Meetings so zu strukturieren, dass in kürzester Zeit echte Entscheidungen getroffen werden.<br><br>Erstelle eine Agenda für: Thema: [Thema]. Dauer: [X Min.]. Teilnehmer: [wer]. Ziel: [was soll erreicht sein]. Format: Zeitblöcke mit Verantwortlichen.</div>
+<div class="prompt-box"><span class="label">WOCHENPLANUNG</span>Du bist Expert:in für Produktivität und persönliches Zeitmanagement. Meine Aufgaben diese Woche: [Liste]. Deadlines: [Deadlines]. Prioritäten: [3 Dinge]. Erstelle einen strukturierten Wochenplan Mo–Fr mit realistischen Zeitblöcken.</div>
+<div class="prompt-box"><span class="label">RETROSPEKTIVE</span>Du bist Expert:in für agile Teamarbeit und konstruktive Retrospektiven. Erstelle eine 60-minütige Retro-Agenda: Was lief gut / was verbessern / konkrete Maßnahmen. Ton: lösungsorientiert, nicht anklagend.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erstelle die Agenda für dein nächstes echtes Meeting.</li>
+<li><span class="task-icon">2.</span>Nutze die Wochenplanungs-Vorlage für deine aktuelle Woche.</li>
+<li><span class="task-icon">3.</span>Vergleiche den KI-Plan mit deiner eigenen Planung.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche wiederkehrenden Meetings könnten von einer strukturierten Agenda profitieren – und was wäre das erste, das ich mit der KI vorbereiten würde?"</p></div></div>
+<div class="complete-section"><p>Hast du mindestens eine Agenda oder einen Wochenplan erstellt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(6)">✓ Tag 6 abschließen</button></div>`,
+
+7:`<div class="day-tag">📅 TAG 7 VON 28 · WOCHE 1</div>
+<h1><span>Reflexion:</span> Was hat Zeit gespart?</h1>
+<p class="day-intro">Woche 1 abgeschlossen. Heute keine neuen Tools – Rückblick, Auswertung und persönliche Erkenntnisse.</p>
+<div class="content-card"><h3>🧠 Warum Reflexion wichtig ist</h3>
+<p>Lernen ohne Reflexion ist wie fahren ohne Rückspiegel. Du weißt, wo du bist – aber nicht, was du als nächstes tun solltest. Die KI kann auch bei der Reflexion helfen: als strukturierter Gesprächspartner, der deine Erkenntnisse sortiert.</p></div>
+<div class="content-card"><h3>💡 KI als Reflexionspartner</h3>
+<div class="highlight-box"><strong>Die Wochenrückblick-Methode</strong>Beschreibe der KI deine 5 Tage: Was hast du ausprobiert? Was hat gut funktioniert? Was war enttäuschend? Sie hilft dir, Muster zu erkennen und nächste Schritte zu formulieren.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">WOCHENRÜCKBLICK</span>Du bist Expert:in für persönliche Produktivität und Lernprozesse. Deine Stärke liegt darin, aus gemachten Erfahrungen konkrete Verbesserungsschritte abzuleiten.<br><br>Ich habe diese Woche KI-Tools ausprobiert: [deine Erfahrungen]. Was lief gut: [Beschreibung]. Was war schwierig: [Beschreibung]. Hilf mir, 3 konkrete Erkenntnisse zu formulieren und 2 Dinge zu identifizieren, die ich nächste Woche anders machen will.</div>
+<div class="prompt-box"><span class="label">KI-ROUTINE ENTWICKELN</span>Du bist Expert:in für Workflow-Optimierung und KI-Integration in berufliche Prozesse. Basierend auf meinen Aufgaben [Aufgaben] und Erfahrungen: Welche 3 täglichen KI-Routinen würden mir die meiste Zeit sparen? Sei konkret.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Schreibe 5 Minuten: Welcher KI-Einsatz hat dir in Woche 1 am meisten gebracht?</li>
+<li><span class="task-icon">2.</span>Nutze den Wochenrückblick-Prompt – gib der KI deine Notizen.</li>
+<li><span class="task-icon">3.</span>Definiere 1 KI-Gewohnheit, die du ab Montag täglich einsetzt.</li>
+<li><span class="task-icon">4.</span>Teile deine #1-Erkenntnis der Woche in der Community!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Wenn ich nur eine einzige KI-Fähigkeit aus dieser Woche behalten dürfte – welche wäre das, und warum hätte sie den größten Einfluss auf meinen Alltag?"</p></div></div>
+<div class="complete-section"><p>Hast du deinen Wochenrückblick gemacht? 🎉 Woche 1 geschafft!</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(7)">✓ Tag 7 abschließen</button></div>`,
+
+// ════════════════════════════════════════
+// WOCHE 2: DATENSCHUTZ & SICHERHEIT
+// ════════════════════════════════════════
+
+8:`<div class="day-tag">📅 TAG 8 VON 28 · WOCHE 2</div>
+<h1>Das 1×1 des <span>KI-Datenschutzes</span></h1>
+<p class="day-intro">Willkommen in Woche 2! Was passiert mit deinen Daten, wenn du ChatGPT & Co. nutzt? Die Fakten – klar und ohne Angst.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>KI-Tools verarbeiten die Daten, die du ihnen gibst. Was damit passiert, unterscheidet sich je nach Tool, Einstellungen und Kontext erheblich. Heute bekommst du das Wissen, um informiert zu entscheiden.</p></div>
+<div class="content-card"><h3>💡 Die wichtigsten Fakten</h3>
+<div class="highlight-box"><strong>OpenAI / ChatGPT</strong>Standardmäßig können Chats für das Training verwendet werden. Das lässt sich in den Einstellungen deaktivieren. API und Enterprise: keine Trainingsdaten-Nutzung.</div>
+<div class="highlight-box"><strong>DSGVO & KI</strong>In der EU gilt: Personenbezogene Daten dürfen nur mit Rechtsgrundlage verarbeitet werden. Niemals echte Namen, Adressen, Kranken- oder Finanzdaten in öffentliche KI-Tools eingeben – ohne Anonymisierung.</div>
+<div class="highlight-box"><strong>DSGVO-konforme Alternativen</strong>Microsoft Copilot (Teams/Office), Adobe Firefly, Aleph Alpha – diese Anbieter haben DSGVO-Verträge und verarbeiten keine Daten für Training.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlage</h3>
+<div class="prompt-box"><span class="label">DATENSCHUTZ VERSTEHEN</span>Du bist Expert:in für Datenschutzrecht und KI-Compliance mit Fokus auf die DSGVO und den deutschen Rechtsraum. Deine Stärke liegt darin, komplexe Rechtsfragen praxisnah und verständlich zu erklären.<br><br>Erkläre mir: Wie verarbeitet [ChatGPT / Claude / Gemini] meine Eingaben? Welche Daten werden gespeichert? Wie kann ich das Training-Opt-out aktivieren? Unterschiede: kostenlos vs. kostenpflichtig?</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Öffne die Datenschutzeinstellungen in ChatGPT – deaktiviere das Modell-Training.</li>
+<li><span class="task-icon">2.</span>Lies die Datenschutzrichtlinien deines meistgenutzten KI-Tools (15 Min.).</li>
+<li><span class="task-icon">3.</span>Erstelle deine persönliche Liste: „Diese Daten gebe ich nie in öffentliche KI-Tools ein."</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Habe ich in den letzten Wochen unwissentlich sensible Daten in KI-Tools eingegeben – und was muss ich ab sofort anders machen?"</p></div></div>
+<div class="complete-section"><p>Hast du deine Datenschutzeinstellungen überprüft?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(8)">✓ Tag 8 abschließen</button></div>`,
+
+9:`<div class="day-tag">📅 TAG 9 VON 28 · WOCHE 2</div>
+<h1>Die <span>Safe-Settings</span></h1>
+<p class="day-intro">So stellst du ChatGPT und andere KI-Tools sicher und DSGVO-bewusst ein – Schritt für Schritt.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Wissen allein schützt nicht – Einstellungen schon. Heute gehst du aktiv durch die Privatsphäre-Einstellungen der wichtigsten KI-Tools und richtest sie so ein, dass deine Nutzung mit deinen Datenschutz-Anforderungen übereinstimmt.</p></div>
+<div class="content-card"><h3>💡 Die wichtigsten Einstellungen</h3>
+<div class="highlight-box"><strong>ChatGPT – Modell-Training deaktivieren</strong>Einstellungen → Datenkontrolle → „Modell für alle verbessern" deaktivieren. Chats können außerdem automatisch nach 30 Tagen gelöscht werden.</div>
+<div class="highlight-box"><strong>Temporäre Chats nutzen</strong>ChatGPT und Claude bieten temporäre Chats an, die nicht gespeichert werden. Ideal für sensible Aufgaben wie Vertragsanalysen oder HR-Themen.</div>
+<div class="highlight-box"><strong>Custom Instructions</strong>Einstellungen → Custom Instructions. Eingabe: „Verarbeite keine personenbezogenen Daten. Erinnere mich, wenn ich sensible Infos eingebe."</div></div>
+<div class="content-card"><h3>📝 Deine Safe-Settings-Checkliste</h3>
+<ul class="task-list">
+<li><span class="task-icon">☐</span>ChatGPT: Modell-Training deaktiviert</li>
+<li><span class="task-icon">☐</span>ChatGPT: Chat-Verlauf auf 30 Tage begrenzt</li>
+<li><span class="task-icon">☐</span>Custom Instructions eingerichtet</li>
+<li><span class="task-icon">☐</span>Temporäre Chats für sensible Themen aktiviert</li>
+<li><span class="task-icon">☐</span>Passwort sicher (min. 16 Zeichen, 2FA aktiv)</li>
+<li><span class="task-icon">☐</span>Interne Richtlinie: Welche Daten sind tabu?</li>
+</ul></div>
+<div class="content-card"><h3>📝 Prompt-Vorlage</h3>
+<div class="prompt-box"><span class="label">SAFE SETTINGS EINRICHTEN</span>Du bist Expert:in für digitale Sicherheit und den datenschutzkonformen Einsatz von KI-Tools im beruflichen Umfeld. Erkläre mir Schritt für Schritt, wie ich [ChatGPT / Claude] optimal für datenschutzbewusste Nutzung einstelle. Fokus: Datensparsamkeit, keine Trainingsdaten, sichere Arbeitsweise.</div></div>
+<div class="complete-section"><p>Hast du alle Safe-Settings überprüft und eingerichtet?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(9)">✓ Tag 9 abschließen</button></div>`,
+
+10:`<div class="day-tag">📅 TAG 10 VON 28 · WOCHE 2</div>
+<h1>Personendaten <span>anonymisieren</span></h1>
+<p class="day-intro">Echte Kundendaten in KI-Prompts? So anonymisierst du Texte richtig – die Power der KI ohne Datenschutzrisiko.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Du willst einen Kundenfall analysieren, ein Feedback auswerten oder eine HR-Situation durchdenken. Problem: Die Texte enthalten echte Namen, Unternehmen und sensible Details. Lösung: systematisches Anonymisieren, bevor der Text in die KI geht.</p></div>
+<div class="content-card"><h3>💡 Die Anonymisierungsmethoden</h3>
+<div class="highlight-box"><strong>Pseudonymisierung</strong>Ersetze echte Namen durch Platzhalter: „Kunde A", „Unternehmen X". Führe eine separate Zuordnungstabelle – nur du weißt, wer dahintersteckt.</div>
+<div class="highlight-box"><strong>Generalisierung</strong>Statt „27-jährige Projektmanagerin aus München bei BMW" → „eine Fachkraft Ende 20 in einem deutschen Großunternehmen". Die KI braucht keine Spezifika für gute Analysen.</div>
+<div class="highlight-box"><strong>KI anonymisiert KI</strong>Du kannst die KI selbst bitten, einen Text zu anonymisieren – bevor du ihn weiterverarbeitest.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">TEXT ANONYMISIEREN</span>Du bist Expert:in für Datenschutz-Compliance und die DSGVO-konforme Verarbeitung von personenbezogenen Daten. Anonymisiere den folgenden Text vollständig: alle echten Namen → Platzhalter (Person A, B...), Unternehmen → „Unternehmen X/Y", Orte → „Stadt A", identifizierende Details → generische Beschreibungen. Text: [Text]</div>
+<div class="prompt-box"><span class="label">ANALYSE MIT ANONYMISIERTEN DATEN</span>Du bist Expert:in für [Themenfeld des Falls]. Hier ist ein anonymisierter Fall: [anonymisierter Text]. Analysiere: Kernproblem, mögliche Ursachen, 3 konkrete Lösungsansätze.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Nimm einen echten Text aus deinem Alltag (Kundenmail, Feedback, Fallbeschreibung).</li>
+<li><span class="task-icon">2.</span>Anonymisiere ihn manuell – dann lass die KI prüfen, ob etwas übersehen wurde.</li>
+<li><span class="task-icon">3.</span>Nutze den anonymisierten Text für eine KI-Analyse.</li>
+<li><span class="task-icon">4.</span>Erstelle dein persönliches Anonymisierungs-Schema für wiederkehrende Fälle.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche Texte nutze ich regelmäßig mit KI – und brauchen diese eine Anonymisierung, die ich bisher vielleicht übersprungen habe?"</p></div></div>
+<div class="complete-section"><p>Hast du einen Text erfolgreich anonymisiert und analysiert?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(10)">✓ Tag 10 abschließen</button></div>`,
+
+11:`<div class="day-tag">📅 TAG 11 VON 28 · WOCHE 2</div>
+<h1>Urheberrecht <span>& KI</span></h1>
+<p class="day-intro">Wem gehört das Bild oder der Text, den eine KI erstellt hat? Die rechtliche Lage – klar, verständlich, praxisrelevant.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>KI-generierte Inhalte befinden sich rechtlich in einer Grauzone – aber die Grundprinzipien sind klarer als viele denken. Heute lernst du, was du bedenken musst, bevor du KI-Inhalte kommerziell nutzt.</p></div>
+<div class="content-card"><h3>💡 Die wichtigsten Rechtsfragen</h3>
+<div class="highlight-box"><strong>Wer besitzt KI-generierte Texte?</strong>In Deutschland kann KI kein Urheberrecht halten. Die Nutzungsrechte liegen beim Anbieter und/oder beim Nutzer. Prüfe immer die AGB des jeweiligen Tools.</div>
+<div class="highlight-box"><strong>KI-Bilder kommerziell nutzen?</strong>Adobe Firefly: Ja, kommerziell freigegeben. DALL-E/OpenAI: Ja, laut AGB. Midjourney (kostenlose Version): Nein. Immer AGB lesen.</div>
+<div class="highlight-box"><strong>Trainingsdaten & Urheberrecht</strong>Viele Modelle wurden auf öffentlichen Daten trainiert – das ist rechtlich umstritten. Als Nutzer bist du dafür i.d.R. nicht haftbar.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlage</h3>
+<div class="prompt-box"><span class="label">RECHTLICHE GRUNDLAGEN</span>Du bist Expert:in für Urheber- und Medienrecht mit Schwerpunkt auf KI-generierten Inhalten und digitalem Recht in Deutschland und der EU. Erkläre mir: Wer hält die Nutzungsrechte an KI-generierten Texten und Bildern? Was muss ich bei kommerzieller Nutzung beachten? Welche Risiken gibt es beim Einsatz von KI für Kundenprojekte? (Hinweis: Bei konkreten Rechtsfragen immer Anwalt konsultieren.)</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Lies die AGB deines meistgenutzten KI-Tools – Fokus auf „Eigentum / Nutzungsrechte".</li>
+<li><span class="task-icon">2.</span>Erstelle eine Liste: Welche KI-generierten Inhalte nutze ich bereits kommerziell?</li>
+<li><span class="task-icon">3.</span>Lass die KI die Rechtslage erklären und stelle Rückfragen.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Nutze ich KI-generierte Bilder oder Texte in Kundenprojekten – und habe ich die Nutzungsrechte wirklich überprüft?"</p></div></div>
+<div class="complete-section"><p>Hast du die Rechtslage für deine KI-Nutzung überprüft?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(11)">✓ Tag 11 abschließen</button></div>`,
+
+12:`<div class="day-tag">📅 TAG 12 VON 28 · WOCHE 2</div>
+<h1>KI-Richtlinien <span>im Job</span></h1>
+<p class="day-intro">Wie kommunizierst du KI-Nutzung gegenüber Kunden, Chefs und Teams? Leitlinien für professionellen, transparenten Umgang.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>KI im Job wirft Fragen auf: Muss ich Kunden sagen, dass ich KI nutze? Was, wenn mein Arbeitgeber keine Richtlinie hat? Wie erkläre ich dem Team, was erlaubt ist? Heute entwickelst du deinen persönlichen KI-Verhaltenskodex für den Berufsalltag.</p></div>
+<div class="content-card"><h3>💡 Die drei Kommunikationsebenen</h3>
+<div class="highlight-box"><strong>Gegenüber Kunden</strong>Transparenz schafft Vertrauen. Wenn KI signifikant zur Arbeit beigetragen hat, kommuniziere das offen.</div>
+<div class="highlight-box"><strong>Gegenüber dem Arbeitgeber</strong>Wenn es keine KI-Richtlinie gibt: Frag aktiv nach oder schlage eine vor. Verantworte Ergebnisse vollständig.</div>
+<div class="highlight-box"><strong>Im Team</strong>Klare Regeln: Was ist erlaubt? Was braucht Freigabe? Was ist verboten?</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">KI-RICHTLINIE ERSTELLEN</span>Du bist Expert:in für Unternehmensrichtlinien und den verantwortungsvollen Einsatz von KI-Technologien im beruflichen Umfeld. Erstelle eine einfache KI-Nutzungsrichtlinie für mein Team. Branche: [Branche]. Typische Aufgaben: [Aufgaben]. Inkludiere: erlaubte Anwendungen, Datenschutz-Regeln, Transparenzpflichten, Verbote, Verantwortlichkeiten.</div>
+<div class="prompt-box"><span class="label">KUNDENANSCHREIBEN</span>Du bist Expert:in für transparente Unternehmenskommunikation und Vertrauensaufbau. Schreibe einen kurzen Absatz für mein Angebot / meine Website, der erklärt, wie ich KI einsetze. Ton: professionell und transparent. Betone: KI unterstützt, ersetzt aber nicht mein Urteilsvermögen.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erstelle eine einfache KI-Richtlinie für dich selbst oder dein Team.</li>
+<li><span class="task-icon">2.</span>Formuliere, wie du KI-Nutzung gegenüber Kunden kommunizieren würdest.</li>
+<li><span class="task-icon">3.</span>Prüfe: Gibt es spezifische Anforderungen an KI-Transparenz in deiner Branche?</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Wenn ein Kunde oder Chef mich heute fragen würde, wie ich KI nutze – wäre meine Antwort klar, ehrlich und professionell?"</p></div></div>
+<div class="complete-section"><p>Hast du deine KI-Richtlinien definiert?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(12)">✓ Tag 12 abschließen</button></div>`,
+
+13:`<div class="day-tag">📅 TAG 13 VON 28 · WOCHE 2</div>
+<h1>Fakten-Check & <span>Halluzinationen</span></h1>
+<p class="day-intro">KI erfindet manchmal Fakten – überzeugend und falsch. Heute lernst du, wie du das erkennst und sicher damit umgehst.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>„Halluzinationen" sind Antworten, die eine KI mit großer Überzeugung liefert – die aber schlicht falsch oder erfunden sind. Zitate, Studien, Gesetze, Statistiken: Die KI kann alles davon fälschen, ohne es zu wissen. Das ist kein Fehler des Nutzers – es ist ein technisches Grundproblem aller Sprachmodelle.</p></div>
+<div class="content-card"><h3>💡 Die Halluzinations-Fallen</h3>
+<div class="highlight-box"><strong>Gefährlich: Spezifische Fakten ohne Quelle</strong>Genaue Zahlen, Zitate, Studienergebnisse, Gerichtsurteile, Gesetze – bei allem Spezifischen immer prüfen.</div>
+<div class="highlight-box"><strong>Weniger gefährlich: Konzepte und Struktur</strong>Erklärungen, Brainstorming, Textentwürfe, Strukturierungen – hier sind Fehler seltener und leichter erkennbar.</div>
+<div class="highlight-box"><strong>Die Verifikations-Regel</strong>Alles, was du öffentlich publizierst oder rechtlich verwendest, muss in einer verifizierbaren Originalquelle bestätigt werden.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">KI ZUR SELBSTPRÜFUNG</span>Du bist Expert:in für Faktenprüfung und wissenschaftliche Recherche. Du hast mir [Aussage] mitgeteilt. Wie sicher bist du, dass das korrekt ist? Gibt es eine verlässliche Quelle dafür? Was könnte an dieser Aussage falsch sein?</div>
+<div class="prompt-box"><span class="label">FAKTENCHECK-ROUTINE ENTWICKELN</span>Du bist Expert:in für Qualitätssicherung und verantwortungsvolle KI-Nutzung. Erstelle mir eine praxistaugliche Checkliste für das Fakten-Checking von KI-Outputs. Was muss ich immer prüfen, bevor ich einen KI-Text veröffentliche oder beruflich verwende?</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Bitte die KI, dir 5 Fakten zu einem Fachthema aus deiner Branche zu nennen.</li>
+<li><span class="task-icon">2.</span>Überprüfe alle 5 Fakten extern – wie viele sind korrekt?</li>
+<li><span class="task-icon">3.</span>Entwickle deine persönliche Faktencheck-Routine.</li>
+<li><span class="task-icon">4.</span>Erstelle die Checkliste mit der Vorlage oben.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Habe ich KI-generierte Inhalte bereits veröffentlicht oder genutzt, die ich nicht vollständig geprüft habe – und was war das Risiko dabei?"</p></div></div>
+<div class="complete-section"><p>Hast du deine persönliche Faktencheck-Routine entwickelt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(13)">✓ Tag 13 abschließen</button></div>`,
+
+14:`<div class="day-tag">📅 TAG 14 VON 28 · WOCHE 2</div>
+<h1>Wochen-Review: <span>Dein KI-Kodex</span></h1>
+<p class="day-intro">Woche 2 endet mit dem wichtigsten Dokument: deinem persönlichen KI-Kodex – dein Fundament für ethischen KI-Einsatz.</p>
+<div class="content-card"><h3>🧠 Was ein KI-Kodex ist</h3>
+<p>Ein Kodex ist kein Regelwerk, das jemand anderes für dich schreibt. Es ist eine bewusste Entscheidung, wie du mit KI umgehst – basierend auf deinen Werten, deiner Arbeit und dem, was du in Woche 2 gelernt hast.</p></div>
+<div class="content-card"><h3>💡 Die fünf Dimensionen</h3>
+<div class="highlight-box"><strong>1. Nutzen</strong>Für welche Aufgaben nutze ich KI bewusst und regelmäßig?</div>
+<div class="highlight-box"><strong>2. Grenzen</strong>Welche Aufgaben überlasse ich bewusst mir selbst – ohne KI?</div>
+<div class="highlight-box"><strong>3. Datenschutz</strong>Welche Daten gebe ich nie in öffentliche KI-Tools ein?</div>
+<div class="highlight-box"><strong>4. Qualitätskontrolle</strong>Wie stelle ich sicher, dass KI-Outputs korrekt und verantwortbar sind?</div>
+<div class="highlight-box"><strong>5. Transparenz</strong>Wie kommuniziere ich KI-Nutzung gegenüber Kunden und Kollegen?</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlage</h3>
+<div class="prompt-box"><span class="label">DEINEN KI-KODEX ENTWICKELN</span>Du bist Expert:in für digitale Ethik und den verantwortungsvollen Einsatz von KI in beruflichen und privaten Kontexten. Deine Stärke liegt darin, Menschen dabei zu helfen, ihre eigenen Werte in konkrete Verhaltensregeln zu übersetzen.<br><br>Ich habe eine Woche KI-Datenschutz und -Sicherheit gelernt. Meine Arbeit: [Beschreibung]. Meine Bedenken: [Beschreibung]. Hilf mir, einen strukturierten, persönlichen KI-Kodex in 5 Abschnitten zu schreiben. Er soll praktisch und authentisch sein.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erstelle deinen persönlichen KI-Kodex mit dem Prompt oben.</li>
+<li><span class="task-icon">2.</span>Überarbeite ihn in deinen eigenen Worten – er soll sich nach dir anfühlen.</li>
+<li><span class="task-icon">3.</span>Speichere ihn an einem Ort, den du regelmäßig siehst.</li>
+<li><span class="task-icon">4.</span>Teile Auszüge in der Community – du inspirierst damit andere!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Was ist der eine Grundsatz, der meinen KI-Einsatz in Zukunft leiten soll – und wie würde ich ihn in einem Satz formulieren?"</p></div></div>
+<div class="complete-section"><p>Hast du deinen persönlichen KI-Kodex erstellt? 🎉 Woche 2 geschafft!</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(14)">✓ Tag 14 abschließen</button></div>`,
+
+// ════════════════════════════════════════
+// WOCHE 3: MULTIMEDIA & VISUELLE INTELLIGENZ
+// ════════════════════════════════════════
+
+15:`<div class="day-tag">📅 TAG 15 VON 28 · WOCHE 3</div>
+<h1>Einführung <span>Bildgenerierung</span></h1>
+<p class="day-intro">Willkommen in Woche 3! Eine neue Dimension der KI öffnet sich: Bilder erschaffen statt suchen.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Bildgenerierende KI-Tools wie Adobe Firefly, DALL-E oder Midjourney erstellen auf Texteingabe hin fotorealistische Bilder, Illustrationen oder Grafiken. Das verändert, wie Kreative, Marketer und Unternehmer visuell kommunizieren – fundamental.</p></div>
+<div class="content-card"><h3>💡 Die wichtigsten Tools</h3>
+<div class="highlight-box"><strong>Adobe Firefly</strong>DSGVO-konform, kommerziell nutzbar, direkt in Creative Cloud. Kostenloser Einstieg möglich.</div>
+<div class="highlight-box"><strong>DALL-E via ChatGPT</strong>Einfachster Einstieg. Gute Qualität für Illustrationen und konzeptuelle Bilder.</div>
+<div class="highlight-box"><strong>Canva KI</strong>Text-to-Image direkt im Design-Tool – ideal, wenn du Bilder direkt in Designs einbauen willst.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlage</h3>
+<p>Ein guter Bild-Prompt beschreibt: <strong>Motiv + Stil + Stimmung + technische Details</strong>.</p>
+<div class="prompt-box"><span class="label">STRUKTURIERTER BILD-PROMPT</span>Du bist Expert:in für KI-Bildgenerierung und visuelles Prompt-Engineering. Hilf mir, einen detaillierten Bild-Prompt zu formulieren für: [Motiv]. Stil: [Kunststil / Fotostil]. Stimmung: [warm / dramatisch / freundlich]. Farben: [Palette]. Perspektive: [Weitwinkel / Nahaufnahme]. Beleuchtung: [natürlich / Studio].</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erstelle einen Account bei Adobe Firefly (firefly.adobe.com) oder nutze DALL-E.</li>
+<li><span class="task-icon">2.</span>Generiere dein erstes Bild mit dem strukturierten Prompt.</li>
+<li><span class="task-icon">3.</span>Variiere den Stil 3 Mal und beobachte den Unterschied.</li>
+<li><span class="task-icon">4.</span>Teile dein liebstes Ergebnis in der Community!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Wo in meiner Arbeit könnte ich KI-generierte Bilder einsetzen – und welche Art würde mir die meiste Zeit oder Kosten sparen?"</p></div></div>
+<div class="complete-section"><p>Hast du dein erstes KI-Bild generiert?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(15)">✓ Tag 15 abschließen</button></div>`,
+
+16:`<div class="day-tag">📅 TAG 16 VON 28 · WOCHE 3</div>
+<h1>Stockfotos <span>ade</span></h1>
+<p class="day-intro">Individuelle Beitragsbilder für Social Media in Minuten – ohne Lizenzprobleme, ohne generische Stock-Ästhetik.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Stockfotos sehen aus wie Stockfotos. Jeder erkennt sie. KI-generierte Bilder können dagegen exakt zu deiner Marke, deinem Post-Thema und deiner Zielgruppe passen. Heute erstellst du dein erstes echtes Social-Media-Beitragsbild.</p></div>
+<div class="content-card"><h3>💡 Formate & Ästhetik</h3>
+<div class="highlight-box"><strong>Social-Media-Formate</strong>Instagram Feed: 1080×1080px · Story/Reel: 1080×1920px · LinkedIn: 1200×628px · Pinterest: 1000×1500px</div>
+<div class="highlight-box"><strong>Prompt-Strategie</strong>Definiere: Plattform + Zielgruppe + Thema + Markenstil. Wichtig: Hintergrund soll für Text-Overlay geeignet sein.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">INSTAGRAM-BEITRAGSBILD</span>Du bist Expert:in für visuelles Social-Media-Marketing und KI-Bildgenerierung für Marken. Erstelle einen Bild-Prompt für ein quadratisches Instagram-Bild (1080×1080px) über [Thema]. Zielgruppe: [Beschreibung]. Stil: modern, professionell. Farbpalette: [Farben]. Hintergrund dezent, damit weißer Text gut lesbar ist.</div>
+<div class="prompt-box"><span class="label">LINKEDIN-ARTIKEL-BILD</span>Du bist Expert:in für Corporate Visual Design und LinkedIn-Content-Strategie. Erstelle einen Bild-Prompt für ein professionelles LinkedIn-Artikelbild zum Thema [Thema]. Stil: vertrauenswürdig, modern. Querformat. Neutrale Farben mit Akzent in [Farbe]. Kein Text im Bild.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle ein aktuelles Social-Media-Thema.</li>
+<li><span class="task-icon">2.</span>Generiere 3 Bildvarianten mit unterschiedlichen Stilen.</li>
+<li><span class="task-icon">3.</span>Füge in Canva einen Text über das Bild – teste den Overlay.</li>
+<li><span class="task-icon">4.</span>Vergleiche: Stockfoto vs. KI-Bild für dasselbe Thema.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welchen visuellen Stil würde ich für meine Marke wählen – und wie würde ich das der KI in einem Prompt beschreiben?"</p></div></div>
+<div class="complete-section"><p>Hast du mindestens ein Social-Media-Bild erstellt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(16)">✓ Tag 16 abschließen</button></div>`,
+
+17:`<div class="day-tag">📅 TAG 17 VON 28 · WOCHE 3</div>
+<h1>Präsentationen in <span>Rekordzeit</span></h1>
+<p class="day-intro">Von der leeren Folie zur fertigen Struktur in Minuten. KI als Präsentationsstratege, Texter und Strukturgeber.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Die meiste Zeit bei Präsentationen geht nicht fürs Gestalten drauf – sondern fürs Strukturieren. Was kommt auf welche Folie? Was ist der rote Faden? Genau hier ist die KI am stärksten: Sie denkt die Struktur durch, du gestaltest.</p></div>
+<div class="content-card"><h3>💡 Die 3-Schritt-Methode</h3>
+<div class="highlight-box"><strong>Schritt 1: Struktur</strong>Thema, Ziel, Publikum, Dauer eingeben → KI liefert vollständigen Folienplan.</div>
+<div class="highlight-box"><strong>Schritt 2: Texte ausarbeiten</strong>Für jede Folie: 1 Headline, 3 Bulletpoints, 1 Sprechernotiz.</div>
+<div class="highlight-box"><strong>Schritt 3: Umsetzen</strong>In PowerPoint / Canva / Gamma.app – die Struktur steht, du gestaltest nur noch.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">PRÄSENTATIONSSTRUKTUR</span>Du bist Expert:in für strategisches Präsentationsdesign und Storytelling in Unternehmen. Deine Stärke liegt darin, komplexe Inhalte in überzeugende, klare Folienstrukturen zu übersetzen.<br><br>Erstelle eine Präsentationsstruktur für: Thema: [Thema]. Zielgruppe: [wer]. Dauer: [X Min.]. Ziel: [was soll das Publikum danach tun / denken]. Format: Folienplan mit Titel + 2–3 Stichpunkten je Folie.</div>
+<div class="prompt-box"><span class="label">FOLIENTEXTE AUSARBEITEN</span>Du bist Expert:in für Folientexte und Executive Communication. Schreibe den vollständigen Inhalt für Folie [X]: Titel: [Titel]. Kernaussage: [was sie vermitteln soll]. Format: 1 starke Headline, 3 kurze Bullets (max. 8 Wörter je), 1 Sprechernotiz (2–3 Sätze).</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle eine kommende Präsentation oder denk dir ein Thema aus.</li>
+<li><span class="task-icon">2.</span>Erstelle den kompletten Folienplan.</li>
+<li><span class="task-icon">3.</span>Arbeite 2–3 Folien vollständig aus.</li>
+<li><span class="task-icon">4.</span>Optional: Probiere Gamma.app – direkt aus Text zur fertigen Präsentation.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche Präsentationen erstelle ich regelmäßig – und könnte ich sie mit KI-Unterstützung in einem Bruchteil der Zeit fertigstellen?"</p></div></div>
+<div class="complete-section"><p>Hast du einen vollständigen Präsentationsplan erstellt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(17)">✓ Tag 17 abschließen</button></div>`,
+
+18:`<div class="day-tag">📅 TAG 18 VON 28 · WOCHE 3</div>
+<h1>Profilbild-Check <span>mit KI</span></h1>
+<p class="day-intro">Dein Profilbild ist dein digitaler erster Eindruck. KI-Tools helfen dir, es professionell zu optimieren – ohne Fotoshooting.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Ein professionelles Headshot kann Hunderte Euro kosten. KI-Tools wie Aragon AI, Remini oder Canva ermöglichen es, aus einem einfachen Selfie ein LinkedIn-würdiges Profilbild zu machen.</p></div>
+<div class="content-card"><h3>💡 Die Tools im Überblick</h3>
+<div class="highlight-box"><strong>Hintergrund entfernen / ersetzen</strong>remove.bg (kostenlos) · Canva (Hintergrund entfernen + ersetzen) · Adobe Express</div>
+<div class="highlight-box"><strong>KI-Headshots generieren</strong>Aragon AI – du lädst 10–20 Fotos hoch, die KI erstellt 40+ professionelle Headshots. Ca. 29€ einmalig.</div>
+<div class="highlight-box"><strong>Foto verbessern</strong>Remini (App) – verbessert Bildqualität und Schärfe in Sekunden.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlage</h3>
+<div class="prompt-box"><span class="label">PROFILBILD-FEEDBACK</span>Du bist Expert:in für Personal Branding und professionelle Außenwirkung auf LinkedIn und anderen Plattformen. Deine Stärke liegt darin, Profilbilder hinsichtlich Wirkung, Professionalität und Zielgruppenpassung zu analysieren.<br><br>[Bild hochladen] Bewerte dieses Profilbild: (1) Professionalität, (2) Zugänglichkeit / Sympathie, (3) Technische Qualität (Belichtung, Schärfe, Hintergrund). Was würdest du verbessern?</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Öffne dein aktuelles LinkedIn- oder Xing-Profilbild.</li>
+<li><span class="task-icon">2.</span>Teste remove.bg: Entferne den Hintergrund und ersetze ihn durch einen professionellen.</li>
+<li><span class="task-icon">3.</span>Lade dein Profilbild in ChatGPT hoch und nutze den Feedback-Prompt.</li>
+<li><span class="task-icon">4.</span>Optional: Probiere Aragon AI für professionelle Headshots.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welchen ersten Eindruck soll mein Profilbild vermitteln – und deckt sich das mit dem, was es aktuell aussagt?"</p></div></div>
+<div class="complete-section"><p>Hast du dein Profilbild analysiert oder optimiert?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(18)">✓ Tag 18 abschließen</button></div>`,
+
+19:`<div class="day-tag">📅 TAG 19 VON 28 · WOCHE 3</div>
+<h1>PDF-Chat: <span>Fragen stellen</span></h1>
+<p class="day-intro">Verträge, Reports, Handbücher – du musst sie nie wieder komplett lesen. Die KI liest für dich und beantwortet deine Fragen.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>„PDF-Chat" bedeutet: Du lädst ein Dokument hoch und kannst der KI Fragen dazu stellen. Das ist eine der praktischsten KI-Fähigkeiten – besonders für juristische Texte, technische Dokumentationen oder lange Berichte.</p></div>
+<div class="content-card"><h3>💡 Die besten Tools</h3>
+<div class="highlight-box"><strong>ChatGPT Plus</strong>Direkt ein PDF hochladen und Fragen stellen. Ideal für gelegentliche Nutzung.</div>
+<div class="highlight-box"><strong>Claude.ai</strong>Besonders stark bei sehr langen Dokumenten (bis 200.000 Zeichen). Ideal für Verträge und Reports.</div>
+<div class="highlight-box"><strong>NotebookLM (Google, kostenlos)</strong>Perfekt für mehrere Quellen gleichzeitig. Erstellt automatisch Zusammenfassungen.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">SCHNELL-ZUSAMMENFASSUNG</span>Du bist Expert:in für Dokumentenanalyse und das schnelle Extrahieren von Kerninformationen aus komplexen Texten. Fasse dieses Dokument in 5 Bullet-Points zusammen. Was sind die wichtigsten Aussagen? Was wird von mir erwartet oder entschieden?</div>
+<div class="prompt-box"><span class="label">RISIKOANALYSE (VERTRÄGE)</span>Du bist Expert:in für Vertragsanalyse und rechtliche Risikoprüfung. Lies diesen Vertrag und markiere alle Klauseln, die für mich als [Rolle] nachteilig oder ungewöhnlich sein könnten. Erkläre, warum. (Hinweis: keine Rechtsberatung, nur Orientierungshilfe.)</div>
+<div class="prompt-box"><span class="label">GEZIELTE SUCHE</span>Du bist Expert:in für strukturierte Informationsextraktion. Enthält dieses Dokument Klauseln oder Abschnitte zu [Thema]? Wenn ja: auf welcher Seite, und was steht dort genau?</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Suche ein PDF aus deinem Alltag (Vertrag, Anleitung, Report).</li>
+<li><span class="task-icon">2.</span>Lade es in ChatGPT oder Claude hoch – teste alle drei Fragetechniken.</li>
+<li><span class="task-icon">3.</span>Teste NotebookLM mit 2 verschiedenen Quellen zum gleichen Thema.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche Dokumente kosten mich regelmäßig viel Lesezeit – und könnte der PDF-Chat das für mich übernehmen?"</p></div></div>
+<div class="complete-section"><p>Hast du erfolgreich mit einem PDF gechattet?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(19)">✓ Tag 19 abschließen</button></div>`,
+
+20:`<div class="day-tag">📅 TAG 20 VON 28 · WOCHE 3</div>
+<h1>Voice-to-Text & <span>Diktieren</span></h1>
+<p class="day-intro">Gedanken sprechen, KI sortiert. Aus dem chaotischen Diktiergerät wird ein strukturiertes Dokument.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Viele Menschen denken schneller, als sie tippen. Voice-to-Text erlaubt es, Ideen frei zu sprechen – und die KI wandelt sie in strukturierten, lesbaren Content um. Das spart nicht nur Zeit, es entsperrt auch Ideen, die beim Tippen verloren gehen würden.</p></div>
+<div class="content-card"><h3>💡 Der zweistufige Workflow</h3>
+<div class="highlight-box"><strong>Stufe 1: Transkription</strong>Diktiere deine Gedanken frei – ohne Struktur. Tools: Whisper (OpenAI), Otter.ai, Diktierfunktion deines Smartphones.</div>
+<div class="highlight-box"><strong>Stufe 2: Strukturierung</strong>Gib das Rohtranskript der KI und lass es umwandeln in: E-Mail, Artikel, Aufgabenliste, Besprechungsnotiz.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">ROHTRANSKRIPT STRUKTURIEREN</span>Du bist Expert:in für Content-Aufbereitung und professionelles Schreiben. Hier ist ein Rohtranskript meiner gesprochenen Gedanken: [Transkript]. Mache daraus: [E-Mail / Artikel / Zusammenfassung / Aufgabenliste]. Korrigiere Grammatik und Wiederholungen, behalte aber meinen Ton und meine Kernaussagen bei.</div>
+<div class="prompt-box"><span class="label">MEETING-AUFZEICHNUNG AUFBEREITEN</span>Du bist Expert:in für Meeting-Dokumentation und Ergebnissicherung. Hier ist das Transkript eines Meetings: [Transkript]. Extrahiere: (1) Entscheidungen, (2) Aufgaben mit Verantwortlichen, (3) Kernaussagen je Person, (4) Nächste Schritte.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Diktiere 2 Minuten frei zu einem Thema aus deiner Arbeit.</li>
+<li><span class="task-icon">2.</span>Nutze Whisper.ai oder die Diktierfunktion für die Transkription.</li>
+<li><span class="task-icon">3.</span>Füge das Transkript in ChatGPT ein und wende die Strukturierungs-Vorlage an.</li>
+<li><span class="task-icon">4.</span>Vergleiche: Wie lange hättest du gebraucht, das direkt zu tippen?</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„In welchen Situationen spreche ich sowieso viel – Autofahrt, Spaziergang, Morgenroutine – und könnte das in produktiven Content umwandeln?"</p></div></div>
+<div class="complete-section"><p>Hast du deinen ersten Voice-to-Text-Workflow ausprobiert?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(20)">✓ Tag 20 abschließen</button></div>`,
+
+21:`<div class="day-tag">📅 TAG 21 VON 28 · WOCHE 3</div>
+<h1>Kreativ-Check: <span>Logo erstellen</span></h1>
+<p class="day-intro">Woche 3 endet kreativ. Erstelle heute ein Logo für ein fiktives Projekt – und erlebe, wie schnell Markenidentität entsteht.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Ein Logo zu entwerfen war lange ein Job für Grafikdesigner. Mit KI-Tools kannst du heute in 20 Minuten eine vollständige Logo-Idee erstellen, variieren und exportieren. Ideal für frühe Konzepte, persönliche Projekte oder schnelle Mockups.</p></div>
+<div class="content-card"><h3>💡 Die Logo-Prompt-Formel</h3>
+<div class="highlight-box"><strong>Was ein Logo-Prompt braucht</strong>Icon-Typ · Stil (minimalistisch / geometrisch / handgezeichnet) · Farbpalette · Branche / Kernbotschaft · Was NICHT dargestellt werden soll</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">LOGO GENERIEREN</span>Du bist Expert:in für Brand Identity und Logo-Design mit Spezialisierung auf KI-gestütztes Markendesign. Erstelle einen detaillierten Prompt für ein minimalistisches Logo-Icon für ein Unternehmen namens [Name]. Branche: [Beschreibung]. Kernbotschaft: [z.B. Vertrauen / Innovation]. Stil: geometrisch-modern. Farben: [Palette]. Kein Text. Weißer Hintergrund.</div>
+<div class="prompt-box"><span class="label">MINI-MARKENSTRATEGIE</span>Du bist Expert:in für Brand Strategy und Corporate Identity-Entwicklung. Ich entwickle eine Marke für [Beschreibung]. Zielgruppe: [wer]. Ton: [professionell / freundlich / mutig]. Schlage vor: 3 Markennamen, eine Farbpalette mit Hex-Codes, einen Tagline-Vorschlag und ein passendes Emoji-Set.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erfinde ein fiktives Unternehmen (oder nutze ein echtes Projekt).</li>
+<li><span class="task-icon">2.</span>Generiere 3 Logo-Varianten mit unterschiedlichen Stilen.</li>
+<li><span class="task-icon">3.</span>Lass die KI eine Mini-Markenstrategie entwickeln (Name, Farben, Tagline).</li>
+<li><span class="task-icon">4.</span>Teile dein Logo-Favorit mit dem Prompt in der Community!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welches Projekt könnte von einem schnellen KI-generierten Markenkonzept profitieren?" </p></div></div>
+<div class="complete-section"><p>Hast du Logo und Markenstrategie erstellt? 🎉 Woche 3 geschafft!</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(21)">✓ Tag 21 abschließen</button></div>`,
+
+// ════════════════════════════════════════
+// WOCHE 4: MARKETING & SOCIAL MEDIA
+// ════════════════════════════════════════
+
+22:`<div class="day-tag">📅 TAG 22 VON 28 · WOCHE 4</div>
+<h1>Der perfekte <span>LinkedIn-Post</span></h1>
+<p class="day-intro">Willkommen in Woche 4! LinkedIn-Posts, die wirklich gelesen werden – Struktur, Hooks und die Kunst des ersten Satzes.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>LinkedIn belohnt Posts, die Menschen in den ersten 2 Zeilen zum Weiterlesen bringen. Der Hook – der erste Satz – entscheidet alles. Danach zählen kurze Absätze, klarer Mehrwert und ein konkreter Call-to-Action.</p></div>
+<div class="content-card"><h3>💡 Anatomie eines erfolgreichen Posts</h3>
+<div class="highlight-box"><strong>Hook (Zeile 1–2)</strong>Provokante These, überraschende Zahl, persönliche Story oder kontraintuitiver Gedanke. Ziel: „Mehr anzeigen" klicken.</div>
+<div class="highlight-box"><strong>Inhalt (3–8 kurze Absätze)</strong>Wert liefern. Eine Idee pro Absatz. Leerzeilen. Keine Textwand.</div>
+<div class="highlight-box"><strong>Call-to-Action</strong>Eine konkrete Frage an die Leser. Einladung zur Diskussion.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">LINKEDIN-POST ERSTELLEN</span>Du bist Expert:in für LinkedIn-Content-Strategie und organisches Wachstum auf der Plattform. Deine Stärke liegt darin, Posts zu schreiben, die authentisch wirken und gleichzeitig den Algorithmus verstehen.<br><br>Schreibe einen LinkedIn-Post über: [Thema]. Meine Perspektive: [deine Meinung]. Zielgruppe: [wer soll das lesen]. Ton: authentisch, nicht werblich. Beginne mit einem starken Hook. Max. 250 Wörter. Endet mit einer offenen Frage.</div>
+<div class="prompt-box"><span class="label">5 HOOK-VARIATIONEN</span>Du bist Expert:in für Copywriting und Aufmerksamkeitsökonomie. Schreibe 5 verschiedene Eröffnungssätze für einen LinkedIn-Post über [Thema]: eine provokante These, eine Zahl, eine persönliche Story, eine Frage, ein kontraintuitiver Gedanke.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle ein Thema aus deiner Expertise.</li>
+<li><span class="task-icon">2.</span>Generiere 5 Hook-Variationen und wähle deinen Favoriten.</li>
+<li><span class="task-icon">3.</span>Schreibe den vollständigen Post.</li>
+<li><span class="task-icon">4.</span>Optional: Poste ihn wirklich und beobachte die Reaktionen!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Über welches Thema aus meiner Arbeit könnte ich regelmäßig schreiben, das meiner Zielgruppe echten Mehrwert bietet?"</p></div></div>
+<div class="complete-section"><p>Hast du einen fertigen LinkedIn-Post erstellt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(22)">✓ Tag 22 abschließen</button></div>`,
+
+23:`<div class="day-tag">📅 TAG 23 VON 28 · WOCHE 4</div>
+<h1><span>Content-Recycling</span></h1>
+<p class="day-intro">Einmal schreiben, zehnmal nutzen. Aus einer E-Mail wird ein Blogpost, ein LinkedIn-Post, eine Story und mehr.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Die meisten Menschen produzieren täglich wertvolle Inhalte – in E-Mails, Gesprächen, Berichten – und veröffentlichen nichts davon. Content-Recycling bedeutet: Du nimmst einen bestehenden Inhalt und verwandelst ihn in mehrere Formate für mehrere Kanäle.</p></div>
+<div class="content-card"><h3>💡 Der Content-Multiplikator</h3>
+<div class="highlight-box"><strong>Aus 1 mach 7</strong>1 Blogartikel → LinkedIn-Post → 3 Tweets → Instagram-Karussell → Newsletter-Abschnitt → Podcast-Thema → FAQ-Seite</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">E-MAIL ZU BLOGPOST</span>Du bist Expert:in für Content-Marketing und das Transformieren von Alltagskommunikation in wertvolle, veröffentlichbare Inhalte. Hier ist eine E-Mail, die ich an einen Kunden geschrieben habe: [E-Mail]. Mache daraus einen Blogpost (~400 Wörter). Struktur: Einleitung, 3 Abschnitte mit Zwischenüberschriften, Fazit mit CTA. Ton: hilfreicher Ratgeber.</div>
+<div class="prompt-box"><span class="label">ARTIKEL ZU SOCIAL-CONTENT</span>Du bist Expert:in für Multi-Channel-Content-Strategie und plattformgerechtes Schreiben. Hier ist mein Blogartikel: [Artikel]. Erstelle daraus: 1 LinkedIn-Post (200 Wörter), 3 Twitter-Posts (max. 280 Zeichen je), 5 Instagram-Caption-Ideen. Passe den Ton für jede Plattform an.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Suche eine E-Mail, einen Report oder ein Dokument, das du zuletzt erstellt hast.</li>
+<li><span class="task-icon">2.</span>Wandle ihn in einen Blogpost um.</li>
+<li><span class="task-icon">3.</span>Erstelle aus dem Blogpost mindestens 3 Social-Media-Formate.</li>
+<li><span class="task-icon">4.</span>Beobachte: Wie viel Content steckt schon in deinen Alltagsdokumenten?</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche meiner Arbeitsdokumente könnten als Basis für öffentlichen Content dienen – und warum habe ich das bisher nicht genutzt?"</p></div></div>
+<div class="complete-section"><p>Hast du einen Inhalt erfolgreich in mehrere Formate recycelt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(23)">✓ Tag 23 abschließen</button></div>`,
+
+24:`<div class="day-tag">📅 TAG 24 VON 28 · WOCHE 4</div>
+<h1>Kunden-Personas <span>simulieren</span></h1>
+<p class="day-intro">Wer ist meine Zielgruppe wirklich? Die KI simuliert deine Kunden und zeigt dir, wie sie denken, fühlen und entscheiden.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Eine Persona ist mehr als Alter und Beruf. Es geht um Gedanken, Ängste, Wünsche und Entscheidungsmuster. Die KI kann eine Persona so detailliert simulieren, dass du mit ihr „sprechen" kannst – und so Einblicke gewinnst, für die du sonst teure Marktforschung bräuchtest.</p></div>
+<div class="content-card"><h3>💡 Die Simulation in der Praxis</h3>
+<div class="highlight-box"><strong>So funktioniert's</strong>Du beschreibst deine Zielgruppe → KI schlüpft in die Rolle → Du stellst Fragen zu Produkt, Inhalten, Angeboten → KI antwortet aus der Perspektive der Persona.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">PERSONA ERSTELLEN</span>Du bist Expert:in für Customer Research und Zielgruppenanalyse mit Fokus auf psychografische Buyer Personas. Erstelle eine detaillierte Persona für: [Produkt/Service]. Inkludiere: Name, Alter, Beruf, Tagesablauf, größte Herausforderungen, Wünsche, Ängste, bevorzugte Infoquellen, typische Einwände.</div>
+<div class="prompt-box"><span class="label">PERSONA BEFRAGEN</span>Du bist jetzt [Persona-Name], [kurze Beschreibung]. Antworte auf meine Fragen aus deiner Perspektive – ehrlich, auch mit Zweifeln und Einwänden. Mein Angebot: [Beschreibung]. Erste Frage: Was ist dein erster Gedanke, wenn du das siehst?</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erstelle 2 verschiedene Personas für deine wichtigste Zielgruppe.</li>
+<li><span class="task-icon">2.</span>„Befrage" eine Persona zu deinem aktuellen Angebot.</li>
+<li><span class="task-icon">3.</span>Frage sie nach ihren größten Einwänden.</li>
+<li><span class="task-icon">4.</span>Notiere 3 Erkenntnisse, die du so noch nicht hattest.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche Annahmen über meine Zielgruppe treffe ich täglich – und wie würde ich sie überprüfen, wenn ich heute eine Persona-Simulation starte?"</p></div></div>
+<div class="complete-section"><p>Hast du mindestens eine Persona erstellt und befragt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(24)">✓ Tag 24 abschließen</button></div>`,
+
+25:`<div class="day-tag">📅 TAG 25 VON 28 · WOCHE 4</div>
+<h1>Einwands-Check: <span>Verkaufsargs prüfen</span></h1>
+<p class="day-intro">Lass die KI deine Argumente zerlegen – bevor es dein Kunde tut. Der härteste und nützlichste Feedback-Geber.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Die stärksten Verkaufsargumente entstehen nicht im leeren Raum, sondern im Dialog mit Einwänden. Wenn du weißt, was dein Gegenüber einwenden wird, kannst du deine Botschaft so formulieren, dass sie diese Einwände schon vorwegnimmt.</p></div>
+<div class="content-card"><h3>💡 Der Einwands-Simulation-Prozess</h3>
+<div class="highlight-box"><strong>Schritt 1</strong>Argument beschreiben → KI spielt skeptischen Kunden → Schwachstellen identifizieren</div>
+<div class="highlight-box"><strong>Schritt 2</strong>Für jeden Einwand: empathische Antwort + Beispiel + überarbeitetes Argument</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">EINWÄNDE IDENTIFIZIEREN</span>Du bist Expert:in für Verkaufspsychologie und kritische Angebotsanalyse. Spiele die Rolle eines skeptischen, erfahrenen Kunden. Was sind deine 5 stärksten Einwände gegen dieses Angebot: [Text]. Sei konkret und direkt.</div>
+<div class="prompt-box"><span class="label">GEGENARGUMENTE ENTWICKELN</span>Du bist Expert:in für Verkaufskommunikation und Einwandbehandlung. Für jeden dieser Einwände: [Liste]. Entwickle: (1) empathische Antwort (erst verstehen, dann widerlegen), (2) konkretes Beispiel / Beweis, (3) überarbeitetes Argument, das den Einwand vorwegnimmt.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle dein wichtigstes Verkaufsargument oder deinen Elevator Pitch.</li>
+<li><span class="task-icon">2.</span>Lass die KI 5 Einwände generieren.</li>
+<li><span class="task-icon">3.</span>Entwickle für jeden Einwand ein Gegenargument.</li>
+<li><span class="task-icon">4.</span>Überarbeite dein ursprüngliches Argument mit den neuen Erkenntnissen.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welcher Einwand kommt bei meinen Kunden am häufigsten – und wie überzeugend ist meine aktuelle Antwort darauf wirklich?"</p></div></div>
+<div class="complete-section"><p>Hast du deine Verkaufsargumente dem Einwands-Check unterzogen?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(25)">✓ Tag 25 abschließen</button></div>`,
+
+26:`<div class="day-tag">📅 TAG 26 VON 28 · WOCHE 4</div>
+<h1>Newsletter-Ideen für <span>einen Monat</span></h1>
+<p class="day-intro">Nie wieder vor dem leeren Newsletter sitzen. Die KI generiert in 10 Minuten 30 Tage Content-Ideen – inklusive Betreffzeilen.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>Der größte Feind regelmäßiger Newsletter ist nicht mangelndes Wissen – sondern das leere Blatt. Die KI löst dieses Problem, indem sie dir einen ganzen Monat an Themen, Winkeln und Ideen liefert.</p></div>
+<div class="content-card"><h3>💡 Strategie-first-Ansatz</h3>
+<div class="highlight-box"><strong>Erst Strategie, dann Ideen</strong>Definiere: Wer liest deinen Newsletter? Was ist ihr größtes Problem? Was ist dein einzigartiger Blickwinkel? Diese 3 Antworten sind dein Prompt-Input.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">MONATS-CONTENT-PLAN</span>Du bist Expert:in für Newsletter-Marketing und Audience-Building. Deine Stärke liegt darin, Redaktionspläne zu entwickeln, die Abonnenten wirklich öffnen und lesen wollen.<br><br>Ich schreibe einen wöchentlichen Newsletter für [Zielgruppe] über [Nische]. Mein Blickwinkel: [deine Perspektive]. Generiere 4 Themen für den nächsten Monat. Je Thema: Titel, 3-satzige Beschreibung, 2 Betreffzeilen-Varianten.</div>
+<div class="prompt-box"><span class="label">NEWSLETTER-ERÖFFNUNG</span>Du bist Expert:in für Email-Copywriting und das Schreiben von Newsletter-Eröffnungen, die sofort Aufmerksamkeit erzeugen. Schreibe die Eröffnung für einen Newsletter über [Thema]. Ton: [persönlich / professionell]. Beginne mit einer kurzen Geschichte oder einem Gedankenexperiment. Überleite zum Hauptthema. Max. 80 Wörter.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Definiere deine Newsletter-Zielgruppe und deinen Blickwinkel in 2–3 Sätzen.</li>
+<li><span class="task-icon">2.</span>Generiere einen 4-Wochen-Content-Plan.</li>
+<li><span class="task-icon">3.</span>Schreibe die Eröffnung für dein Lieblingsthema.</li>
+<li><span class="task-icon">4.</span>Teste 2 Betreffzeilen – welche würdest du öffnen?</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Was ist die eine Frage, die meine Leser immer wieder stellen – und wie viele Newsletter-Themen könnte ich allein daraus entwickeln?"</p></div></div>
+<div class="complete-section"><p>Hast du deinen 4-Wochen-Content-Plan erstellt?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(26)">✓ Tag 26 abschließen</button></div>`,
+
+27:`<div class="day-tag">📅 TAG 27 VON 28 · WOCHE 4</div>
+<h1>Hashtags & SEO <span>ohne Experten</span></h1>
+<p class="day-intro">Die richtigen Keywords und Hashtags – ohne SEO-Studium und teure Tools. Die KI als Suchmaschinen-Berater.</p>
+<div class="content-card"><h3>🧠 Was du heute lernst</h3>
+<p>SEO und Hashtag-Strategie galten lange als Expertenwissen. Die KI demokratisiert das. Sie kennt Suchintentionen, Long-Tail-Keywords und Plattform-Algorithmen – und erklärt dir, wie du sie für deine Inhalte nutzt.</p></div>
+<div class="content-card"><h3>💡 Keywords als Intentionen verstehen</h3>
+<div class="highlight-box"><strong>3 Arten von Keywords</strong>Informational: „Wie funktioniert X?" · Navigational: „X Tool Login" · Transaktional: „X kaufen günstig". Je nach Ziel brauchst du andere Keywords.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">KEYWORD-RECHERCHE</span>Du bist Expert:in für Suchmaschinenoptimierung und Content-Strategie. Deine Stärke liegt darin, Keyword-Listen zu entwickeln, die sowohl den Algorithmus als auch echte Suchintentionen treffen.<br><br>Erstelle für Thema [Thema] / Zielgruppe [Beschreibung]: 5 Short-Tail-Keywords, 10 Long-Tail-Keywords, 5 Frage-Keywords. Sortiert nach Suchintention: informational / transaktional / navigational.</div>
+<div class="prompt-box"><span class="label">HASHTAG-STRATEGIE</span>Du bist Expert:in für Social-Media-Algorithmen und organische Reichweite. Erstelle für [Instagram / LinkedIn / TikTok] zu [Thema] eine Hashtag-Strategie: 5 große Hashtags (1M+ Posts), 10 mittlere (100k–1M), 5 Nischen-Hashtags (unter 100k). Erkläre, warum diese Mischung funktioniert.</div>
+<div class="prompt-box"><span class="label">SEO-TEXT OPTIMIEREN</span>Du bist Expert:in für SEO-Texting und On-Page-Optimierung. Optimiere diesen Text für Keyword [Hauptkeyword]: [Text]. Baue das Keyword natürlich ein (Titel, erster Absatz, Zwischenüberschriften). Füge 3 verwandte Keywords hinzu. Behalte den natürlichen Lesefluss.</div></div>
+<div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Wähle ein Thema aus deiner Arbeit oder deinem Profil.</li>
+<li><span class="task-icon">2.</span>Recherchiere 20 Keywords mit dem Prompt oben.</li>
+<li><span class="task-icon">3.</span>Erstelle eine Hashtag-Strategie für deine Hauptplattform.</li>
+<li><span class="task-icon">4.</span>Optimiere einen bestehenden Text oder Post.</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Reflexionsfrage</h3>
+<div class="reflection-box"><p>„Welche Fragen stellen meine Kunden, bevor sie mich oder mein Angebot finden – und bin ich für diese Suchanfragen sichtbar?"</p></div></div>
+<div class="complete-section"><p>Hast du Keywords und Hashtags für ein echtes Thema recherchiert?</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(27)">✓ Tag 27 abschließen</button></div>`,
+
+28:`<div class="day-tag">📅 TAG 28 VON 28 · ABSCHLUSS 🎓</div>
+<h1>Social-Media-Plan & <span>Challenge-Resümee</span></h1>
+<p class="day-intro">Tag 28. Du hast es geschafft. Heute planst du deinen Social-Media-Auftritt für die nächste Woche – und ziehst dein persönliches Fazit.</p>
+<div class="content-card"><h3>🧠 Was du heute abschließt</h3>
+<p>28 Tage. 4 Wochen. 28 neue Fähigkeiten. Von der ersten Expertenrolle bis zur vollständigen Content-Strategie. Heute planst du, wie du das Gelernte in deinen Alltag integrierst – dauerhaft, nicht nur für die Challenge.</p></div>
+<div class="content-card"><h3>💡 Der wöchentliche Content-Rhythmus</h3>
+<div class="highlight-box"><strong>Die 3-Pillar-Regel</strong>Wähle 3 wiederkehrende Content-Themen: 1) Wissen / Tipps, 2) Persönliches / Behind-the-Scenes, 3) Angebot / CTA. Das schafft Abwechslung und Wiedererkennungswert.</div></div>
+<div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
+<div class="prompt-box"><span class="label">WÖCHENTLICHER CONTENT-PLAN</span>Du bist Expert:in für Social-Media-Strategie und konsistente Content-Planung. Erstelle meinen Content-Plan für die nächste Woche. Plattformen: [z.B. Instagram + LinkedIn]. Thema der Woche: [Thema]. Meine 3 Content-Pillar: [Pillar 1 / 2 / 3]. Für jeden Tag (Mo–Fr): Format, Thema, Hook-Idee, Caption-Idee.</div>
+<div class="prompt-box"><span class="label">CHALLENGE-RESÜMEE SCHREIBEN</span>Du bist Expert:in für persönliche Entwicklung und das Reflektieren von Lernprozessen. Ich habe eine 28-Tage-KI-Challenge abgeschlossen. Themen: [kurze Liste]. Meine größten Erkenntnisse: [3 Punkte]. Hilf mir, ein authentisches Resümee für LinkedIn zu schreiben: Was ich gelernt habe, was sich verändert hat, was ich anderen empfehlen würde. Max. 200 Wörter.</div>
+<div class="prompt-box"><span class="label">MEIN KI-FAHRPLAN FÜR DIE NÄCHSTEN 30 TAGE</span>Du bist Expert:in für KI-Integration in berufliche Workflows und nachhaltige Kompetenzentwicklung. Basierend auf meinen Stärken [Bereiche] und meinem Arbeitsalltag [Beschreibung]: Erstelle meinen persönlichen KI-Fahrplan für die nächsten 30 Tage. Was soll ich tägliche üben? Was sind die 3 wichtigsten nächsten Schritte?</div></div>
+<div class="content-card"><h3>🎯 Abschluss-Aufgaben</h3>
+<ul class="task-list">
+<li><span class="task-icon">1.</span>Erstelle deinen vollständigen Social-Media-Plan für die nächste Woche.</li>
+<li><span class="task-icon">2.</span>Schreibe dein Challenge-Resümee und teile es auf LinkedIn.</li>
+<li><span class="task-icon">3.</span>Erstelle deinen persönlichen KI-Fahrplan für die nächsten 30 Tage.</li>
+<li><span class="task-icon">4.</span>Teile dein Resümee in der Community-Gruppe.</li>
+<li><span class="task-icon">5.</span>🎓 Beantrage dein Abschluss-Zertifikat!</li>
+</ul></div>
+<hr class="content-divider">
+<div class="content-card"><h3>💬 Abschlussfrage</h3>
+<div class="reflection-box"><p>„Wer war ich vor 28 Tagen in Bezug auf KI – und wer bin ich heute? Was ist die eine Fähigkeit, die mich am meisten verändert hat?"</p></div></div>
+<div class="complete-section" style="background:linear-gradient(135deg,rgba(94,234,212,.1),rgba(129,140,248,.1));border-color:rgba(94,234,212,.3);">
+<p style="font-size:1rem;color:var(--text);margin-bottom:1.5rem;">🎉 <strong>28 Tage. 28 neue Fähigkeiten. Eine neue Art, mit KI zu arbeiten.</strong><br>Herzlichen Glückwunsch – du hast die komplette Challenge gemeistert!</p>
+<button class="btn-complete" id="completeBtn" onclick="completeDay(28)">🎓 Challenge abschließen!</button></div>`
+
+}; // end DAY_CONTENT
+</script>
+// ════════════════════════════════════════════════════════
+// ⚙️  KONFIGURATION – HIER DEINE SUPABASE-DATEN EINTRAGEN
+// ════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://rnedyeimsgtvhcqvbama.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0';
+// ════════════════════════════════════════════════════════
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ─── STATE ──────────────────────────────────────────────
+let currentUser   = null;
+let completedDays = new Set();
+let currentDayNum = null;
+
+// ─── WEEK / DAY DATA ────────────────────────────────────
+const WEEKS = [
+  { label:"Woche 1", sub:"ChatGPT als smarter Assistent", days:[
+    {num:1,  title:'Der Rollen-Trick',                        short:'Rollen-Trick'},
+    {num:2,  title:'Die Zusammenfassungs-Maschine',           short:'Zusammenfassen'},
+    {num:3,  title:'Bessere E-Mails schreiben',               short:'E-Mails'},
+    {num:4,  title:'Brainstorming-Partner',                   short:'Brainstorming'},
+    {num:5,  title:'Die "Erkläre wie 5"-Methode',             short:'Vereinfachen'},
+    {num:6,  title:'Struktur-Tag: Wochenagenda',              short:'Agenda'},
+    {num:7,  title:'Reflexion: Was sparte Zeit?',             short:'Reflexion W1'},
+  ]},
+  { label:"Woche 2", sub:"Datenschutz & Sicherheit", days:[
+    {num:8,  title:'Das 1×1 des KI-Datenschutzes',           short:'Datenschutz'},
+    {num:9,  title:'Die Safe-Settings',                       short:'Safe Settings'},
+    {num:10, title:'Personendaten anonymisieren',             short:'Anonymisieren'},
+    {num:11, title:'Urheberrecht & KI',                       short:'Urheberrecht'},
+    {num:12, title:'KI-Richtlinien im Job',                   short:'KI im Job'},
+    {num:13, title:'Fakten-Check & Halluzinationen',          short:'Fakten-Check'},
+    {num:14, title:'Wochen-Review: Dein KI-Kodex',           short:'KI-Kodex'},
+  ]},
+  { label:"Woche 3", sub:"Multimedia & Visuelle Intelligenz", days:[
+    {num:15, title:'Einführung Bildgenerierung',              short:'Bilder-KI'},
+    {num:16, title:'Stockfotos ade – Social-Media-Bild',     short:'Stockfotos ade'},
+    {num:17, title:'Präsentationen in Rekordzeit',            short:'Präsentationen'},
+    {num:18, title:'Profilbild-Check mit KI',                short:'Profilbild'},
+    {num:19, title:'PDF-Chat: Fragen stellen',               short:'PDF-Chat'},
+    {num:20, title:'Voice-to-Text & Diktieren',              short:'Voice-to-Text'},
+    {num:21, title:'Kreativ-Check: Logo erstellen',          short:'Logo'},
+  ]},
+  { label:"Woche 4", sub:"Marketing & Social Media", days:[
+    {num:22, title:'Der perfekte LinkedIn-Post',             short:'LinkedIn'},
+    {num:23, title:'Content-Recycling',                      short:'Recycling'},
+    {num:24, title:'Kunden-Personas simulieren',             short:'Personas'},
+    {num:25, title:'Einwands-Check: Verkaufsargs',           short:'Einwände'},
+    {num:26, title:'Newsletter-Ideen für 1 Monat',          short:'Newsletter'},
+    {num:27, title:'Hashtags & SEO ohne Experten',          short:'Hashtags & SEO'},
+    {num:28, title:'Abschluss: Social-Media-Plan & Resümee 🎓', short:'Abschluss'},
+  ]}
+];
+
+const ALL_DAYS = WEEKS.flatMap(w => w.days);
+
+// ════════════════════════════════════════════════════════
+// AUTH FUNCTIONS
+// ════════════════════════════════════════════════════════
+
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['login','register','reset'][i] === tab);
+  });
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById(`form-${tab}`).classList.add('active');
+  clearAuthMsgs();
+}
+
+function clearAuthMsgs() {
+  document.querySelectorAll('.auth-msg').forEach(m => {
+    m.className = 'auth-msg'; m.textContent = '';
+  });
+}
+
+function showMsg(id, msg, type='error') {
+  const el = document.getElementById(id);
+  el.className = `auth-msg ${type}`;
+  el.textContent = msg;
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.querySelector('span').textContent = loading ? 'Bitte warten…' :
+    btnId === 'btn-login'    ? 'Einloggen →' :
+    btnId === 'btn-register' ? 'Kostenlosen Account erstellen →' :
+                               'Reset-Link senden →';
+}
+
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showMsg('login-msg', 'Bitte E-Mail und Passwort eingeben.');
+  setLoading('btn-login', true);
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  setLoading('btn-login', false);
+  if (error) {
+    const msg = error.message.includes('Invalid login') 
+      ? 'E-Mail oder Passwort falsch.' 
+      : error.message;
+    showMsg('login-msg', msg);
+  }
+  // onAuthStateChange handles the redirect
+}
+
+async function handleRegister() {
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if (!name)                   return showMsg('register-msg', 'Bitte deinen Namen eingeben.');
+  if (!email)                  return showMsg('register-msg', 'Bitte eine E-Mail eingeben.');
+  if (password.length < 8)    return showMsg('register-msg', 'Passwort muss mindestens 8 Zeichen haben.');
+  setLoading('btn-register', true);
+  const { error } = await db.auth.signUp({
+    email, password,
+    options: { data: { full_name: name } }
+  });
+  setLoading('btn-register', false);
+  if (error) {
+    showMsg('register-msg', error.message);
+  } else {
+    showMsg('register-msg',
+      '✅ Bitte bestätige deine E-Mail-Adresse. Dann kannst du dich einloggen.',
+      'success'
+    );
+  }
+}
+
+async function handleReset() {
+  const email = document.getElementById('reset-email').value.trim();
+  if (!email) return showMsg('reset-msg', 'Bitte eine E-Mail eingeben.');
+  setLoading('btn-reset', true);
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href
+  });
+  setLoading('btn-reset', false);
+  if (error) {
+    showMsg('reset-msg', error.message);
+  } else {
+    showMsg('reset-msg', '✅ Reset-Link wurde gesendet. Bitte überprüfe dein Postfach.', 'success');
+  }
+}
+
+async function handleLogout() {
+  await db.auth.signOut();
+  completedDays = new Set();
+  currentUser   = null;
+  goTo('screen-auth');
+  showToast('Erfolgreich abgemeldet.', 'success');
+}
+
+// ════════════════════════════════════════════════════════
+// SUPABASE DATA FUNCTIONS
+// ════════════════════════════════════════════════════════
+
+async function loadProgress() {
+  if (!currentUser) return;
+  const { data, error } = await db
+    .from('progress')
+    .select('day_number')
+    .eq('user_id', currentUser.id);
+  if (error) { console.error('loadProgress error:', error); return; }
+  completedDays = new Set(data.map(r => r.day_number));
+}
+
+async function saveProgress(dayNum) {
+  if (!currentUser) return false;
+  // Upsert so we don't get duplicate entries
+  const { error } = await db.from('progress').upsert({
+    user_id:    currentUser.id,
+    day_number: dayNum,
+    completed_at: new Date().toISOString()
+  }, { onConflict: 'user_id,day_number' });
+  if (error) { console.error('saveProgress error:', error); return false; }
+  return true;
+}
+
+// ════════════════════════════════════════════════════════
+// UI FUNCTIONS
+// ════════════════════════════════════════════════════════
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show toast-${type}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function getActiveDay() {
+  // Returns the next uncompleted day (1–28)
+  for (let i = 1; i <= 28; i++) {
+    if (!completedDays.has(i)) return i;
+  }
+  return 28; // all done
+}
+
+function buildDashboard() {
+  const firstName = currentUser?.user_metadata?.full_name?.split(' ')[0] || 'Hey';
+  const avatarLetter = firstName[0]?.toUpperCase() || '?';
+  document.getElementById('userAvatar').textContent = avatarLetter;
+  document.getElementById('userNameDisplay').textContent =
+    currentUser?.user_metadata?.full_name || currentUser?.email || '';
+
+  const done    = completedDays.size;
+  const pct     = Math.round(done / 28 * 100);
+  const activeDay = getActiveDay();
+
+  // Stats
+  document.getElementById('statDone').textContent   = done;
+  document.getElementById('statStreak').textContent = done + '🔥';
+  document.getElementById('statLeft').textContent   = 28 - done;
+  document.getElementById('ringPercent').textContent = pct + '%';
+  document.getElementById('ringFill').style.strokeDashoffset = 126 - (126 * pct / 100);
+
+  // Welcome message
+  if (done === 0) {
+    document.getElementById('welcomeHeadline').textContent = `Hey ${firstName}, los geht's! 🚀`;
+    document.getElementById('welcomeSub').textContent = 'Deine 28-Tage-KI-Challenge startet heute. Tag 1 wartet auf dich.';
+  } else if (done < 28) {
+    document.getElementById('welcomeHeadline').textContent = `Hey ${firstName}, weiter so! 🔥`;
+    document.getElementById('welcomeSub').textContent = `${done} von 28 Tagen abgeschlossen. Du bist auf Kurs!`;
+  } else {
+    document.getElementById('welcomeHeadline').textContent = 'Challenge abgeschlossen! 🎓';
+    document.getElementById('welcomeSub').textContent = 'Herzlichen Glückwunsch! Du hast alle 28 Tage gemeistert.';
+  }
+
+  // Day grid
+  const cont = document.getElementById('weekSections');
+  cont.innerHTML = '';
+  WEEKS.forEach(week => {
+    const sec  = document.createElement('div');
+    sec.className = 'week-section';
+    sec.innerHTML = `<div class="week-label"><em>${week.label}</em>${week.sub}</div><div class="day-grid"></div>`;
+    const grid = sec.querySelector('.day-grid');
+    week.days.forEach(day => {
+      const chip = document.createElement('div');
+      chip.className = 'day-chip';
+      chip.onclick = () => openDay(day);
+      if (completedDays.has(day.num)) {
+        chip.classList.add('done');
+        chip.innerHTML = `<div class="d-num">TAG ${day.num}</div><div class="d-title">${day.short}</div>`;
+      } else if (day.num === activeDay) {
+        chip.classList.add('active-day');
+        chip.innerHTML = `<div class="d-num">TAG ${day.num} · HEUTE</div><div class="d-title">${day.short}</div>`;
+      } else {
+        chip.classList.add('locked');
+        chip.innerHTML = `<div class="d-num">TAG ${day.num} · 🔒</div><div class="d-title">${day.short}</div>`;
+      }
+      grid.appendChild(chip);
+    });
+    cont.appendChild(sec);
+  });
+}
+
+function openDay(day) {
+  currentDayNum = day.num;
+  const week = WEEKS.find(w => w.days.some(d => d.num === day.num));
+  document.getElementById('weekHint').textContent    = `${week.label.toUpperCase()} · ${week.sub.toUpperCase()}`;
+  document.getElementById('dayTitleH').textContent   = `Tag ${day.num} – ${day.title}`;
+
+  const body    = document.getElementById('dayBodyContent');
+  const activeDay = getActiveDay();
+  const isLocked  = day.num > activeDay; // locked = not yet reached
+
+  let html = '';
+  if (isLocked) {
+    html += `<div class="preview-notice">👁️ <strong>Vorschau-Modus</strong> – Dieser Tag wird freigeschaltet, sobald du alle vorherigen Tage abgeschlossen hast.</div>`;
+  }
+  html += DAY_CONTENT[day.num] || `<p>Inhalt für Tag ${day.num} folgt.</p>`;
+  body.innerHTML = html;
+
+  // Update complete button state
+  const btn = document.getElementById('completeBtn');
+  if (btn) {
+    if (completedDays.has(day.num)) {
+      btn.textContent = '✓ Bereits abgeschlossen';
+      btn.classList.add('completed');
+      btn.disabled = true;
+    } else if (isLocked) {
+      btn.textContent = '🔒 Noch nicht freigeschaltet';
+      btn.classList.add('completed');
+      btn.disabled = true;
+    }
+  }
+  goTo('screen-day');
+}
+
+async function completeDay(num) {
+  const btn = document.getElementById('completeBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Wird gespeichert…'; }
+
+  const ok = await saveProgress(num);
+  if (!ok) {
+    showToast('Fehler beim Speichern. Bitte erneut versuchen.', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = `✓ Tag ${num} abschließen`; }
+    return;
+  }
+
+  completedDays.add(num);
+  showToast('Fortschritt gespeichert! ✓', 'success');
+
+  const cur = ALL_DAYS.find(d => d.num === num);
+  const nxt = ALL_DAYS.find(d => d.num === num + 1);
+
+  document.getElementById('successDayNum').textContent = num;
+  document.getElementById('successMsg').textContent = num < 28
+    ? `Stark! Du hast heute „${cur.title}" abgeschlossen. Morgen wartet der nächste Schritt.`
+    : `Unglaublich! Du hast alle 28 Tage gemeistert. Herzlichen Glückwunsch! 🎓`;
+
+  if (nxt) {
+    document.getElementById('nextLabel').textContent    = `⏳ Tag ${nxt.num} wird freigeschaltet in`;
+    document.getElementById('nextTitle').textContent    = nxt.title;
+    document.getElementById('countdown').style.display = 'block';
+  } else {
+    document.getElementById('nextLabel').textContent    = '🎓 Challenge vollständig abgeschlossen!';
+    document.getElementById('nextTitle').textContent    = 'Beantrage jetzt dein Zertifikat in der Community.';
+    document.getElementById('countdown').style.display = 'none';
+  }
+
+  buildDashboard();
+  goTo('screen-success');
+}
+
+// ─── Countdown ──────────────────────────────────────────
+let cd = {h:23,m:59,s:59};
+setInterval(() => {
+  const el = document.getElementById('countdown');
+  if (!el || el.style.display === 'none') return;
+  if(--cd.s < 0){cd.s=59; if(--cd.m < 0){cd.m=59; if(--cd.h < 0){cd.h=cd.m=cd.s=0;}}}
+  el.textContent = `${String(cd.h).padStart(2,'0')}:${String(cd.m).padStart(2,'0')}:${String(cd.s).padStart(2,'0')}`;
+}, 1000);
+
+// ════════════════════════════════════════════════════════
+// INIT – AUTH STATE LISTENER
+// ════════════════════════════════════════════════════════
+db.auth.onAuthStateChange(async (event, session) => {
+  const overlay = document.getElementById('loadingOverlay');
+
+  if (session?.user) {
+    currentUser = session.user;
+    overlay.querySelector('p').textContent = 'Fortschritt wird geladen…';
+    await loadProgress();
+    buildDashboard();
+    overlay.classList.add('hidden');
+    goTo('screen-dashboard');
+  } else {
+    currentUser = null;
+    completedDays = new Set();
+    overlay.classList.add('hidden');
+    goTo('screen-auth');
+  }
+});
+
+</script>
+</body>
+</html>
