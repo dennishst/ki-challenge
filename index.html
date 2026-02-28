@@ -89,7 +89,7 @@
   .ring-bg{stroke:var(--surface2);}
   .ring-fill{stroke:var(--accent);stroke-dasharray:126;stroke-dashoffset:126;transition:stroke-dashoffset 1s ease;}
   .ring-label{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:var(--accent);}
-  .streak-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem;}
+  .streak-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:2rem;}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1rem 1.4rem;flex:1;min-width:110px;}
   .stat-card .val{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--accent);line-height:1;}
   .stat-card .lbl{font-size:.75rem;color:var(--muted);margin-top:.25rem;}
@@ -346,16 +346,36 @@
     .dashboard-content { padding-bottom: 5rem !important; }
     .day-body { padding-bottom: 5rem !important; }
 
-    /* Welcome banner mobile: stack columns vertically */
+    /* Welcome banner mobile */
     .welcome-banner {
       flex-direction: column !important;
-      gap: .75rem !important;
-      padding: 1rem 1.25rem !important;
+      gap: 0 !important;
+      padding: 0 !important;
+      align-items: stretch !important;
     }
+    /* Hide vertical dividers on mobile */
     .welcome-banner > div[style*="align-self:stretch"] { display: none !important; }
-    .welcome-banner > div[style*="padding-right"] { padding-right: 0 !important; }
-    .welcome-banner > div[style*="padding:0 1.5rem"] { padding: 0 !important; }
-    .welcome-banner > div[style*="padding-left:1.5rem"] { padding-left: 0 !important; }
+    /* Col 1: headline */
+    .welcome-banner > div:first-child {
+      padding: 1.1rem 1.25rem .8rem !important;
+    }
+    /* Col 2: ring + progress – row layout on mobile too */
+    .welcome-banner > div[style*="padding:0 1.5rem"] {
+      padding: .75rem 1.25rem !important;
+      border-top: 1px solid rgba(255,255,255,.07) !important;
+      gap: .85rem !important;
+      align-items: center !important;
+    }
+    /* Col 3: group */
+    .welcome-banner > div[style*="padding-left:1.5rem"] {
+      padding: .75rem 1.25rem 1rem !important;
+      border-top: 1px solid rgba(255,255,255,.07) !important;
+      min-width: 0 !important;
+    }
+    /* Stat row: 2x2 grid on small screens */
+    .streak-row {
+      grid-template-columns: 1fr 1fr !important;
+    }
   }
 
   /* Hide mobile elements on desktop */
@@ -767,25 +787,27 @@
       <!-- DIVIDER -->
       <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.07);flex-shrink:0;"></div>
 
-      <!-- COL 3: Gruppe heute – no card, no badges -->
-      <div style="padding-left:1.5rem;flex-shrink:0;min-width:130px;">
+      <!-- COL 3: Gruppe heute -->
+      <div style="padding-left:1.5rem;flex-shrink:0;min-width:140px;">
         <div style="font-family:'Syne',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.3rem;">Gruppe heute</div>
         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--accent2);line-height:1;margin-bottom:.4rem;" id="groupBannerPct">0%</div>
-        <div style="font-size:.78rem;color:var(--muted);" id="groupBannerText">Lädt…</div>
+        <div style="background:rgba(255,255,255,.08);border-radius:100px;height:4px;overflow:hidden;margin-bottom:.4rem;">
+          <div id="groupBannerBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1.2s ease;"></div>
+        </div>
+        <div style="font-size:.75rem;color:var(--muted);" id="groupBannerText">Lädt…</div>
       </div>
 
       <!-- hidden compat -->
-      <span style="display:none;" id="groupBannerBar"></span>
       <span style="display:none;" id="statDoneBadge"></span>
       <span style="display:none;" id="statStreakBadge"></span>
       <span style="display:none;" id="statParticipantsBadge"></span>
     </div>
-    <!-- Hidden stat elements for compatibility -->
-    <div style="display:none;">
-      <span id="statDone">0</span>
-      <span id="statStreak">0</span>
-      <span id="statLeft">28</span>
-      <span id="statParticipants">–</span>
+    <!-- STAT ROW -->
+    <div class="streak-row">
+      <div class="stat-card"><div class="val" id="statDone">0</div><div class="lbl">Abgeschlossen</div></div>
+      <div class="stat-card"><div class="val" id="statStreak">0🔥</div><div class="lbl">Streak</div></div>
+      <div class="stat-card"><div class="val" id="statLeft">28</div><div class="lbl">Verbleibend</div></div>
+      <div class="stat-card"><div class="val" id="statParticipants">–</div><div class="lbl">Teilnehmende</div></div>
     </div>
 
 
@@ -1856,7 +1878,7 @@ function buildDashboard() {
 
   // Stats
   document.getElementById('statDone').textContent   = done;
-  document.getElementById('statStreak').textContent = done + '🔥';
+  document.getElementById('statStreak').textContent = streak + '🔥';
   document.getElementById('statLeft').textContent   = 28 - done;
   document.getElementById('ringPercent').textContent = pct + '%';
 
@@ -2070,7 +2092,7 @@ async function loadGroupProgress() {
     const barEl  = document.getElementById('groupBannerBar');
     if (pctEl)  pctEl.textContent  = pct + '%';
     if (textEl) textEl.textContent = `${todayUsers} von ${totalUsers} aktiv`;
-    setTimeout(() => { if (barEl) barEl.style.width = pct + '%'; }, 300);
+    if (barEl)  setTimeout(() => { barEl.style.width = pct + '%'; }, 400);
 
   } catch(e) {
     console.error('Group progress error:', e);
