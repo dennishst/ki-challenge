@@ -347,17 +347,10 @@
     .day-body { padding-bottom: 5rem !important; }
 
     /* Welcome banner mobile */
-    .welcome-banner { flex-direction: column !important; gap: .9rem !important; }
-    .welcome-banner > div[style*="width:1px"] { display: none !important; }
-    /* Ring + group side by side on mobile */
-    .banner-mobile-progress {
-      display: flex !important;
-      gap: 1rem;
-      align-items: center;
-      width: 100%;
+    .welcome-banner { padding: 1rem !important; }
+    .welcome-banner > div[style*="grid-template-columns:1fr 1fr"] {
+      grid-template-columns: 1fr !important;
     }
-    .banner-mobile-progress .banner-progress-row { flex: 0 0 auto; }
-    .banner-mobile-progress #groupBannerBlock { flex: 1; min-width: 0; }
   }
 
   /* Hide mobile elements on desktop */
@@ -458,6 +451,34 @@
   .share-option:hover { border-color: var(--accent); }
   .share-option .share-icon { font-size: 1.3rem; }
   .share-option .share-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; color: var(--text); }
+
+  /* ─── DESKTOP PILL NAVIGATION ──────────────────────── */
+  #desktopDayNav { display: none; }
+  @media (min-width: 769px) {
+    #desktopDayNav { display: block !important; }
+    /* Add bottom padding to day content so pill doesn't overlap */
+    .day-body { padding-bottom: 5rem !important; }
+  }
+  .pill-btn {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .78rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: .45rem .8rem;
+    border-radius: 100px;
+    transition: color .2s, background .2s;
+    white-space: nowrap;
+  }
+  .pill-btn:hover { color: #5eead4; background: rgba(94,234,212,.07); }
+  .pill-btn.pill-active { color: #5eead4; background: rgba(94,234,212,.1); }
+  .pill-btn.ki-pill-btn { color: #818cf8; }
+  .pill-btn.ki-pill-btn:hover { background: rgba(129,140,248,.1); }
 
 </style>
 </head>
@@ -696,48 +717,81 @@
       <div class="cd-arrow">→</div>
     </div>
 
-    <div class="welcome-banner" style="align-items:stretch;gap:1.25rem;">
-      <!-- LEFT: Text -->
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;">
-        <h2 id="welcomeHeadline" style="word-break:break-word;">Hey, los geht's! 🚀</h2>
-        <p id="welcomeSub">Deine 28-Tage-KI-Challenge. Tag 1 wartet auf dich.</p>
+    <div class="welcome-banner" style="flex-direction:column;gap:.6rem;padding:1.5rem 1.75rem 1.25rem;">
+
+      <!-- HEADLINE ROW -->
+      <div>
+        <h2 id="welcomeHeadline" style="word-break:break-word;margin-bottom:.2rem;">Hey, los geht's! 🚀</h2>
+        <p id="welcomeSub" style="margin:0;">Deine 28-Tage-KI-Challenge. Tag 1 wartet auf dich.</p>
       </div>
 
-      <!-- DIVIDER -->
-      <div style="width:1px;background:rgba(255,255,255,.07);flex-shrink:0;align-self:stretch;"></div>
+      <!-- TWO CARDS ROW -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-top:.4rem;">
 
-      <!-- MIDDLE: Eigener Fortschritt (Ring) -->
-      <div class="banner-progress-row" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;flex-shrink:0;min-width:90px;">
-        <div style="font-family:'Syne',sans-serif;font-size:.62rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:.1rem;">Mein Fortschritt</div>
-        <div class="progress-ring-wrap">
-          <svg width="64" height="64" viewBox="0 0 44 44">
-            <circle class="ring-bg" cx="22" cy="22" r="20"/>
-            <circle class="ring-fill" cx="22" cy="22" r="20" id="ringFill"/>
-          </svg>
-          <div class="ring-label" id="ringPercent">0%</div>
+        <!-- CARD LEFT: Mein Fortschritt -->
+        <div style="background:rgba(0,0,0,.25);border:1px solid rgba(94,234,212,.12);border-radius:14px;padding:1.1rem 1.2rem;display:flex;gap:1rem;align-items:center;">
+          <!-- Ring -->
+          <div style="position:relative;flex-shrink:0;">
+            <svg width="90" height="90" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
+              <circle fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4" cx="22" cy="22" r="18"/>
+              <circle fill="none" stroke="url(#ringGrad)" stroke-width="4" stroke-linecap="round"
+                cx="22" cy="22" r="18"
+                stroke-dasharray="113" stroke-dashoffset="113"
+                id="ringFill" style="transition:stroke-dashoffset 1s ease;"/>
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#818cf8"/>
+                  <stop offset="100%" stop-color="#5eead4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <span style="font-family:'Syne',sans-serif;font-size:.5rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;" id="ringLevel">LEVEL 1</span>
+              <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--accent);line-height:1;" id="ringPercent">0%</span>
+            </div>
+          </div>
+          <!-- Info -->
+          <div style="min-width:0;flex:1;">
+            <div style="font-family:'Syne',sans-serif;font-size:.6rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.35rem;">Mein Fortschritt</div>
+            <div style="font-size:.82rem;color:var(--text);margin-bottom:.5rem;" id="ringLektionen">0 von 28 Lektionen</div>
+            <div style="background:rgba(255,255,255,.06);border-radius:100px;height:3px;overflow:hidden;margin-bottom:.4rem;">
+              <div id="ringBar" style="height:100%;background:linear-gradient(90deg,#818cf8,#5eead4);border-radius:100px;width:0%;transition:width 1s ease;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <span style="font-size:.7rem;color:var(--muted);">Bis nächstes Level</span>
+            </div>
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);margin-top:.1rem;" id="ringNextLevel">–</div>
+          </div>
         </div>
-      </div>
 
-      <!-- DIVIDER (hidden on mobile) -->
-      <div style="width:1px;background:rgba(255,255,255,.07);flex-shrink:0;align-self:stretch;"></div>
-
-      <!-- RIGHT: Gruppen-Fortschritt (Bar) -->
-      <div id="groupBannerBlock" style="display:flex;flex-direction:column;justify-content:center;gap:.5rem;min-width:140px;flex:1;">
-        <div style="font-family:'Syne',sans-serif;font-size:.62rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">Gruppe heute</div>
-        <div style="display:flex;align-items:baseline;gap:.4rem;">
-          <span id="groupBannerPct" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--accent2);">–%</span>
-          <span id="groupBannerText" style="font-size:.75rem;color:var(--muted);"></span>
-        </div>
-        <div style="background:rgba(255,255,255,.07);border-radius:100px;height:5px;overflow:hidden;">
-          <div id="groupBannerBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1s ease;"></div>
+        <!-- CARD RIGHT: Gruppe heute -->
+        <div style="background:rgba(0,0,0,.25);border:1px solid rgba(129,140,248,.12);border-radius:14px;padding:1.1rem 1.2rem;display:flex;flex-direction:column;justify-content:space-between;">
+          <div style="font-family:'Syne',sans-serif;font-size:.6rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.5rem;">Gruppe heute</div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--accent2);line-height:1;margin-bottom:.3rem;" id="groupBannerPct">–%</div>
+            <div style="background:rgba(255,255,255,.07);border-radius:100px;height:5px;overflow:hidden;margin-bottom:.5rem;">
+              <div id="groupBannerBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1.2s ease;"></div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border-radius:100px;height:3px;overflow:hidden;margin-bottom:.5rem;">
+              <div style="height:100%;width:100%;background:rgba(129,140,248,.15);border-radius:100px;"></div>
+            </div>
+            <div style="font-size:.78rem;color:var(--muted);" id="groupBannerText">Lädt…</div>
+          </div>
+          <div style="display:flex;gap:.5rem;margin-top:.6rem;" id="statBadges">
+            <span style="background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.15);border-radius:6px;padding:.2rem .5rem;font-size:.68rem;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;" id="statDoneBadge">0 ✓</span>
+            <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);border-radius:6px;padding:.2rem .5rem;font-size:.68rem;color:#f87171;font-family:'Syne',sans-serif;font-weight:700;" id="statStreakBadge">0🔥</span>
+            <span style="background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.15);border-radius:6px;padding:.2rem .5rem;font-size:.68rem;color:var(--accent2);font-family:'Syne',sans-serif;font-weight:700;" id="statParticipantsBadge">– 👥</span>
+          </div>
         </div>
       </div>
     </div>
-    <div class="streak-row">
-      <div class="stat-card"><div class="val" id="statDone">0</div><div class="lbl">Abgeschlossen</div></div>
-      <div class="stat-card"><div class="val" id="statStreak">0🔥</div><div class="lbl">Streak</div></div>
-      <div class="stat-card"><div class="val" id="statLeft">28</div><div class="lbl">Verbleibend</div></div>
-      <div class="stat-card"><div class="val" id="statParticipants">–</div><div class="lbl">Teilnehmende</div></div>
+    <!-- Hidden stat elements for compatibility -->
+    <div style="display:none;">
+      <span id="statDone">0</span>
+      <span id="statStreak">0</span>
+      <span id="statLeft">28</span>
+      <span id="statParticipants">–</span>
     </div>
 
 
@@ -810,6 +864,33 @@
     <a href="#" onclick="showLegal('imprint');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Impressum</a>
   </p>
 </footer>
+
+<!-- DESKTOP PILL NAVIGATION (day screen) -->
+<nav id="desktopDayNav" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:20;background:rgba(20,24,40,.95);border:1px solid rgba(94,234,212,.15);border-radius:100px;padding:.4rem .5rem;box-shadow:0 8px 32px rgba(0,0,0,.4);backdrop-filter:blur(12px);">
+  <div style="display:flex;align-items:center;gap:.25rem;">
+    <button class="pill-btn" onclick="goTo('screen-dashboard')" title="Dashboard">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="pill-btn ki-pill-btn" onclick="openKiTool()" title="KI-Tool öffnen" id="desktopKiBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+      <span id="desktopKiLabel">ChatGPT</span>
+    </button>
+    <button class="pill-btn pill-active" onclick="openCurrentDay()" title="Aktueller Tag">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="desktopDayLabel">Tag 1</span>
+    </button>
+    <button class="pill-btn" onclick="openShare()" title="Teilen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      <span>Teilen</span>
+    </button>
+    <button class="pill-btn" onclick="openProfile()" title="Profil">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profil</span>
+    </button>
+  </div>
+</nav>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
@@ -1784,7 +1865,28 @@ function buildDashboard() {
   document.getElementById('statStreak').textContent = done + '🔥';
   document.getElementById('statLeft').textContent   = 28 - done;
   document.getElementById('ringPercent').textContent = pct + '%';
-  document.getElementById('ringFill').style.strokeDashoffset = 126 - (126 * pct / 100);
+
+  // New ring uses dasharray=113 (r=18)
+  const ringFillEl = document.getElementById('ringFill');
+  if (ringFillEl) ringFillEl.style.strokeDashoffset = 113 - (113 * pct / 100);
+
+  // Level system (7 days per level)
+  const level = Math.min(4, Math.floor(done / 7) + 1);
+  const levelEl = document.getElementById('ringLevel');
+  if (levelEl) levelEl.textContent = 'LEVEL ' + level;
+  const lektEl = document.getElementById('ringLektionen');
+  if (lektEl) lektEl.textContent = done + ' von 28 Lektionen';
+  const ringBarEl = document.getElementById('ringBar');
+  if (ringBarEl) setTimeout(() => { ringBarEl.style.width = pct + '%'; }, 200);
+  const nextLevelDays = level < 4 ? (level * 7) - done : 0;
+  const nextEl = document.getElementById('ringNextLevel');
+  if (nextEl) nextEl.textContent = nextLevelDays > 0 ? nextLevelDays + (nextLevelDays === 1 ? ' Tag' : ' Tage') : '🏆 Max Level!';
+
+  // Update stat badges
+  const doneBadge = document.getElementById('statDoneBadge');
+  if (doneBadge) doneBadge.textContent = done + ' ✓';
+  const streakBadge = document.getElementById('statStreakBadge');
+  if (streakBadge) streakBadge.textContent = done + '🔥';
 
   // Welcome message
   if (done === 0) {
@@ -1965,6 +2067,8 @@ async function loadGroupProgress() {
 
     // Update UI
     document.getElementById('statParticipants').textContent = totalUsers;
+    const pb = document.getElementById('statParticipantsBadge');
+    if (pb) pb.textContent = totalUsers + ' 👥';
 
     // Update banner group block
     const pctEl = document.getElementById('groupBannerPct');
@@ -2024,8 +2128,7 @@ function getSelectedKi() {
 
 function updateKiLabels() {
   const ki = getSelectedKi();
-  const labels = ['mobileKiLabel', 'dayKiLabel'];
-  labels.forEach(id => {
+  ['mobileKiLabel', 'dayKiLabel', 'desktopKiLabel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = ki.name;
   });
@@ -2071,7 +2174,7 @@ function renderKiList() {
         <div class="ki-name">${t.name}</div>
         <div class="ki-url">${t.url.replace('https://', '')}</div>
       </div>
-      ${t.custom ? `<button onclick="event.stopPropagation();removeCustomKiTool('${t.id}')" style="background:none;border:none;color:#475569;font-size:1rem;cursor:pointer;padding:.2rem .4rem;" title="Entfernen">×</button>` : ''}
+      ${t.custom ? `<button onclick="event.stopPropagation();removeCustomKiTool('${t.id}')" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);border-radius:6px;color:#f87171;font-size:.75rem;font-weight:700;cursor:pointer;padding:.2rem .45rem;line-height:1;transition:background .2s;" onmouseover="this.style.background='rgba(248,113,113,.25)'" onmouseout="this.style.background='rgba(248,113,113,.1)'" title="Entfernen">✕</button>` : ''}
       <span class="ki-check" style="color:var(--accent);font-size:.9rem;opacity:${t.id === selectedKiTool ? '1' : '0'};">✓</span>
     </div>
   `).join('');
@@ -2159,10 +2262,12 @@ function updateMobileCurrentCard() {
   const title = document.getElementById('mobileCardTitle');
   const unlock = document.getElementById('mobileCardUnlock');
   const label = document.getElementById('mobileCurrentLabel');
+  const desktopLabel = document.getElementById('desktopDayLabel');
 
   if (badge) badge.textContent = `HEUTE · TAG ${activeDay}`;
   if (title) title.textContent = day.title;
   if (label) label.textContent = `Tag ${activeDay}`;
+  if (desktopLabel) desktopLabel.textContent = `Tag ${activeDay}`;
 
   // Check if previous day was completed today (unlock tomorrow)
   const prevCompleted = window.completionDates && window.completionDates[activeDay - 1];
