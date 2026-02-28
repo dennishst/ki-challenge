@@ -346,8 +346,18 @@
     .dashboard-content { padding-bottom: 5rem !important; }
     .day-body { padding-bottom: 5rem !important; }
 
-    /* Welcome banner stacked */
-    .welcome-banner { flex-direction: column; align-items: flex-start; }
+    /* Welcome banner mobile */
+    .welcome-banner { flex-direction: column !important; gap: .9rem !important; }
+    .welcome-banner > div[style*="width:1px"] { display: none !important; }
+    /* Ring + group side by side on mobile */
+    .banner-mobile-progress {
+      display: flex !important;
+      gap: 1rem;
+      align-items: center;
+      width: 100%;
+    }
+    .banner-mobile-progress .banner-progress-row { flex: 0 0 auto; }
+    .banner-mobile-progress #groupBannerBlock { flex: 1; min-width: 0; }
   }
 
   /* Hide mobile elements on desktop */
@@ -686,22 +696,41 @@
       <div class="cd-arrow">→</div>
     </div>
 
-    <div class="welcome-banner">
-      <div style="flex:1;min-width:0;">
+    <div class="welcome-banner" style="align-items:stretch;gap:1.25rem;">
+      <!-- LEFT: Text -->
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;">
         <h2 id="welcomeHeadline" style="word-break:break-word;">Hey, los geht's! 🚀</h2>
         <p id="welcomeSub">Deine 28-Tage-KI-Challenge. Tag 1 wartet auf dich.</p>
-        <div id="groupBannerStat" style="display:none;margin-top:.75rem;padding:.5rem .8rem;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.15);border-radius:8px;font-size:.78rem;color:var(--muted);display:inline-flex;align-items:center;gap:.4rem;">
-          <span style="color:var(--accent2);">👥</span>
-          <span id="groupBannerText">Lädt…</span>
-          <span id="groupBannerPct" style="color:var(--accent2);font-family:'Syne',sans-serif;font-weight:700;margin-left:.2rem;"></span>
+      </div>
+
+      <!-- DIVIDER -->
+      <div style="width:1px;background:rgba(255,255,255,.07);flex-shrink:0;align-self:stretch;"></div>
+
+      <!-- MIDDLE: Eigener Fortschritt (Ring) -->
+      <div class="banner-progress-row" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;flex-shrink:0;min-width:90px;">
+        <div style="font-family:'Syne',sans-serif;font-size:.62rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:.1rem;">Mein Fortschritt</div>
+        <div class="progress-ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 44 44">
+            <circle class="ring-bg" cx="22" cy="22" r="20"/>
+            <circle class="ring-fill" cx="22" cy="22" r="20" id="ringFill"/>
+          </svg>
+          <div class="ring-label" id="ringPercent">0%</div>
         </div>
       </div>
-      <div class="progress-ring-wrap" style="flex-shrink:0;">
-        <svg width="60" height="60" viewBox="0 0 44 44">
-          <circle class="ring-bg" cx="22" cy="22" r="20"/>
-          <circle class="ring-fill" cx="22" cy="22" r="20" id="ringFill"/>
-        </svg>
-        <div class="ring-label" id="ringPercent">0%</div>
+
+      <!-- DIVIDER (hidden on mobile) -->
+      <div style="width:1px;background:rgba(255,255,255,.07);flex-shrink:0;align-self:stretch;"></div>
+
+      <!-- RIGHT: Gruppen-Fortschritt (Bar) -->
+      <div id="groupBannerBlock" style="display:flex;flex-direction:column;justify-content:center;gap:.5rem;min-width:140px;flex:1;">
+        <div style="font-family:'Syne',sans-serif;font-size:.62rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;">Gruppe heute</div>
+        <div style="display:flex;align-items:baseline;gap:.4rem;">
+          <span id="groupBannerPct" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--accent2);">–%</span>
+          <span id="groupBannerText" style="font-size:.75rem;color:var(--muted);"></span>
+        </div>
+        <div style="background:rgba(255,255,255,.07);border-radius:100px;height:5px;overflow:hidden;">
+          <div id="groupBannerBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1s ease;"></div>
+        </div>
       </div>
     </div>
     <div class="streak-row">
@@ -711,19 +740,7 @@
       <div class="stat-card"><div class="val" id="statParticipants">–</div><div class="lbl">Teilnehmende</div></div>
     </div>
 
-    <!-- GROUP PROGRESS -->
-    <div id="groupProgressWrap" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.4rem;margin-bottom:1.5rem;display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem;">
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-size:.7rem;letter-spacing:.1em;color:var(--accent2);text-transform:uppercase;margin-bottom:.2rem;">Heutige Abschlüsse – Gruppe</div>
-          <div style="font-size:.82rem;color:var(--muted);" id="groupProgressSub">Lädt…</div>
-        </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);" id="groupProgressPct">–%</div>
-      </div>
-      <div style="background:var(--surface2);border-radius:100px;height:6px;overflow:hidden;">
-        <div id="groupProgressBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1s ease;"></div>
-      </div>
-    </div>
+
     <div id="weekSections"></div>
   </div>
 
@@ -1949,23 +1966,13 @@ async function loadGroupProgress() {
     // Update UI
     document.getElementById('statParticipants').textContent = totalUsers;
 
-    const wrap = document.getElementById('groupProgressWrap');
-    wrap.style.display = 'block';
-    document.getElementById('groupProgressPct').textContent = pct + '%';
-    document.getElementById('groupProgressSub').textContent =
-      `${todayUsers} von ${totalUsers} Teilnehmenden aktiv heute`;
-    setTimeout(() => {
-      document.getElementById('groupProgressBar').style.width = pct + '%';
-    }, 200);
-
-    // Update welcome banner stat
-    const bannerStat = document.getElementById('groupBannerStat');
-    if (bannerStat) {
-      bannerStat.style.display = 'inline-flex';
-      document.getElementById('groupBannerText').textContent =
-        `${todayUsers} von ${totalUsers} Teilnehmenden heute aktiv`;
-      document.getElementById('groupBannerPct').textContent = `· ${pct}%`;
-    }
+    // Update banner group block
+    const pctEl = document.getElementById('groupBannerPct');
+    const textEl = document.getElementById('groupBannerText');
+    const barEl  = document.getElementById('groupBannerBar');
+    if (pctEl)  pctEl.textContent  = pct + '%';
+    if (textEl) textEl.textContent = `${todayUsers} von ${totalUsers} aktiv`;
+    setTimeout(() => { if (barEl) barEl.style.width = pct + '%'; }, 300);
 
   } catch(e) {
     console.error('Group progress error:', e);
@@ -1976,18 +1983,43 @@ async function loadGroupProgress() {
 // MOBILE NAVIGATION
 // ════════════════════════════════════════════════════════
 
-const KI_TOOLS = [
-  { id: 'chatgpt',    name: 'ChatGPT',    icon: '🟢', url: 'https://chat.openai.com' },
-  { id: 'claude',     name: 'Claude',     icon: '🟠', url: 'https://claude.ai' },
-  { id: 'gemini',     name: 'Gemini',     icon: '🔵', url: 'https://gemini.google.com' },
-  { id: 'perplexity', name: 'Perplexity', icon: '🟣', url: 'https://perplexity.ai' },
-  { id: 'copilot',    name: 'Copilot',    icon: '⚪', url: 'https://copilot.microsoft.com' },
+// Real SVG logos for KI tools
+const KI_TOOL_LOGOS = {
+  chatgpt: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.28 9.78a5.98 5.98 0 00-.52-4.91 6.1 6.1 0 00-6.57-2.93A6.02 6.02 0 0010.7.5a6.1 6.1 0 00-5.82 4.22 6.03 6.03 0 00-4.02 2.93 6.1 6.1 0 00.75 7.14 5.98 5.98 0 00.52 4.91 6.1 6.1 0 006.57 2.93 6.02 6.02 0 004.49 2.44 6.1 6.1 0 005.83-4.23 6.03 6.03 0 004.02-2.92 6.1 6.1 0 00-.76-7.14zm-9.28 13a4.52 4.52 0 01-2.9-1.06l.14-.08 4.82-2.78a.8.8 0 00.4-.69v-6.8l2.04 1.18a.07.07 0 01.04.06v5.62a4.54 4.54 0 01-4.54 4.55zm-9.74-4.17a4.52 4.52 0 01-.54-3.05l.14.09 4.82 2.78a.8.8 0 00.8 0l5.88-3.4v2.35a.07.07 0 01-.03.06l-4.87 2.81a4.54 4.54 0 01-6.2-1.64zm-1.27-10.5a4.52 4.52 0 012.36-1.99v5.72a.8.8 0 00.4.69l5.88 3.4-2.04 1.17a.07.07 0 01-.07 0L3.75 14.4a4.54 4.54 0 01-.76-6.29zm16.73 3.9l-5.88-3.4 2.04-1.18a.07.07 0 01.07 0l4.87 2.81a4.52 4.52 0 01-.7 8.17V12.7a.8.8 0 00-.4-.69zm2.03-3.07l-.14-.09-4.82-2.78a.8.8 0 00-.8 0L9.11 9.87V7.52a.07.07 0 01.03-.06l4.87-2.81a4.54 4.54 0 016.74 4.7zm-12.74 4.19l-2.04-1.18a.07.07 0 01-.04-.06V6.27a4.54 4.54 0 017.44-3.49l-.14.08-4.82 2.78a.8.8 0 00-.4.69v6.8zm1.1-2.38l2.62-1.51 2.62 1.51v3.02l-2.62 1.51-2.62-1.51V10.75z"/></svg>`,
+  claude: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.33 12.37c.28-.67.42-1.38.42-2.12 0-3.11-2.5-5.62-5.6-5.62-1.13 0-2.18.33-3.06.9L7.6 4.04A7.93 7.93 0 0112.15 2.5c4.42 0 8 3.61 8 8.07 0 1.22-.27 2.37-.76 3.4l-2.06-1.6zM12 21.5c-2.08 0-3.96-.8-5.37-2.1l1.5-1.73a5.58 5.58 0 003.87 1.56c3.09 0 5.6-2.52 5.6-5.63 0-.44-.05-.86-.14-1.27l2.1-1.22c.22.79.34 1.62.34 2.49C19.9 17.97 16.37 21.5 12 21.5zm-7.9-8.07c0-1.2.27-2.34.75-3.35l2.06 1.6c-.28.67-.43 1.4-.43 2.15 0 3.11 2.52 5.63 5.62 5.63.32 0 .63-.03.94-.07l.72 2.13c-.54.1-1.1.16-1.66.16-4.41 0-8-3.6-8-8.06v.01z"/></svg>`,
+  gemini: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l7 4.5-7 4.5z"/><path d="M12 4.5c.96 0 1.88.18 2.73.5L12 8.73 9.27 5A7.45 7.45 0 0112 4.5zm6.5 5.77L15.27 12l3.23 1.73c.32-.85.5-1.77.5-2.73s-.18-1.88-.5-2.73zM5.5 9.27C5.18 10.12 5 11.04 5 12s.18 1.88.5 2.73L8.73 12 5.5 9.27zM12 19.5c-.96 0-1.88-.18-2.73-.5L12 15.27l2.73 3.73c-.85.32-1.77.5-2.73.5zm1-6.77L12 8.73l3.23 1.73L12 12.73z"/></svg>`,
+  perplexity: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v10l9 5 9-5V7L12 2zm0 2.18L19 8v8l-7 3.82L5 16V8l7-3.82zM12 6L7 8.73v6.54L12 18l5-2.73V8.73L12 6zm0 2.18L15 10v4l-3 1.64L9 14v-4l3-1.82z"/></svg>`,
+  copilot: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm4.93 6.5h-3.18l1.6-2.77a8.2 8.2 0 011.58 2.77zm-5.68-2.9l-1.83 3.16H6.3a8.23 8.23 0 014.95-3.16zm-5.58 4.9h3.5L7.62 14H4.1a8.2 8.2 0 011.57-3.5zm1.68 5.25l1.8-3.12h3.5l-1.8 3.12H7.35zm3.12 3.28l1.83-3.16h3.35a8.23 8.23 0 01-5.18 3.16zm5.86-4.9h-3.5l1.55-2.5h3.5a8.2 8.2 0 01-1.55 2.5z"/></svg>`,
+};
+
+const KI_TOOLS_DEFAULT = [
+  { id: 'chatgpt',    name: 'ChatGPT',    color: '#10a37f', url: 'https://chat.openai.com' },
+  { id: 'claude',     name: 'Claude',     color: '#d4a574', url: 'https://claude.ai' },
+  { id: 'gemini',     name: 'Gemini',     color: '#4285f4', url: 'https://gemini.google.com' },
+  { id: 'perplexity', name: 'Perplexity', color: '#20b2aa', url: 'https://perplexity.ai' },
+  { id: 'copilot',    name: 'Copilot',    color: '#0078d4', url: 'https://copilot.microsoft.com' },
 ];
+
+function getCustomKiTools() {
+  return JSON.parse(localStorage.getItem('ki_custom_tools') || '[]');
+}
+
+function getAllKiTools() {
+  return [...KI_TOOLS_DEFAULT, ...getCustomKiTools()];
+}
+
+function getKiLogo(tool) {
+  if (KI_TOOL_LOGOS[tool.id]) {
+    return `<svg viewBox="0 0 24 24" fill="${tool.color || 'currentColor'}" width="22" height="22">${KI_TOOL_LOGOS[tool.id].match(/<svg[^>]*>([\s\S]*)<\/svg>/)?.[1] || ''}</svg>`;
+  }
+  // Custom tool: show first letter
+  return `<span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:${tool.color||'var(--accent)'};">${tool.name[0].toUpperCase()}</span>`;
+}
 
 let selectedKiTool = localStorage.getItem('ki_tool') || 'chatgpt';
 
 function getSelectedKi() {
-  return KI_TOOLS.find(t => t.id === selectedKiTool) || KI_TOOLS[0];
+  return getAllKiTools().find(t => t.id === selectedKiTool) || KI_TOOLS_DEFAULT[0];
 }
 
 function updateKiLabels() {
@@ -2011,7 +2043,7 @@ function openKiTool() {
   sheet.innerHTML = `
     <div style="background:#141828;border:1px solid rgba(94,234,212,.2);border-radius:20px 20px 0 0;padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom));width:100%;max-width:500px;animation:slideUp .2s ease;">
       <div style="text-align:center;margin-bottom:1.25rem;">
-        <div style="font-size:2rem;margin-bottom:.5rem;">🔗</div>
+        <div style="width:44px;height:44px;border-radius:12px;background:${ki.color+'22'};display:flex;align-items:center;justify-content:center;margin:0 auto .6rem;">${getKiLogo(ki)}</div>
         <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.3rem;">Zu ${ki.name} wechseln?</div>
         <div style="font-size:.82rem;color:var(--muted);">Du verlässt die KI-Challenge und wirst zu <strong style="color:var(--accent);">${ki.url.replace('https://','')}</strong> weitergeleitet.</div>
       </div>
@@ -2027,18 +2059,62 @@ function openKiTool() {
   document.body.appendChild(sheet);
 }
 
-function openKiSettings() {
+function renderKiList() {
   const list = document.getElementById('kiOptionsList');
-  list.innerHTML = KI_TOOLS.map(t => `
+  const tools = getAllKiTools();
+  list.innerHTML = tools.map(t => `
     <div class="ki-option ${t.id === selectedKiTool ? 'selected' : ''}" onclick="selectKiTool('${t.id}')">
-      <span class="ki-logo">${t.icon}</span>
-      <div>
+      <span class="ki-logo" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:${t.color ? t.color+'22' : 'rgba(255,255,255,.05)'};">
+        ${getKiLogo(t)}
+      </span>
+      <div style="flex:1;min-width:0;">
         <div class="ki-name">${t.name}</div>
         <div class="ki-url">${t.url.replace('https://', '')}</div>
       </div>
-      <span class="ki-check">✓</span>
+      ${t.custom ? `<button onclick="event.stopPropagation();removeCustomKiTool('${t.id}')" style="background:none;border:none;color:#475569;font-size:1rem;cursor:pointer;padding:.2rem .4rem;" title="Entfernen">×</button>` : ''}
+      <span class="ki-check" style="color:var(--accent);font-size:.9rem;opacity:${t.id === selectedKiTool ? '1' : '0'};">✓</span>
     </div>
   `).join('');
+
+  // Add custom tool button
+  list.innerHTML += `
+    <div class="ki-option" id="addKiBtn" onclick="toggleAddKiForm()" style="border-style:dashed;color:var(--muted);">
+      <span style="font-size:1.1rem;">＋</span>
+      <div><div class="ki-name" style="color:var(--muted);">KI-Tool hinzufügen</div></div>
+    </div>
+    <div id="addKiForm" style="display:none;background:rgba(94,234,212,.04);border:1px solid rgba(94,234,212,.15);border-radius:10px;padding:.9rem;margin-top:.3rem;">
+      <input id="newKiName" type="text" placeholder="Name (z.B. Grok)" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.55rem .8rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;margin-bottom:.5rem;box-sizing:border-box;">
+      <input id="newKiUrl" type="url" placeholder="URL (z.B. https://grok.x.ai)" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:.55rem .8rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;margin-bottom:.6rem;box-sizing:border-box;">
+      <button onclick="addCustomKiTool()" style="width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;border:none;border-radius:8px;padding:.6rem;cursor:pointer;">Hinzufügen</button>
+    </div>`;
+}
+
+function toggleAddKiForm() {
+  const form = document.getElementById('addKiForm');
+  if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function addCustomKiTool() {
+  const name = document.getElementById('newKiName')?.value.trim();
+  const url  = document.getElementById('newKiUrl')?.value.trim();
+  if (!name || !url) { showToast('Name und URL angeben', 'error'); return; }
+  const id = 'custom_' + Date.now();
+  const custom = getCustomKiTools();
+  custom.push({ id, name, url, color: '#5eead4', custom: true });
+  localStorage.setItem('ki_custom_tools', JSON.stringify(custom));
+  renderKiList();
+  showToast(`${name} hinzugefügt ✓`, 'success');
+}
+
+function removeCustomKiTool(id) {
+  const custom = getCustomKiTools().filter(t => t.id !== id);
+  localStorage.setItem('ki_custom_tools', JSON.stringify(custom));
+  if (selectedKiTool === id) { selectedKiTool = 'chatgpt'; localStorage.setItem('ki_tool', 'chatgpt'); }
+  renderKiList();
+}
+
+function openKiSettings() {
+  renderKiList();
   document.getElementById('kiSettingsModal').classList.add('open');
 }
 
@@ -2046,10 +2122,8 @@ function selectKiTool(id) {
   selectedKiTool = id;
   localStorage.setItem('ki_tool', id);
   updateKiLabels();
-  // Update selected state
-  document.querySelectorAll('.ki-option').forEach(el => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
-  setTimeout(closeKiSettings, 400);
+  renderKiList();
+  setTimeout(closeKiSettings, 350);
 }
 
 function closeKiSettings() {
