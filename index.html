@@ -348,11 +348,14 @@
 
     /* Welcome banner mobile: stack columns vertically */
     .welcome-banner {
-      grid-template-columns: 1fr !important;
-      grid-template-rows: auto !important;
+      flex-direction: column !important;
+      gap: .75rem !important;
+      padding: 1rem 1.25rem !important;
     }
-    /* Hide dividers on mobile */
-    .welcome-banner > div[style*="width:1px"] { display: none !important; }
+    .welcome-banner > div[style*="align-self:stretch"] { display: none !important; }
+    .welcome-banner > div[style*="padding-right"] { padding-right: 0 !important; }
+    .welcome-banner > div[style*="padding:0 1.5rem"] { padding: 0 !important; }
+    .welcome-banner > div[style*="padding-left:1.5rem"] { padding-left: 0 !important; }
   }
 
   /* Hide mobile elements on desktop */
@@ -719,22 +722,22 @@
       <div class="cd-arrow">→</div>
     </div>
 
-    <div class="welcome-banner" style="display:grid;grid-template-columns:1fr auto auto;gap:0;padding:0;overflow:hidden;align-items:stretch;">
+    <div class="welcome-banner" style="display:flex;flex-direction:row;align-items:center;gap:0;padding:1.25rem 1.75rem;justify-content:space-between;">
 
       <!-- COL 1: Hey Text -->
-      <div style="padding:1.5rem 1.75rem;display:flex;flex-direction:column;justify-content:center;min-width:0;">
+      <div style="flex:1;min-width:0;padding-right:1.5rem;">
         <h2 id="welcomeHeadline" style="word-break:break-word;margin-bottom:.25rem;">Hey, los geht's! 🚀</h2>
         <p id="welcomeSub" style="margin:0;">Deine 28-Tage-KI-Challenge. Tag 1 wartet auf dich.</p>
       </div>
 
       <!-- DIVIDER -->
-      <div style="width:1px;background:rgba(255,255,255,.07);"></div>
+      <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.07);flex-shrink:0;"></div>
 
-      <!-- COL 2: Mein Fortschritt -->
-      <div style="padding:1.25rem 1.5rem;display:flex;gap:1rem;align-items:center;min-width:260px;">
+      <!-- COL 2: Mein Fortschritt – Ring + Text inline, no card -->
+      <div style="display:flex;align-items:center;gap:.9rem;padding:0 1.5rem;flex-shrink:0;">
         <!-- Ring -->
         <div style="position:relative;flex-shrink:0;">
-          <svg width="80" height="80" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
+          <svg width="72" height="72" viewBox="0 0 44 44" style="transform:rotate(-90deg);">
             <circle fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4" cx="22" cy="22" r="18"/>
             <circle fill="none" stroke="url(#ringGrad)" stroke-width="4" stroke-linecap="round"
               cx="22" cy="22" r="18"
@@ -748,39 +751,34 @@
             </defs>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <span style="font-family:'Syne',sans-serif;font-size:.45rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;" id="ringLevel">LEVEL 1</span>
-            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);line-height:1;" id="ringPercent">0%</span>
+            <span style="font-family:'Syne',sans-serif;font-size:.42rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;" id="ringLevel">LEVEL 1</span>
+            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);line-height:1;" id="ringPercent">0%</span>
           </div>
         </div>
-        <!-- Info -->
-        <div style="min-width:0;">
-          <div style="font-family:'Syne',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.3rem;">Mein Fortschritt</div>
-          <div style="font-size:.8rem;color:var(--text);margin-bottom:.4rem;" id="ringLektionen">0 von 28 Lektionen</div>
-          <div style="background:rgba(255,255,255,.06);border-radius:100px;height:3px;overflow:hidden;margin-bottom:.35rem;">
-            <div id="ringBar" style="height:100%;background:linear-gradient(90deg,#818cf8,#5eead4);border-radius:100px;width:0%;transition:width 1s ease;"></div>
-          </div>
-          <div style="font-size:.68rem;color:var(--muted);">Bis nächstes Level</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--accent);margin-top:.1rem;" id="ringNextLevel">–</div>
+        <!-- Text beside ring -->
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.2rem;">Mein Fortschritt</div>
+          <div style="font-size:.88rem;color:var(--text);font-weight:600;margin-bottom:.5rem;" id="ringLektionen">0 von 28 Lektionen</div>
+          <div style="font-size:.65rem;color:var(--muted);margin-bottom:.1rem;">Bis nächstes Level</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);" id="ringNextLevel">–</div>
         </div>
       </div>
 
       <!-- DIVIDER -->
-      <div style="width:1px;background:rgba(255,255,255,.07);"></div>
+      <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.07);flex-shrink:0;"></div>
 
-      <!-- COL 3: Gruppe heute -->
-      <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;justify-content:center;gap:.4rem;min-width:180px;">
-        <div style="font-family:'Syne',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;">Gruppe heute</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--accent2);line-height:1;" id="groupBannerPct">–%</div>
-        <div style="background:rgba(255,255,255,.07);border-radius:100px;height:4px;overflow:hidden;">
-          <div id="groupBannerBar" style="height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:100px;width:0%;transition:width 1.2s ease;"></div>
-        </div>
-        <div style="font-size:.75rem;color:var(--muted);" id="groupBannerText">Lädt…</div>
-        <div style="display:flex;gap:.4rem;margin-top:.2rem;">
-          <span style="background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.15);border-radius:5px;padding:.15rem .45rem;font-size:.65rem;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;" id="statDoneBadge">0 ✓</span>
-          <span style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);border-radius:5px;padding:.15rem .45rem;font-size:.65rem;color:#f87171;font-family:'Syne',sans-serif;font-weight:700;" id="statStreakBadge">0🔥</span>
-          <span style="background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.15);border-radius:5px;padding:.15rem .45rem;font-size:.65rem;color:var(--accent2);font-family:'Syne',sans-serif;font-weight:700;" id="statParticipantsBadge">–</span>
-        </div>
+      <!-- COL 3: Gruppe heute – no card, no badges -->
+      <div style="padding-left:1.5rem;flex-shrink:0;min-width:130px;">
+        <div style="font-family:'Syne',sans-serif;font-size:.58rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.3rem;">Gruppe heute</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--accent2);line-height:1;margin-bottom:.4rem;" id="groupBannerPct">0%</div>
+        <div style="font-size:.78rem;color:var(--muted);" id="groupBannerText">Lädt…</div>
       </div>
+
+      <!-- hidden compat -->
+      <span style="display:none;" id="groupBannerBar"></span>
+      <span style="display:none;" id="statDoneBadge"></span>
+      <span style="display:none;" id="statStreakBadge"></span>
+      <span style="display:none;" id="statParticipantsBadge"></span>
     </div>
     <!-- Hidden stat elements for compatibility -->
     <div style="display:none;">
@@ -1873,7 +1871,7 @@ function buildDashboard() {
   const lektEl = document.getElementById('ringLektionen');
   if (lektEl) lektEl.textContent = done + ' von 28 Lektionen';
   const ringBarEl = document.getElementById('ringBar');
-  if (ringBarEl) setTimeout(() => { ringBarEl.style.width = pct + '%'; }, 200);
+  // ringBar removed from new layout
   const nextLevelDays = level < 4 ? (level * 7) - done : 0;
   const nextEl = document.getElementById('ringNextLevel');
   if (nextEl) nextEl.textContent = nextLevelDays > 0 ? nextLevelDays + (nextLevelDays === 1 ? ' Tag' : ' Tage') : '🏆 Max Level!';
