@@ -1876,6 +1876,19 @@ function buildDashboard() {
   const pct     = Math.round(done / 28 * 100);
   const activeDay = getActiveDay();
 
+  // Calculate streak: consecutive days ending today
+  let streak = 0;
+  const today = new Date();
+  for (let i = 1; i <= 28; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - (streak));
+    const dateStr = d.toISOString().split('T')[0];
+    // Check if any day was completed on this calendar date
+    const completedOnDay = Object.values(window.completionDates || {})
+      .some(ts => ts && ts.startsWith(dateStr));
+    if (completedOnDay) { streak++; } else { break; }
+  }
+
   // Stats
   document.getElementById('statDone').textContent   = done;
   document.getElementById('statStreak').textContent = streak + '🔥';
