@@ -607,9 +607,9 @@
 <div id="screen-auth" class="screen">
   <div class="auth-card">
     <div style="text-align:center;margin-bottom:1.2rem;">
-      <div class="auth-logo">
-        <div class="auth-logo-icon">🤖</div>
-        <div class="auth-logo-text">KI<span>Challenge</span></div>
+      <div class="auth-logo" style="flex-direction:column;gap:.4rem;">
+        <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport Logo" style="height:48px;width:auto;object-fit:contain;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</div>
       </div>
     </div>
     <h1 style="text-align:center;">Willkommen<br><span>zur Challenge.</span></h1>
@@ -687,16 +687,16 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <div class="mobile-header-brand" style="display:flex;align-items:center;gap:.4rem;">
-      <div style="width:24px;height:24px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">🤖</div>
-      KI<span>Challenge</span>
+    <div class="mobile-header-brand" style="display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:22px;width:auto;object-fit:contain;">
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</span>
     </div>
   </div>
 
   <div class="topbar">
-    <div class="topbar-brand" style="display:flex;align-items:center;gap:.5rem;">
-      <div style="width:28px;height:28px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;">🤖</div>
-      KI<span>Challenge</span>
+    <div class="topbar-brand" style="display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:26px;width:auto;object-fit:contain;">
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</span>
     </div>
     <div class="topbar-right">
       <div class="topbar-user" onclick="openProfile()" style="cursor:pointer;padding:.3rem .5rem;border-radius:10px;border:1px solid transparent;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(94,234,212,.3)'" onmouseout="this.style.borderColor='transparent'">
@@ -832,9 +832,9 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <div class="mobile-header-brand" style="display:flex;align-items:center;gap:.4rem;">
-      <div style="width:24px;height:24px;background:linear-gradient(135deg,#5eead4,#818cf8);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">🤖</div>
-      KI<span>Challenge</span>
+    <div class="mobile-header-brand" style="display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:22px;width:auto;object-fit:contain;">
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</span>
     </div>
   </div>
 
@@ -1631,8 +1631,8 @@ const DAY_CONTENT = {
 // ════════════════════════════════════════════════════════
 // ⚙️  KONFIGURATION – HIER DEINE SUPABASE-DATEN EINTRAGEN
 // ════════════════════════════════════════════════════════
-const SUPABASE_URL  = 'https://rnedyeimsgtvhcqvbama.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0';
+const SUPABASE_URL  = 'https://rnedyeimsgtvhcqvbama.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0'
 // ════════════════════════════════════════════════════════
 
 const { createClient } = supabase;
