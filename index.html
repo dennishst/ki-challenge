@@ -1916,26 +1916,11 @@ function goTo(screenId) {
 }
 
 function getActiveDay() {
-  // Returns the highest day that is unlocked today based on calendar dates
-  // Day 1 is always unlocked
-  // Day N is unlocked if Day N-1 was completed on a previous calendar day
-  const today = new Date().toDateString();
-
+  // TESTMODUS: nächster Tag wird sofort nach Abschluss freigeschaltet
   for (let i = 1; i <= 28; i++) {
-    if (!completedDays.has(i)) {
-      // This day is not completed yet - check if it's unlocked
-      if (i === 1) return 1; // Day 1 always unlocked
-      const prevCompleted = window.completionDates && window.completionDates[i - 1];
-      if (!prevCompleted) return i - 1; // previous not done yet
-      const prevDate = new Date(prevCompleted).toDateString();
-      if (prevDate === today) {
-        // Previous day was completed TODAY - not yet unlocked
-        return i - 1;
-      }
-      return i; // previous day completed on earlier date - unlocked!
-    }
+    if (!completedDays.has(i)) return i;
   }
-  return 28; // all done
+  return 28; // alle abgeschlossen
 }
 
 function buildDashboard() {
