@@ -221,8 +221,9 @@
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 50;
+      z-index: 100;
       width: 100%;
+      touch-action: manipulation;
     }
     .mobile-nav-btn {
       display: flex;
@@ -240,6 +241,10 @@
       transition: color .2s;
       flex: 1;
       max-width: 64px;
+      min-height: 48px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
     .mobile-nav-btn:hover { color: #5eead4; }
     .mobile-nav-btn.active { color: #5eead4; }
@@ -337,8 +342,10 @@
 
     /* Day header title wraps on mobile */
     .day-header { flex-wrap: wrap !important; }
-    h1, h2, h3, h4 { word-break: break-word !important; overflow-wrap: break-word !important; }
-    .welcome-banner h2 { word-break: break-word !important; }
+    h1, h2, h3, h4 { overflow-wrap: break-word !important; word-break: normal !important; hyphens: none !important; }
+    .welcome-banner h2 { overflow-wrap: break-word !important; }
+    .day-body h1, .day-body h2, .day-body h3 { overflow-wrap: break-word !important; word-break: normal !important; hyphens: none !important; }
+    .content-card, .content-card p, .day-intro, .highlight-box, .reflection-box { overflow-wrap: break-word !important; word-break: normal !important; hyphens: none !important; }
     .day-header-meta { min-width: 0; flex: 1; }
     .day-header-meta .day-title-h {
       font-size: .9rem !important;
@@ -718,7 +725,7 @@
       </div>
     </a>
     <div class="topbar-right">
-      <div class="topbar-user" onclick="openProfile()" style="cursor:pointer;padding:.3rem .5rem;border-radius:10px;border:1px solid transparent;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(94,234,212,.3)'" onmouseout="this.style.borderColor='transparent'">
+      <div class="topbar-user" onclick="openProfile()" style="cursor:pointer;padding:.5rem .75rem;border-radius:10px;border:1px solid transparent;transition:border-color .2s;-webkit-tap-highlight-color:transparent;user-select:none;" onmouseover="this.style.borderColor='rgba(94,234,212,.3)'" onmouseout="this.style.borderColor='transparent'">
         <div class="avatar" id="userAvatar">?</div>
         <span id="userNameDisplay" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -2301,19 +2308,43 @@ function downloadBadge() {
   a.click();
 }
 
-function shareWeekBadge(platform) {
+async function shareWeekBadge(platform) {
   const week = document.getElementById('weekBadgeModal')._week || 1;
-  const text = encodeURIComponent(`Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI`);
-  const url = encodeURIComponent('https://dennishst.github.io/ki-challenge/');
+  const shareText = `Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI\nhttps://dennishst.github.io/ki-challenge/`;
 
+  // Bild als Blob erzeugen
+  const canvas = document.getElementById('badgeCanvas');
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+  const file = new File([blob], `ki-challenge-woche-${week}.png`, { type: 'image/png' });
+
+  // Web Share API Level 2 – übergibt Bild direkt ans Betriebssystem / App
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: `Woche ${week} der KI-Challenge geschafft! 🚀`,
+        text: shareText,
+      });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return; // User hat abgebrochen
+    }
+  }
+
+  // Fallback: Plattform-spezifisch
   if (platform === 'whatsapp') {
-    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
-  } else if (platform === 'facebook') {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
-  } else if (platform === 'instagram') {
-    // Instagram has no direct share URL – download + prompt
+    // Bild laden + WhatsApp öffnen
     downloadBadge();
-    setTimeout(() => showToast('Bild heruntergeladen! Öffne Instagram und teile es in deiner Story oder im Feed.', 'success'), 400);
+    const url = encodeURIComponent(shareText);
+    setTimeout(() => window.open(`https://wa.me/?text=${url}`, '_blank'), 400);
+  } else if (platform === 'facebook') {
+    downloadBadge();
+    const url = encodeURIComponent('https://dennishst.github.io/ki-challenge/');
+    setTimeout(() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank'), 400);
+    setTimeout(() => showToast('Bild gespeichert – lade es in deinem Facebook-Post hoch!', 'success'), 800);
+  } else if (platform === 'instagram') {
+    downloadBadge();
+    setTimeout(() => showToast('Bild gespeichert! Öffne Instagram → Story → Bild auswählen', 'success'), 400);
   }
 }
 
