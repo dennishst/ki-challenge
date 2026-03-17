@@ -700,13 +700,17 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;" class="mobile-header-brand" style="display:flex;align-items:center;gap:.6rem;">
+    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.6rem;">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:34px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">Challenge</span>
       </div>
     </a>
+  </div>
+
+  <!-- DESKTOP TOPBAR -->
+  <div class="topbar">
     <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.85rem;" class="topbar-brand">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:48px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.15;gap:0;">
@@ -848,13 +852,16 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;" class="mobile-header-brand" style="display:flex;align-items:center;gap:.6rem;">
+    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.6rem;">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:34px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">Challenge</span>
       </div>
     </a>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV (Day screen) -->
   <nav class="mobile-nav">
     <button class="mobile-nav-btn" onclick="goTo('screen-dashboard')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -877,6 +884,20 @@
       <span class="nav-label">Profil</span>
     </button>
   </nav>
+
+  <!-- DESKTOP TOPBAR -->
+  <div class="topbar">
+    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.85rem;" class="topbar-brand">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:48px;width:auto;object-fit:contain;">
+      <div style="display:flex;flex-direction:column;line-height:1.15;gap:0;">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">Challenge</span>
+      </div>
+    </a>
+    <div class="topbar-right">
+      <button class="btn-logout" onclick="goTo('screen-dashboard')">← Dashboard</button>
+    </div>
+  </div>
 
   <div class="day-header">
     <button class="back-btn" onclick="goTo('screen-dashboard')">← Zurück</button>
@@ -1797,7 +1818,10 @@ async function handleRegister() {
   setLoading('btn-register', true);
   const { error } = await db.auth.signUp({
     email, password,
-    options: { data: { full_name: name } }
+    options: {
+      data: { full_name: name },
+      emailRedirectTo: 'https://dennishst.github.io/ki-challenge/'
+    }
   });
   setLoading('btn-register', false);
   if (error) {
