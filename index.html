@@ -143,6 +143,11 @@
   .btn-complete:hover:not(.completed):not(:disabled){opacity:.9;transform:translateY(-2px);}
   .btn-complete.completed{background:var(--surface2);color:var(--done);border:1px solid rgba(34,197,94,.3);cursor:default;}
   .btn-complete:disabled{opacity:.6;cursor:wait;}
+  .complete-btn-row{display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;}
+  .btn-next-day{background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;padding:1rem 1.5rem;cursor:pointer;transition:opacity .2s,transform .1s;display:inline-flex;align-items:center;gap:.5rem;}
+  .btn-next-day:hover{opacity:.9;transform:translateY(-2px);}
+  .btn-next-day.locked{background:var(--surface2);color:var(--muted);border:1px solid var(--border);cursor:default;}
+  .btn-next-day.locked:hover{opacity:1;transform:none;}
   .content-divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
   .preview-notice{background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.2);border-radius:10px;padding:.8rem 1.1rem;font-size:.82rem;color:var(--warn);margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;}
 
@@ -616,7 +621,11 @@
         </div>
       </div>
     </div>
-    <h1 style="text-align:center;font-size:clamp(.95rem,3.8vw,1.9rem);white-space:nowrap;overflow:hidden;text-overflow:clip;line-height:1.2;">Willkommen zur <span>Challenge.</span></h1>
+    <h1 style="text-align:center;line-height:1.25;font-size:1.9rem;margin-bottom:.5rem;">
+      Willkommen zur<br>
+      <span style="color:var(--text);">makerport</span><br>
+      <span>KI Challenge.</span>
+    </h1>
     <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um deinen Fortschritt zu speichern.</p>
 
     <div class="auth-tabs">
@@ -2031,12 +2040,40 @@ function openDay(day) {
   html += DAY_CONTENT[day.num] || `<p>Inhalt für Tag ${day.num} folgt.</p>`;
   body.innerHTML = html;
 
-  // Update complete button state
+  // Update complete button state + add next-day arrow
   const btn = document.getElementById('completeBtn');
   if (btn && completedDays.has(day.num)) {
     btn.textContent = '✓ Bereits abgeschlossen';
     btn.classList.add('completed');
     btn.disabled = true;
+
+    // Wrap btn in row and add next-day arrow if not already done
+    const section = btn.closest('.complete-section');
+    if (section && !section.querySelector('.btn-next-day')) {
+      const row = document.createElement('div');
+      row.className = 'complete-btn-row';
+      btn.parentNode.insertBefore(row, btn);
+      row.appendChild(btn);
+
+      const nextNum = day.num + 1;
+      const nextDay = ALL_DAYS.find(d => d.num === nextNum);
+      if (nextDay) {
+        const activeDay = getActiveDay();
+        const isNextLocked = nextNum > activeDay;
+        const nextBtn = document.createElement('button');
+        if (isNextLocked) {
+          nextBtn.className = 'btn-next-day locked';
+          nextBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Tag ${nextNum} ab morgen`;
+          nextBtn.title = `Tag ${nextNum} wird morgen freigeschaltet`;
+          nextBtn.onclick = () => showToast(`Tag ${nextNum} wird morgen freigeschaltet. 🕐`, 'error');
+        } else {
+          nextBtn.className = 'btn-next-day';
+          nextBtn.innerHTML = `Tag ${nextNum} → <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+          nextBtn.onclick = () => openDay(nextDay);
+        }
+        row.appendChild(nextBtn);
+      }
+    }
   }
   goTo('screen-day');
   // Add copy buttons to all prompt boxes
