@@ -632,7 +632,7 @@
       <span style="color:var(--text);">zur Makerport</span><br>
       <span>KI Challenge</span>
     </h1>
-    <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um deinen Fortschritt zu speichern.</p>
+    <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um an der Challenge teilzunehmen.</p>
 
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
@@ -959,33 +959,27 @@
      WOCHEN-ABZEICHEN MODAL
 ════════════════════════════════════════════════════════ -->
 <div id="weekBadgeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:1.5rem;">
-  <div style="background:var(--surface);border:1px solid rgba(94,234,212,.25);border-radius:28px;padding:2.5rem 2rem;max-width:400px;width:100%;text-align:center;box-shadow:0 0 80px rgba(94,234,212,.12);position:relative;animation:fadeUp .4s ease;">
+  <div style="background:var(--surface);border:1px solid rgba(94,234,212,.25);border-radius:28px;padding:2rem 2rem 1.75rem;max-width:440px;width:100%;text-align:center;box-shadow:0 0 80px rgba(94,234,212,.12);position:relative;animation:fadeUp .4s ease;">
     <button onclick="closeWeekBadge()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
 
-    <!-- Badge Canvas -->
-    <canvas id="badgeCanvas" width="320" height="320" style="width:240px;height:240px;border-radius:16px;margin-bottom:1.25rem;"></canvas>
+    <!-- Badge Canvas 4:3 – hidden, used for download only -->
+    <canvas id="badgeCanvas" width="1200" height="900" style="display:none;"></canvas>
+    <!-- Preview canvas shown in modal -->
+    <canvas id="badgePreview" width="1200" height="900" style="width:100%;max-width:360px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
 
     <h2 id="badgeTitle" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:.4rem;"></h2>
-    <p id="badgeSubtitle" style="color:var(--muted);font-size:.88rem;margin-bottom:1.75rem;line-height:1.5;"></p>
+    <p id="badgeSubtitle" style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;line-height:1.5;"></p>
 
-    <p style="font-size:.75rem;color:var(--muted);margin-bottom:.75rem;letter-spacing:.06em;text-transform:uppercase;">Auf Social Media teilen</p>
-    <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;">
-      <button onclick="shareWeekBadge('instagram')" style="display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;border:none;border-radius:10px;padding:.6rem 1.1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        Instagram
+    <div style="display:flex;gap:.6rem;justify-content:center;">
+      <button onclick="shareWeekBadge()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.5rem;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;border:none;border-radius:12px;padding:.75rem 1.25rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Teilen
       </button>
-      <button onclick="shareWeekBadge('facebook')" style="display:flex;align-items:center;gap:.5rem;background:#1877f2;color:#fff;border:none;border-radius:10px;padding:.6rem 1.1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        Facebook
-      </button>
-      <button onclick="shareWeekBadge('whatsapp')" style="display:flex;align-items:center;gap:.5rem;background:#25d366;color:#fff;border:none;border-radius:10px;padding:.6rem 1.1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
+      <button onclick="downloadBadge()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:.75rem 1.25rem;cursor:pointer;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Herunterladen
       </button>
     </div>
-    <button onclick="downloadBadge()" style="margin-top:.75rem;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;padding:.6rem;cursor:pointer;transition:color .2s,border-color .2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
-      ↓ Bild herunterladen
-    </button>
   </div>
 </div>
 
@@ -2174,96 +2168,135 @@ const WEEK_BADGES = {
 };
 
 function drawBadge(week) {
-  const canvas = document.getElementById('badgeCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = 320, H = 320;
   const b = WEEK_BADGES[week];
 
-  ctx.clearRect(0, 0, W, H);
+  function drawOnCanvas(canvas) {
+    const ctx = canvas.getContext('2d');
+    const W = 1200, H = 900;
+    canvas.width = W; canvas.height = H;
 
-  // Background
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#0c0f1a');
-  bg.addColorStop(1, '#141828');
-  ctx.fillStyle = bg;
-  roundRect(ctx, 0, 0, W, H, 24);
-  ctx.fill();
+    ctx.clearRect(0, 0, W, H);
 
-  // Grid lines
-  ctx.strokeStyle = 'rgba(94,234,212,0.04)';
-  ctx.lineWidth = 1;
-  for (let x = 0; x < W; x += 32) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for (let y = 0; y < H; y += 32) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    // Background gradient
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#0c0f1a');
+    bg.addColorStop(1, '#141828');
+    ctx.fillStyle = bg;
+    roundRect(ctx, 0, 0, W, H, 0); ctx.fill();
 
-  // Glow circle
-  const glow = ctx.createRadialGradient(W/2, H/2-20, 0, W/2, H/2-20, 120);
-  glow.addColorStop(0, b.color1 + '22');
-  glow.addColorStop(1, 'transparent');
-  ctx.fillStyle = glow;
-  ctx.beginPath(); ctx.arc(W/2, H/2-20, 120, 0, Math.PI*2); ctx.fill();
+    // Grid
+    ctx.strokeStyle = 'rgba(94,234,212,0.035)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-  // Badge ring
-  ctx.save();
-  ctx.strokeStyle = b.color1;
-  ctx.lineWidth = 3;
-  ctx.shadowColor = b.color1;
-  ctx.shadowBlur = 16;
-  ctx.beginPath(); ctx.arc(W/2, 130, 72, 0, Math.PI*2); ctx.stroke();
-  ctx.restore();
+    // ── TOP HEADER BAR ──────────────────────────────────
+    // Logo from URL (async, drawn via Image)
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    logoImg.onload = () => {
+      // Redraw background region + logo once loaded
+      ctx.fillStyle = 'rgba(12,15,26,0.0)';
+      const logoH = 52, logoW = logoH * (logoImg.width / logoImg.height);
+      ctx.drawImage(logoImg, 72, 36, logoW, logoH);
+    };
+    logoImg.src = 'https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png';
 
-  // Inner circle fill
-  const inner = ctx.createRadialGradient(W/2, 130, 0, W/2, 130, 72);
-  inner.addColorStop(0, b.color1 + '18');
-  inner.addColorStop(1, b.color2 + '08');
-  ctx.fillStyle = inner;
-  ctx.beginPath(); ctx.arc(W/2, 130, 72, 0, Math.PI*2); ctx.fill();
+    // "28 Tage Challenge" beside logo
+    ctx.fillStyle = b.color1;
+    ctx.font = 'bold 22px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('28 TAGE CHALLENGE', 72 + 220, 62);
 
-  // Emoji
-  ctx.font = '58px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(b.emoji, W/2, 132);
+    // Divider line
+    ctx.strokeStyle = 'rgba(94,234,212,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(72, 108); ctx.lineTo(W-72, 108); ctx.stroke();
 
-  // Week label pill – Breite passt sich dem Text an
-  ctx.save();
-  ctx.font = 'bold 11px sans-serif';
-  const labelText = b.label.toUpperCase();
-  const textW = ctx.measureText(labelText).width;
-  const pillH = 26, pillPad = 20;
-  const pillW = Math.max(textW + pillPad * 2, 140);
-  const pillX = W/2 - pillW/2, pillY = 212;
-  const pillGrad = ctx.createLinearGradient(pillX, 0, pillX+pillW, 0);
-  pillGrad.addColorStop(0, b.color1);
-  pillGrad.addColorStop(1, b.color2);
-  roundRect(ctx, pillX, pillY, pillW, pillH, 13);
-  ctx.fillStyle = pillGrad;
-  ctx.fill();
-  ctx.fillStyle = '#0c0f1a';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.fillText(labelText, W/2, pillY + pillH/2 + 1);
-  ctx.restore();
+    // ── CENTRE GLOW ─────────────────────────────────────
+    const cx = W/2, cy = 490;
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 260);
+    glow.addColorStop(0, b.color1 + '28');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(cx, cy, 260, 0, Math.PI*2); ctx.fill();
 
-  // Title
-  ctx.fillStyle = '#e2e8f0';
-  ctx.font = 'bold 22px "Syne", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  ctx.fillText(b.title, W/2, 250);
+    // Badge ring
+    ctx.save();
+    ctx.strokeStyle = b.color1;
+    ctx.lineWidth = 5;
+    ctx.shadowColor = b.color1;
+    ctx.shadowBlur = 30;
+    ctx.beginPath(); ctx.arc(cx, cy, 155, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
 
-  // Subtitle line
-  ctx.fillStyle = '#64748b';
-  ctx.font = '13px "DM Sans", sans-serif';
-  ctx.fillText('28-Tage KI-Challenge · makerport.de', W/2, 282);
+    // Inner circle
+    const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, 155);
+    inner.addColorStop(0, b.color1 + '1a');
+    inner.addColorStop(1, b.color2 + '08');
+    ctx.fillStyle = inner;
+    ctx.beginPath(); ctx.arc(cx, cy, 155, 0, Math.PI*2); ctx.fill();
 
-  // Border glow
-  ctx.save();
-  ctx.strokeStyle = b.color1 + '55';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = b.color1;
-  ctx.shadowBlur = 10;
-  roundRect(ctx, 1, 1, W-2, H-2, 23);
-  ctx.stroke();
-  ctx.restore();
+    // Emoji
+    ctx.font = '130px serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(b.emoji, cx, cy);
+
+    // ── PILL LABEL ───────────────────────────────────────
+    ctx.save();
+    const labelText = b.label.toUpperCase();
+    ctx.font = 'bold 24px sans-serif';
+    const tW = ctx.measureText(labelText).width;
+    const pH = 46, pPad = 36;
+    const pW = Math.max(tW + pPad * 2, 320);
+    const pX = cx - pW/2, pY = cy + 175;
+    const pGrad = ctx.createLinearGradient(pX, 0, pX+pW, 0);
+    pGrad.addColorStop(0, b.color1);
+    pGrad.addColorStop(1, b.color2);
+    roundRect(ctx, pX, pY, pW, pH, 23);
+    ctx.fillStyle = pGrad;
+    ctx.fill();
+    ctx.fillStyle = '#0c0f1a';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(labelText, cx, pY + pH/2);
+    ctx.restore();
+
+    // ── TITLE ───────────────────────────────────────────
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 52px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(b.title, cx, cy + 240);
+
+    // ── FOOTER ──────────────────────────────────────────
+    ctx.strokeStyle = 'rgba(94,234,212,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(72, H-80); ctx.lineTo(W-72, H-80); ctx.stroke();
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('makerport.de · 28-Tage KI-Challenge', cx, H-46);
+
+    // Border glow
+    ctx.save();
+    ctx.strokeStyle = b.color1 + '44';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = b.color1;
+    ctx.shadowBlur = 20;
+    roundRect(ctx, 2, 2, W-4, H-4, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Draw on both canvases (hidden full-res + visible preview)
+  drawOnCanvas(document.getElementById('badgeCanvas'));
+  drawOnCanvas(document.getElementById('badgePreview'));
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -2296,56 +2329,38 @@ function closeWeekBadge() {
   document.body.style.overflow = '';
 }
 
-function getBadgeDataUrl() {
-  return document.getElementById('badgeCanvas').toDataURL('image/png');
-}
-
 function downloadBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
-  const a = document.createElement('a');
-  a.href = getBadgeDataUrl();
-  a.download = `ki-challenge-woche-${week}-abzeichen.png`;
-  a.click();
+  // Wait a tick so logo image has time to load
+  setTimeout(() => {
+    const a = document.createElement('a');
+    a.href = document.getElementById('badgeCanvas').toDataURL('image/png');
+    a.download = `ki-challenge-woche-${week}-abzeichen.png`;
+    a.click();
+  }, 300);
 }
 
-async function shareWeekBadge(platform) {
+async function shareWeekBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
   const shareText = `Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI\nhttps://dennishst.github.io/ki-challenge/`;
 
-  // Bild als Blob erzeugen
   const canvas = document.getElementById('badgeCanvas');
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
   const file = new File([blob], `ki-challenge-woche-${week}.png`, { type: 'image/png' });
 
-  // Web Share API Level 2 – übergibt Bild direkt ans Betriebssystem / App
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({
-        files: [file],
-        title: `Woche ${week} der KI-Challenge geschafft! 🚀`,
-        text: shareText,
-      });
+      await navigator.share({ files: [file], title: `Woche ${week} geschafft! 🚀`, text: shareText });
       return;
     } catch (e) {
-      if (e.name === 'AbortError') return; // User hat abgebrochen
+      if (e.name === 'AbortError') return;
     }
   }
-
-  // Fallback: Plattform-spezifisch
-  if (platform === 'whatsapp') {
-    // Bild laden + WhatsApp öffnen
-    downloadBadge();
-    const url = encodeURIComponent(shareText);
-    setTimeout(() => window.open(`https://wa.me/?text=${url}`, '_blank'), 400);
-  } else if (platform === 'facebook') {
-    downloadBadge();
-    const url = encodeURIComponent('https://dennishst.github.io/ki-challenge/');
-    setTimeout(() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank'), 400);
-    setTimeout(() => showToast('Bild gespeichert – lade es in deinem Facebook-Post hoch!', 'success'), 800);
-  } else if (platform === 'instagram') {
-    downloadBadge();
-    setTimeout(() => showToast('Bild gespeichert! Öffne Instagram → Story → Bild auswählen', 'success'), 400);
-  }
+  // Desktop fallback: download + open share URL
+  downloadBadge();
+  const url = encodeURIComponent('https://dennishst.github.io/ki-challenge/');
+  setTimeout(() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank'), 400);
+  showToast('Bild gespeichert – wähle es in deinem Post aus!', 'success');
 }
 
 // ════════════════════════════════════════════════════════
