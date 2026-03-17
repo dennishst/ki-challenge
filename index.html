@@ -188,13 +188,14 @@
       display: flex !important;
       align-items: center;
       justify-content: center;
-      padding: .9rem 1rem;
+      padding: .75rem 1rem;
       background: rgba(12,15,26,.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 10;
+      min-height: 64px;
     }
     .mobile-header-brand {
       font-family: 'Syne', sans-serif;
@@ -607,12 +608,15 @@
 <div id="screen-auth" class="screen">
   <div class="auth-card">
     <div style="text-align:center;margin-bottom:1.2rem;">
-      <div class="auth-logo" style="flex-direction:column;gap:.4rem;">
-        <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport Logo" style="height:48px;width:auto;object-fit:contain;">
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</div>
+      <div class="auth-logo" style="flex-direction:column;gap:.5rem;">
+        <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport Logo" style="height:64px;width:auto;object-fit:contain;">
+        <div style="display:flex;flex-direction:column;align-items:center;line-height:1.15;gap:0;">
+          <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;">Challenge</span>
+        </div>
       </div>
     </div>
-    <h1 style="text-align:center;">Willkommen<br><span>zur Challenge.</span></h1>
+    <h1 style="text-align:center;font-size:clamp(1.1rem,4.5vw,1.9rem);word-break:keep-all;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Willkommen zur Challenge.</h1>
     <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um deinen Fortschritt zu speichern.</p>
 
     <div class="auth-tabs">
@@ -687,16 +691,22 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <div class="mobile-header-brand" style="display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;">
-      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:22px;width:auto;object-fit:contain;">
-      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</span>
+    <div class="mobile-header-brand" style="display:flex;align-items:center;gap:.6rem;">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:34px;width:auto;object-fit:contain;">
+      <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">Challenge</span>
+      </div>
     </div>
   </div>
 
   <div class="topbar">
-    <div class="topbar-brand" style="display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;">
-      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:26px;width:auto;object-fit:contain;">
-      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</span>
+    <div class="topbar-brand" style="display:flex;align-items:center;gap:.75rem;">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:36px;width:auto;object-fit:contain;">
+      <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.72rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">Challenge</span>
+      </div>
     </div>
     <div class="topbar-right">
       <div class="topbar-user" onclick="openProfile()" style="cursor:pointer;padding:.3rem .5rem;border-radius:10px;border:1px solid transparent;transition:border-color .2s;" onmouseover="this.style.borderColor='rgba(94,234,212,.3)'" onmouseout="this.style.borderColor='transparent'">
@@ -832,9 +842,12 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <div class="mobile-header-brand" style="display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;">
-      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:22px;width:auto;object-fit:contain;">
-      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.6rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage Challenge</span>
+    <div class="mobile-header-brand" style="display:flex;align-items:center;gap:.6rem;">
+      <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:34px;width:auto;object-fit:contain;">
+      <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">Challenge</span>
+      </div>
     </div>
   </div>
 
