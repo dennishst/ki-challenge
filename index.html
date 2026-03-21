@@ -983,9 +983,9 @@
     <button onclick="closeWeekBadge()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
 
     <!-- Badge Canvas 4:3 – hidden, used for download only -->
-    <canvas id="badgeCanvas" width="1250" height="1000" style="display:none;"></canvas>
+    <canvas id="badgeCanvas" width="1000" height="1250" style="display:none;"></canvas>
     <!-- Preview canvas shown in modal -->
-    <canvas id="badgePreview" width="1250" height="1000" style="width:100%;max-width:360px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
+    <canvas id="badgePreview" width="1000" height="1250" style="width:100%;max-width:360px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
 
     <h2 id="badgeTitle" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:.4rem;"></h2>
     <p id="badgeSubtitle" style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;line-height:1.5;"></p>
@@ -2203,13 +2203,13 @@ function drawBadge(week) {
 
   function drawOnCanvas(canvas) {
     const ctx = canvas.getContext('2d');
-    const W = 1250, H = 1000;
+    const W = 1000, H = 1250;
     canvas.width = W; canvas.height = H;
 
     ctx.clearRect(0, 0, W, H);
 
     // Background
-    const bg = ctx.createLinearGradient(0, 0, W, H);
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
     bg.addColorStop(0, '#0c0f1a');
     bg.addColorStop(1, '#141828');
     ctx.fillStyle = bg;
@@ -2218,86 +2218,79 @@ function drawBadge(week) {
     // Grid
     ctx.strokeStyle = 'rgba(94,234,212,0.03)';
     ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    for (let x = 0; x < W; x += 50) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 50) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-    // ── HEADER BLOCK (login-style) ───────────────────────
-    const headerH = 200;
-    // Header bg
-    const hBg = ctx.createLinearGradient(0, 0, W, headerH);
-    hBg.addColorStop(0, 'rgba(94,234,212,0.06)');
-    hBg.addColorStop(1, 'rgba(129,140,248,0.04)');
-    ctx.fillStyle = hBg;
-    ctx.fillRect(0, 0, W, headerH);
-
-    // Accent pill (like auth-badge)
+    // ── HEADER BLOCK ────────────────────────────────────
+    // Accent pill
     const pillText = '28 TAGE CHALLENGE';
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = 'bold 18px sans-serif';
     const pillTW = ctx.measureText(pillText).width;
-    const hpW = pillTW + 48, hpH = 36, hpX = W/2 - hpW/2, hpY = 28;
+    const hpW = pillTW + 44, hpH = 32, hpX = W/2 - hpW/2, hpY = 36;
     const hpGrad = ctx.createLinearGradient(hpX, 0, hpX+hpW, 0);
     hpGrad.addColorStop(0, b.color1);
     hpGrad.addColorStop(1, b.color2);
-    roundRect(ctx, hpX, hpY, hpW, hpH, 18);
+    roundRect(ctx, hpX, hpY, hpW, hpH, 16);
     ctx.fillStyle = hpGrad;
     ctx.fill();
     ctx.fillStyle = '#0c0f1a';
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = 'bold 18px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(pillText, W/2, hpY + hpH/2);
 
-    // Makerport logo (async)
+    // Makerport logo
     const logoImg = new Image();
     logoImg.crossOrigin = 'anonymous';
     logoImg.onload = () => {
-      const logoH = 56, logoW = logoH * (logoImg.width / logoImg.height);
-      ctx.drawImage(logoImg, W/2 - logoW/2, 76, logoW, logoH);
+      const logoH = 48, logoW = logoH * (logoImg.width / logoImg.height);
+      ctx.drawImage(logoImg, W/2 - logoW/2, 82, logoW, logoH);
     };
     logoImg.src = 'https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png';
 
-    // "Makerport KI Challenge" lines (login-style)
+    // "Makerport KI Challenge"
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#e2e8f0';
-    ctx.font = 'bold 32px sans-serif';
-    ctx.fillText('Makerport', W/2, 144);
+    ctx.font = 'bold 28px sans-serif';
+    ctx.fillText('Makerport', W/2, 142);
     ctx.fillStyle = b.color1;
-    ctx.fillText('KI Challenge', W/2, 182);
+    ctx.font = 'bold 28px sans-serif';
+    ctx.fillText('KI Challenge', W/2, 178);
 
     // Divider
     ctx.strokeStyle = 'rgba(94,234,212,0.15)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(80, headerH); ctx.lineTo(W-80, headerH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(60, 222); ctx.lineTo(W-60, 222); ctx.stroke();
 
     // ── CENTRE ──────────────────────────────────────────
-    const cx = W/2, cy = 560;
+    const cx = W/2, cy = 580;
 
     // Glow
-    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 240);
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 230);
     glow.addColorStop(0, b.color1 + '28');
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(cx, cy, 240, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 230, 0, Math.PI*2); ctx.fill();
 
     // Ring
     ctx.save();
     ctx.strokeStyle = b.color1;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 6;
     ctx.shadowColor = b.color1;
-    ctx.shadowBlur = 30;
-    ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI*2); ctx.stroke();
+    ctx.shadowBlur = 32;
+    ctx.beginPath(); ctx.arc(cx, cy, 160, 0, Math.PI*2); ctx.stroke();
     ctx.restore();
 
     // Inner circle
-    const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, 150);
+    const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, 160);
     inner.addColorStop(0, b.color1 + '1a');
     inner.addColorStop(1, b.color2 + '08');
     ctx.fillStyle = inner;
-    ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 160, 0, Math.PI*2); ctx.fill();
 
-    // Emoji
-    ctx.font = '120px serif';
+    // Emoji – cross-platform font stack
+    ctx.font = "130px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif";
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(b.emoji, cx, cy);
@@ -2305,19 +2298,19 @@ function drawBadge(week) {
     // ── PILL LABEL ───────────────────────────────────────
     ctx.save();
     const labelText = b.label.toUpperCase();
-    ctx.font = 'bold 22px sans-serif';
+    ctx.font = 'bold 20px sans-serif';
     const tW = ctx.measureText(labelText).width;
-    const pH = 44, pPad = 36;
-    const pW = Math.max(tW + pPad * 2, 300);
-    const pX = cx - pW/2, pY = cy + 165;
+    const pH = 42, pPad = 32;
+    const pW = Math.max(tW + pPad * 2, 280);
+    const pX = cx - pW/2, pY = cy + 178;
     const pGrad = ctx.createLinearGradient(pX, 0, pX+pW, 0);
     pGrad.addColorStop(0, b.color1);
     pGrad.addColorStop(1, b.color2);
-    roundRect(ctx, pX, pY, pW, pH, 22);
+    roundRect(ctx, pX, pY, pW, pH, 21);
     ctx.fillStyle = pGrad;
     ctx.fill();
     ctx.fillStyle = '#0c0f1a';
-    ctx.font = 'bold 22px sans-serif';
+    ctx.font = 'bold 20px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(labelText, cx, pY + pH/2);
@@ -2325,20 +2318,20 @@ function drawBadge(week) {
 
     // Title
     ctx.fillStyle = '#e2e8f0';
-    ctx.font = 'bold 48px sans-serif';
+    ctx.font = 'bold 44px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(b.title, cx, cy + 222);
+    ctx.fillText(b.title, cx, cy + 234);
 
     // ── FOOTER ──────────────────────────────────────────
     ctx.strokeStyle = 'rgba(94,234,212,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(80, H-72); ctx.lineTo(W-80, H-72); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(60, H-70); ctx.lineTo(W-60, H-70); ctx.stroke();
     ctx.fillStyle = '#475569';
-    ctx.font = '20px sans-serif';
+    ctx.font = '18px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('makerport.de · 28-Tage KI-Challenge', cx, H-40);
+    ctx.fillText('makerport.de · 28-Tage KI-Challenge', cx, H-38);
 
     // Border glow
     ctx.save();
