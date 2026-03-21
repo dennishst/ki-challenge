@@ -2936,15 +2936,21 @@ async function saveProfile() {
   msg.textContent = 'Wird gespeichert…';
 
   // ── Save to Supabase profiles table ──
+  const marketingConsent = currentUser?.user_metadata?.marketing_consent || false;
+  const marketingDate    = currentUser?.user_metadata?.marketing_consent_date || null;
+
   const { error: profileError } = await db.from('profiles').upsert({
-    id:          currentUser.id,
-    full_name:   currentUser.user_metadata?.full_name || null,
-    age:         age ? parseInt(age) : null,
-    city:        city || null,
-    company:     company || null,
-    industry:    industry || null,
-    interests:   interests,
-    updated_at:  new Date().toISOString()
+    id:                       currentUser.id,
+    email:                    currentUser.email,
+    full_name:                currentUser.user_metadata?.full_name || null,
+    age:                      age ? parseInt(age) : null,
+    city:                     city || null,
+    company:                  company || null,
+    industry:                 industry || null,
+    interests:                interests,
+    marketing_consent:        marketingConsent,
+    marketing_consent_date:   marketingDate,
+    updated_at:               new Date().toISOString()
   }, { onConflict: 'id' });
 
   if (profileError) {
