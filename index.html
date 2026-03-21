@@ -55,7 +55,7 @@
 
   .btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;padding:.9rem;cursor:pointer;margin-top:.5rem;transition:opacity .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:.5rem;}
   .btn-primary:hover:not(:disabled){opacity:.9;transform:translateY(-1px);}
-  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;background:linear-gradient(135deg,var(--accent),#38bdf8);-webkit-appearance:none;}
 
   .auth-msg{margin-top:1rem;padding:.75rem 1rem;border-radius:10px;font-size:.85rem;display:none;}
   .auth-msg.error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);display:block;}
@@ -69,7 +69,7 @@
   .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 
   /* ─── TOPBAR ──────────────────────────────────────── */
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:20;pointer-events:all;}
   .topbar-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
   .topbar-brand span{color:var(--accent);}
   .topbar-right{display:flex;align-items:center;gap:1rem;}
@@ -109,7 +109,7 @@
   .day-chip.locked{background:var(--locked);border-color:rgba(255,255,255,.04);color:var(--muted);}
 
   /* ─── DAY CONTENT ─────────────────────────────────── */
-  .day-header{padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .day-header{padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
   .back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;}
   .back-btn:hover{color:var(--text);border-color:var(--accent);}
   .day-header-meta .week-hint{font-size:.72rem;color:var(--accent2);letter-spacing:.08em;}
@@ -132,12 +132,13 @@
   .prompt-box{padding-right:2.4rem !important;}
   .prompt-box .label{font-family:'Syne',sans-serif;font-size:.68rem;letter-spacing:.1em;color:var(--accent2);margin-bottom:.6rem;display:block;}
   .task-list{list-style:none;}
-  .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:1rem;color:var(--text);line-height:1.6;}
+  .task-list li{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 0;border-bottom:1px solid var(--border);font-size:1rem;color:var(--text);line-height:1.6;overflow-wrap:break-word;word-break:normal;min-width:0;}
   .task-list li:last-child{border-bottom:none;}
+  .task-list li>*{min-width:0;}
   .task-icon{color:var(--accent);flex-shrink:0;font-size:.9rem;}
   .reflection-box{background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2);border-radius:12px;padding:1.2rem 1.4rem;margin-top:.8rem;}
   .reflection-box p{color:#94a3b8;font-size:.9rem;line-height:1.7;font-style:italic;}
-  .complete-section{margin-top:2rem;background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(94,234,212,.06));border:1px solid rgba(34,197,94,.15);border-radius:16px;padding:1.75rem;text-align:center;}
+  .complete-section{margin-top:2rem;background:linear-gradient(135deg,rgba(34,197,94,.06),rgba(94,234,212,.06));border:1px solid rgba(34,197,94,.15);border-radius:16px;padding:1.75rem;text-align:center;position:relative;z-index:2;}
   .complete-section p{color:var(--muted);font-size:.88rem;margin-bottom:1.2rem;}
   .btn-complete{background:linear-gradient(135deg,var(--done),#16a34a);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:12px;padding:1rem 2.5rem;cursor:pointer;transition:opacity .2s,transform .1s;display:inline-flex;align-items:center;gap:.5rem;}
   .btn-complete:hover:not(.completed):not(:disabled){opacity:.9;transform:translateY(-2px);}
@@ -676,6 +677,12 @@
         <input type="checkbox" id="reg-privacy" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
         <label for="reg-privacy" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
           Ich habe die <a href="#" onclick="showLegal('privacy');return false;" style="color:var(--accent);text-decoration:none;">Datenschutzerklärung</a> gelesen und stimme zu.
+        </label>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.25rem 0 .75rem;">
+        <input type="checkbox" id="reg-marketing" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
+        <label for="reg-marketing" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
+          Ich möchte gelegentlich Tipps, Updates und Neuigkeiten rund um die KI-Challenge per E-Mail erhalten. (Optional – jederzeit widerrufbar)
         </label>
       </div>
       <button class="btn-primary" onclick="handleRegister()" id="btn-register">
@@ -1810,10 +1817,11 @@ async function handleLogin() {
 }
 
 async function handleRegister() {
-  const name     = document.getElementById('reg-name').value.trim();
-  const email    = document.getElementById('reg-email').value.trim();
-  const password = document.getElementById('reg-password').value;
-  const privacy  = document.getElementById('reg-privacy')?.checked;
+  const name      = document.getElementById('reg-name').value.trim();
+  const email     = document.getElementById('reg-email').value.trim();
+  const password  = document.getElementById('reg-password').value;
+  const privacy   = document.getElementById('reg-privacy')?.checked;
+  const marketing = document.getElementById('reg-marketing')?.checked || false;
   if (!name)                   return showMsg('register-msg', 'Bitte deinen Namen eingeben.');
   if (!email)                  return showMsg('register-msg', 'Bitte eine E-Mail eingeben.');
   if (password.length < 8)    return showMsg('register-msg', 'Passwort muss mindestens 8 Zeichen haben.');
@@ -1822,7 +1830,7 @@ async function handleRegister() {
   const { error } = await db.auth.signUp({
     email, password,
     options: {
-      data: { full_name: name },
+      data: { full_name: name, marketing_consent: marketing, marketing_consent_date: new Date().toISOString() },
       emailRedirectTo: 'https://dennishst.github.io/ki-challenge/'
     }
   });
@@ -3118,7 +3126,11 @@ const LEGAL_CONTENT = {
       </ul>
       <p>Zur Ausübung deiner Rechte wende dich an: <a href="mailto:info@makerport.de" style="color:#818cf8;">info@makerport.de</a></p>
 
-      <h3 style="color:#5eead4;font-family:'Syne',sans-serif;margin:1.5rem 0 .75rem;">8. Beschwerderecht</h3>
+      <h3 style="color:#5eead4;font-family:'Syne',sans-serif;margin:1.5rem 0 .75rem;">8. Marketing-E-Mails</h3>
+      <p>Bei der Registrierung kannst du optional einwilligen, gelegentlich Tipps, Updates und Neuigkeiten rund um die KI-Challenge per E-Mail zu erhalten. Diese Einwilligung ist freiwillig und hat keinen Einfluss auf die Nutzung der Challenge.</p>
+      <p style="margin-top:.5rem;">Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen – per E-Mail an <a href="mailto:info@makerport.de" style="color:#818cf8;">info@makerport.de</a> oder über dein Nutzerprofil. Der Zeitpunkt der Einwilligung wird protokolliert und gespeichert.</p>
+
+      <h3 style="color:#5eead4;font-family:'Syne',sans-serif;margin:1.5rem 0 .75rem;">9. Beschwerderecht</h3>
       <p>Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Zuständig ist der <strong style="color:#e2e8f0;">Landesbeauftragte für Datenschutz Mecklenburg-Vorpommern</strong>, Schloss Schwerin, 19053 Schwerin.</p>
 
       <p style="margin-top:1.5rem;font-size:.82rem;color:#475569;">Stand: März 2026 · Stralsunder Innovations- und Gründerzentrum GmbH</p>
