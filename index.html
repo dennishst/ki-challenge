@@ -2776,6 +2776,14 @@ async function showProfileSheet(name, done, pct) {
         </select>
       </div>
 
+      <div style="margin-bottom:1rem;">
+        <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Position</label>
+        <select id="prof-position" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;appearance:none;">
+          <option value="">Position wählen…</option>
+          ${['Geschäftsführung','Selbständig / Freiberuflich','Führungskraft / Management','Angestellt (Fachkraft)','Angestellt (Sachbearbeitung)','Student','Auszubildender','Ehrenamtlich','Ruhestand','Sonstiges'].map(p=>`<option value="${p}" ${saved.position===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+
       <div style="margin-bottom:1.25rem;">
         <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;">Interessen <span style="color:#475569;font-size:.65rem;text-transform:none;">(Mehrfachauswahl)</span></label>
         <div style="display:flex;flex-wrap:wrap;gap:.4rem;" id="interestTags">
@@ -2943,11 +2951,12 @@ function updateAvatarDisplay() {
 // ─── SAVE PROFILE TO SUPABASE ────────────────────────────────────────
 async function saveProfile() {
   const msg = document.getElementById('prof-msg');
-  const age = document.getElementById('prof-age')?.value || null;
-  const city = document.getElementById('prof-city')?.value || null;
-  const company = document.getElementById('prof-company')?.value || null;
+  const age      = document.getElementById('prof-age')?.value || null;
+  const city     = document.getElementById('prof-city')?.value || null;
+  const company  = document.getElementById('prof-company')?.value || null;
   const industry = document.getElementById('prof-industry')?.value || null;
-  const newPass = document.getElementById('prof-newpass')?.value || '';
+  const position = document.getElementById('prof-position')?.value || null;
+  const newPass  = document.getElementById('prof-newpass')?.value || '';
   const newEmail = document.getElementById('prof-newemail')?.value || '';
 
   // Collect selected interests
@@ -2973,6 +2982,7 @@ async function saveProfile() {
     city:                     city || null,
     company:                  company || null,
     industry:                 industry || null,
+    position:                 position || null,
     interests:                interests,
     marketing_emails:         marketingConsent,
     marketing_consent_date:   marketingDate,
