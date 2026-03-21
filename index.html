@@ -694,7 +694,7 @@
       <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.25rem 0 .75rem;">
         <input type="checkbox" id="reg-marketing" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
         <label for="reg-marketing" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
-          Ich möchte gelegentlich Tipps, Updates und Neuigkeiten rund um die KI-Challenge per E-Mail erhalten. (Optional – jederzeit widerrufbar)
+          Neue Challenges, Tipps & Updates bequem per Mail erhalten. (Optional)
         </label>
       </div>
       <button class="btn-primary" onclick="handleRegister()" id="btn-register">
@@ -2289,11 +2289,17 @@ function drawBadge(week) {
     ctx.fillStyle = inner;
     ctx.beginPath(); ctx.arc(cx, cy, 160, 0, Math.PI*2); ctx.fill();
 
-    // Emoji – cross-platform font stack
-    ctx.font = "130px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif";
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(b.emoji, cx, cy);
+    // Emoji – iOS-kompatibler Trick: kleiner Zwischen-Canvas erzwingt Farb-Emoji
+    const emojiSize = 160;
+    const ec = document.createElement('canvas');
+    ec.width = emojiSize; ec.height = emojiSize;
+    const ectx = ec.getContext('2d');
+    ectx.clearRect(0, 0, emojiSize, emojiSize);
+    ectx.font = `${emojiSize * 0.75}px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',Arial,sans-serif`;
+    ectx.textAlign = 'center';
+    ectx.textBaseline = 'middle';
+    ectx.fillText(b.emoji, emojiSize/2, emojiSize/2 + 4);
+    ctx.drawImage(ec, cx - emojiSize/2, cy - emojiSize/2);
 
     // ── PILL LABEL ───────────────────────────────────────
     ctx.save();
