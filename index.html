@@ -2948,7 +2948,7 @@ async function saveProfile() {
     company:                  company || null,
     industry:                 industry || null,
     interests:                interests,
-    marketing_consent:        marketingConsent,
+    marketing_emails:         marketingConsent,
     marketing_consent_date:   marketingDate,
     updated_at:               new Date().toISOString()
   }, { onConflict: 'id' });
