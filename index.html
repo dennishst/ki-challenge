@@ -3,7 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>28-Tage KI-Challenge</title>
+<title>28-Tage KI-Challenge · MakerPort</title>
+
+<!-- SEO -->
+<meta name="description" content="In 28 Tagen KI-Tools meistern – von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
+<meta name="author" content="MakerPort Stralsund">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ki-challenge.makerport.de/">
+<meta property="og:title" content="28-Tage KI-Challenge · MakerPort">
+<meta property="og:description" content="In 28 Tagen KI-Tools meistern – von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
+<meta property="og:image" content="https://ki-challenge.makerport.de/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="MakerPort KI-Challenge">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://ki-challenge.makerport.de/">
+<meta name="twitter:title" content="28-Tage KI-Challenge · MakerPort">
+<meta name="twitter:description" content="In 28 Tagen KI-Tools meistern – von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
+<meta name="twitter:image" content="https://ki-challenge.makerport.de/preview.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png">
 
 <!-- Supabase JS SDK (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1844,7 +1870,7 @@ async function handleRegister() {
     email, password,
     options: {
       data: { full_name: name, marketing_consent: marketing, marketing_consent_date: new Date().toISOString() },
-      emailRedirectTo: 'https://dennishst.github.io/ki-challenge/'
+      emailRedirectTo: 'https://ki-challenge.makerport.de/'
     }
   });
   setLoading('btn-register', false);
@@ -2398,7 +2424,7 @@ function downloadBadge() {
 
 async function shareWeekBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
-  const shareText = `Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI\nhttps://dennishst.github.io/ki-challenge/`;
+  const shareText = `Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI\nhttps://ki-challenge.makerport.de/`;
 
   const canvas = document.getElementById('badgeCanvas');
   const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
@@ -2414,7 +2440,7 @@ async function shareWeekBadge() {
   }
   // Desktop fallback: download + open share URL
   downloadBadge();
-  const url = encodeURIComponent('https://dennishst.github.io/ki-challenge/');
+  const url = encodeURIComponent('https://ki-challenge.makerport.de/');
   setTimeout(() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank'), 400);
   showToast('Bild gespeichert – wähle es in deinem Post aus!', 'success');
 }
