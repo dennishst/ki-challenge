@@ -983,9 +983,9 @@
     <button onclick="closeWeekBadge()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
 
     <!-- Badge Canvas 4:3 – hidden, used for download only -->
-    <canvas id="badgeCanvas" width="1200" height="900" style="display:none;"></canvas>
+    <canvas id="badgeCanvas" width="1250" height="1000" style="display:none;"></canvas>
     <!-- Preview canvas shown in modal -->
-    <canvas id="badgePreview" width="1200" height="900" style="width:100%;max-width:360px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
+    <canvas id="badgePreview" width="1250" height="1000" style="width:100%;max-width:360px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
 
     <h2 id="badgeTitle" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:.4rem;"></h2>
     <p id="badgeSubtitle" style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;line-height:1.5;"></p>
@@ -2203,74 +2203,101 @@ function drawBadge(week) {
 
   function drawOnCanvas(canvas) {
     const ctx = canvas.getContext('2d');
-    const W = 1200, H = 900;
+    const W = 1250, H = 1000;
     canvas.width = W; canvas.height = H;
 
     ctx.clearRect(0, 0, W, H);
 
-    // Background gradient
+    // Background
     const bg = ctx.createLinearGradient(0, 0, W, H);
     bg.addColorStop(0, '#0c0f1a');
     bg.addColorStop(1, '#141828');
     ctx.fillStyle = bg;
-    roundRect(ctx, 0, 0, W, H, 0); ctx.fill();
+    ctx.fillRect(0, 0, W, H);
 
     // Grid
-    ctx.strokeStyle = 'rgba(94,234,212,0.035)';
+    ctx.strokeStyle = 'rgba(94,234,212,0.03)';
     ctx.lineWidth = 1;
     for (let x = 0; x < W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
     for (let y = 0; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
 
-    // ── TOP HEADER BAR ──────────────────────────────────
-    // Logo from URL (async, drawn via Image)
+    // ── HEADER BLOCK (login-style) ───────────────────────
+    const headerH = 200;
+    // Header bg
+    const hBg = ctx.createLinearGradient(0, 0, W, headerH);
+    hBg.addColorStop(0, 'rgba(94,234,212,0.06)');
+    hBg.addColorStop(1, 'rgba(129,140,248,0.04)');
+    ctx.fillStyle = hBg;
+    ctx.fillRect(0, 0, W, headerH);
+
+    // Accent pill (like auth-badge)
+    const pillText = '28 TAGE CHALLENGE';
+    ctx.font = 'bold 20px sans-serif';
+    const pillTW = ctx.measureText(pillText).width;
+    const hpW = pillTW + 48, hpH = 36, hpX = W/2 - hpW/2, hpY = 28;
+    const hpGrad = ctx.createLinearGradient(hpX, 0, hpX+hpW, 0);
+    hpGrad.addColorStop(0, b.color1);
+    hpGrad.addColorStop(1, b.color2);
+    roundRect(ctx, hpX, hpY, hpW, hpH, 18);
+    ctx.fillStyle = hpGrad;
+    ctx.fill();
+    ctx.fillStyle = '#0c0f1a';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pillText, W/2, hpY + hpH/2);
+
+    // Makerport logo (async)
     const logoImg = new Image();
     logoImg.crossOrigin = 'anonymous';
     logoImg.onload = () => {
-      // Redraw background region + logo once loaded
-      ctx.fillStyle = 'rgba(12,15,26,0.0)';
-      const logoH = 52, logoW = logoH * (logoImg.width / logoImg.height);
-      ctx.drawImage(logoImg, 72, 36, logoW, logoH);
+      const logoH = 56, logoW = logoH * (logoImg.width / logoImg.height);
+      ctx.drawImage(logoImg, W/2 - logoW/2, 76, logoW, logoH);
     };
     logoImg.src = 'https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png';
 
-    // "28 Tage Challenge" beside logo
+    // "Makerport KI Challenge" lines (login-style)
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 32px sans-serif';
+    ctx.fillText('Makerport', W/2, 144);
     ctx.fillStyle = b.color1;
-    ctx.font = 'bold 22px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('28 TAGE CHALLENGE', 72 + 220, 62);
+    ctx.fillText('KI Challenge', W/2, 182);
 
-    // Divider line
-    ctx.strokeStyle = 'rgba(94,234,212,0.12)';
+    // Divider
+    ctx.strokeStyle = 'rgba(94,234,212,0.15)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(72, 108); ctx.lineTo(W-72, 108); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(80, headerH); ctx.lineTo(W-80, headerH); ctx.stroke();
 
-    // ── CENTRE GLOW ─────────────────────────────────────
-    const cx = W/2, cy = 490;
-    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 260);
+    // ── CENTRE ──────────────────────────────────────────
+    const cx = W/2, cy = 560;
+
+    // Glow
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 240);
     glow.addColorStop(0, b.color1 + '28');
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(cx, cy, 260, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 240, 0, Math.PI*2); ctx.fill();
 
-    // Badge ring
+    // Ring
     ctx.save();
     ctx.strokeStyle = b.color1;
     ctx.lineWidth = 5;
     ctx.shadowColor = b.color1;
     ctx.shadowBlur = 30;
-    ctx.beginPath(); ctx.arc(cx, cy, 155, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI*2); ctx.stroke();
     ctx.restore();
 
     // Inner circle
-    const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, 155);
+    const inner = ctx.createRadialGradient(cx, cy, 0, cx, cy, 150);
     inner.addColorStop(0, b.color1 + '1a');
     inner.addColorStop(1, b.color2 + '08');
     ctx.fillStyle = inner;
-    ctx.beginPath(); ctx.arc(cx, cy, 155, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 150, 0, Math.PI*2); ctx.fill();
 
     // Emoji
-    ctx.font = '130px serif';
+    ctx.font = '120px serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(b.emoji, cx, cy);
@@ -2278,41 +2305,40 @@ function drawBadge(week) {
     // ── PILL LABEL ───────────────────────────────────────
     ctx.save();
     const labelText = b.label.toUpperCase();
-    ctx.font = 'bold 24px sans-serif';
+    ctx.font = 'bold 22px sans-serif';
     const tW = ctx.measureText(labelText).width;
-    const pH = 46, pPad = 36;
-    const pW = Math.max(tW + pPad * 2, 320);
-    const pX = cx - pW/2, pY = cy + 175;
+    const pH = 44, pPad = 36;
+    const pW = Math.max(tW + pPad * 2, 300);
+    const pX = cx - pW/2, pY = cy + 165;
     const pGrad = ctx.createLinearGradient(pX, 0, pX+pW, 0);
     pGrad.addColorStop(0, b.color1);
     pGrad.addColorStop(1, b.color2);
-    roundRect(ctx, pX, pY, pW, pH, 23);
+    roundRect(ctx, pX, pY, pW, pH, 22);
     ctx.fillStyle = pGrad;
     ctx.fill();
     ctx.fillStyle = '#0c0f1a';
-    ctx.font = 'bold 24px sans-serif';
+    ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(labelText, cx, pY + pH/2);
     ctx.restore();
 
-    // ── TITLE ───────────────────────────────────────────
+    // Title
     ctx.fillStyle = '#e2e8f0';
-    ctx.font = 'bold 52px sans-serif';
+    ctx.font = 'bold 48px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(b.title, cx, cy + 240);
+    ctx.fillText(b.title, cx, cy + 222);
 
     // ── FOOTER ──────────────────────────────────────────
     ctx.strokeStyle = 'rgba(94,234,212,0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(72, H-80); ctx.lineTo(W-72, H-80); ctx.stroke();
-
+    ctx.beginPath(); ctx.moveTo(80, H-72); ctx.lineTo(W-80, H-72); ctx.stroke();
     ctx.fillStyle = '#475569';
-    ctx.font = '22px sans-serif';
+    ctx.font = '20px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('makerport.de · 28-Tage KI-Challenge', cx, H-46);
+    ctx.fillText('makerport.de · 28-Tage KI-Challenge', cx, H-40);
 
     // Border glow
     ctx.save();
@@ -2691,8 +2717,10 @@ function openProfile() {
 }
 
 async function showProfileSheet(name, done, pct) {
+  // Cleanup any existing sheet and reset body scroll
   const existing = document.getElementById('profileSheet');
   if (existing) existing.remove();
+  document.body.style.overflow = 'hidden';
 
   const interests = ['Neues Lernen', 'Produktivität', 'Marketing', 'Programmierung', 'Design', 'Finanzen', 'Gesundheit', 'Führung', 'Vertrieb', 'KI & Automatisierung'];
 
@@ -2711,7 +2739,7 @@ async function showProfileSheet(name, done, pct) {
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
         <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase;margin:0;">Mein Profil</h3>
-        <button onclick="document.getElementById('profileSheet').remove();" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">×</button>
+        <button onclick="document.getElementById('profileSheet').remove();document.body.style.overflow='';" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">×</button>
       </div>
 
       <div style="text-align:center;margin-bottom:1.5rem;">
@@ -2738,7 +2766,7 @@ async function showProfileSheet(name, done, pct) {
               4:{emoji:'🏆',color:'#22c55e',label:'Marketing & Social Media'}
             };
             const badge = b[week];
-            return `<button onclick="document.getElementById('profileSheet').remove();setTimeout(()=>showWeekBadge(${week}),100)" style="display:flex;align-items:center;gap:.75rem;background:var(--surface2);border:1px solid ${badge.color}44;border-radius:12px;padding:.6rem .9rem;cursor:pointer;transition:border-color .2s;text-align:left;width:100%;" onmouseover="this.style.borderColor='${badge.color}'" onmouseout="this.style.borderColor='${badge.color}44'">
+            return `<button onclick="document.getElementById('profileSheet').remove();document.body.style.overflow='';setTimeout(()=>showWeekBadge(${week}),100)" style="display:flex;align-items:center;gap:.75rem;background:var(--surface2);border:1px solid ${badge.color}44;border-radius:12px;padding:.6rem .9rem;cursor:pointer;transition:border-color .2s;text-align:left;width:100%;" onmouseover="this.style.borderColor='${badge.color}'" onmouseout="this.style.borderColor='${badge.color}44'">
               <span style="font-size:1.4rem;flex-shrink:0;">${badge.emoji}</span>
               <div>
                 <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;color:${badge.color};text-transform:uppercase;letter-spacing:.06em;">Woche ${week}</div>
@@ -2780,7 +2808,7 @@ async function showProfileSheet(name, done, pct) {
         <label style="display:block;font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;">Position</label>
         <select id="prof-position" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;appearance:none;">
           <option value="">Position wählen…</option>
-          ${['Geschäftsführung','Selbständig / Freiberuflich','Führungskraft / Management','Angestellt (Fachkraft)','Angestellt (Sachbearbeitung)','Student','Auszubildender','Ehrenamtlich','Ruhestand','Sonstiges'].map(p=>`<option value="${p}" ${saved.position===p?'selected':''}>${p}</option>`).join('')}
+          ${['Geschäftsführung','Selbständig / Freiberuflich','Führungskraft / Management','Angestellt (Fachkraft)','Angestellt (Sachbearbeitung)','Studium','Ausbildung','Ehrenamtlich','Ruhestand','Sonstiges'].map(p=>`<option value="${p}" ${saved.position===p?'selected':''}>${p}</option>`).join('')}
         </select>
       </div>
 
@@ -2806,14 +2834,19 @@ async function showProfileSheet(name, done, pct) {
       <div id="prof-msg" style="display:none;padding:.6rem .9rem;border-radius:8px;font-size:.82rem;margin-bottom:.75rem;"></div>
 
       <button onclick="saveProfile()" style="width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;border:none;border-radius:10px;padding:.85rem;cursor:pointer;margin-bottom:.5rem;">Profil speichern</button>
-      <button onclick="handleLogout();document.getElementById('profileSheet').remove();" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;">Abmelden</button>
+      <button onclick="handleLogout();document.getElementById('profileSheet').remove();document.body.style.overflow='';" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;">Abmelden</button>
       <div style="text-align:center;padding-top:.75rem;margin-top:.5rem;border-top:1px solid rgba(255,255,255,.06);">
-        <button onclick="document.getElementById('profileSheet').remove();setTimeout(()=>showLegal('privacy'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Datenschutz</button>
+        <button onclick="document.getElementById('profileSheet').remove();document.body.style.overflow='';setTimeout(()=>showLegal('privacy'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Datenschutz</button>
         <span style="color:#334155;font-size:.75rem;">·</span>
-        <button onclick="document.getElementById('profileSheet').remove();setTimeout(()=>showLegal('imprint'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Impressum</button>
+        <button onclick="document.getElementById('profileSheet').remove();document.body.style.overflow='';setTimeout(()=>showLegal('imprint'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Impressum</button>
       </div>
     </div>`;
-  sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+  sheet.addEventListener('click', (e) => {
+    if (e.target === sheet) {
+      sheet.remove();
+      document.body.style.overflow = '';
+    }
+  });
   document.body.appendChild(sheet);
 }
 
