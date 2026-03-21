@@ -216,7 +216,8 @@
       display: flex !important;
       align-items: center;
       justify-content: space-around;
-      padding: .5rem .3rem calc(.5rem + env(safe-area-inset-bottom));
+      padding: .5rem .3rem;
+      padding-bottom: calc(.5rem + env(safe-area-inset-bottom, 16px));
       background: #141828;
       border-top: 2px solid rgba(94,234,212,.15);
       position: fixed;
@@ -226,6 +227,10 @@
       z-index: 100;
       width: 100%;
       touch-action: manipulation;
+      /* Verhindert dass Browser-Chrome die Nav überdeckt */
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      will-change: transform;
     }
     .mobile-nav-btn {
       display: flex;
@@ -359,8 +364,8 @@
     .day-header-meta .week-hint { font-size: .75rem !important; }
 
     /* Pad content above bottom nav */
-    .dashboard-content { padding-bottom: 5rem !important; }
-    .day-body { padding-bottom: 5rem !important; }
+    .dashboard-content { padding-bottom: calc(5rem + env(safe-area-inset-bottom, 16px)) !important; }
+    .day-body { padding-bottom: calc(5rem + env(safe-area-inset-bottom, 16px)) !important; }
 
     /* Welcome banner mobile */
     .welcome-banner {
@@ -720,7 +725,7 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.6rem;">
+    <a href="https://makerport.de/?utm_source=tool&utm_medium=ki-challenge" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.6rem;">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:34px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
@@ -731,7 +736,7 @@
 
   <!-- DESKTOP TOPBAR -->
   <div class="topbar">
-    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.85rem;" class="topbar-brand">
+    <a href="https://makerport.de/?utm_source=tool&utm_medium=ki-challenge" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.85rem;" class="topbar-brand">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:48px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.15;gap:0;">
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
@@ -812,7 +817,7 @@
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <span style="font-family:'Syne',sans-serif;font-size:.42rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;" id="ringLevel">LEVEL 1</span>
-            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);line-height:1;" id="ringPercent">0%</span>
+            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:var(--accent);line-height:1;" id="ringPercent">0%</span>
           </div>
         </div>
         <!-- Text beside ring -->
@@ -872,7 +877,7 @@
 
   <!-- MOBILE HEADER -->
   <div class="mobile-header">
-    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.6rem;">
+    <a href="https://makerport.de/?utm_source=tool&utm_medium=ki-challenge" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.6rem;">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:34px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.68rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
@@ -907,7 +912,7 @@
 
   <!-- DESKTOP TOPBAR -->
   <div class="topbar">
-    <a href="https://makerport.de/" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.85rem;" class="topbar-brand">
+    <a href="https://makerport.de/?utm_source=tool&utm_medium=ki-challenge" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;gap:.85rem;" class="topbar-brand">
       <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport" style="height:48px;width:auto;object-fit:contain;">
       <div style="display:flex;flex-direction:column;line-height:1.15;gap:0;">
         <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;">28 Tage</span>
@@ -1974,7 +1979,11 @@ function buildDashboard() {
   document.getElementById('statDone').textContent   = done;
   document.getElementById('statStreak').textContent = streak + '🔥';
   document.getElementById('statLeft').textContent   = 28 - done;
-  document.getElementById('ringPercent').textContent = pct + '%';
+  const ringPctEl = document.getElementById('ringPercent');
+  if (ringPctEl) {
+    ringPctEl.textContent = pct + '%';
+    ringPctEl.style.fontSize = pct === 100 ? '.68rem' : '.85rem';
+  }
 
   // New ring uses dasharray=113 (r=18)
   const ringFillEl = document.getElementById('ringFill');
