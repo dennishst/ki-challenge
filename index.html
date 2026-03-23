@@ -870,14 +870,23 @@
       </div>
       <div class="form-field">
         <label>Passwort</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+        <div style="position:relative;">
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;box-sizing:border-box;">
+          <button type="button" onclick="togglePasswordVisibility('login-password', this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:.2rem;display:flex;align-items:center;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'" title="Passwort anzeigen">
+            <svg id="eyeIcon-login-password" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:.25rem 0 .75rem;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.82rem;color:var(--muted);">
+          <input type="checkbox" id="login-remember" style="accent-color:var(--accent);width:14px;height:14px;">
+          Angemeldet bleiben
+        </label>
+        <button onclick="switchTab('reset')" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='var(--muted)'">Passwort vergessen?</button>
       </div>
       <button class="btn-primary" onclick="handleLogin()" id="btn-login">
         <span>Einloggen →</span>
       </button>
-      <div style="text-align:center;margin-top:.75rem;">
-        <button onclick="switchTab('reset')" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='var(--muted)'">Passwort vergessen?</button>
-      </div>
       <div class="auth-msg" id="login-msg"></div>
     </div>
 
@@ -1195,8 +1204,8 @@
 <!-- ══════════════════════════════════════════════════════
      WOCHEN-ABZEICHEN MODAL
 ════════════════════════════════════════════════════════ -->
-<div id="weekBadgeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:1.5rem;">
-  <div style="background:var(--surface);border:1px solid rgba(94,234,212,.25);border-radius:28px;padding:2rem 2rem 1.75rem;max-width:440px;width:100%;text-align:center;box-shadow:0 0 80px rgba(94,234,212,.12);position:relative;animation:fadeUp .4s ease;">
+<div id="weekBadgeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;">
+  <div style="background:var(--surface);border:1px solid rgba(94,234,212,.25);border-radius:28px;padding:1.5rem 1.5rem 1.5rem;max-width:420px;width:100%;text-align:center;box-shadow:0 0 80px rgba(94,234,212,.12);position:relative;margin:auto;">
     <button onclick="closeWeekBadge()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
 
     <!-- Badge Canvas 4:3 – hidden, used for download only -->
@@ -2033,17 +2042,34 @@ function setLoading(btnId, loading) {
 async function handleLogin() {
   const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
+  const remember = document.getElementById('login-remember')?.checked || false;
   if (!email || !password) return showMsg('login-msg', 'Bitte E-Mail und Passwort eingeben.');
   setLoading('btn-login', true);
-  const { error } = await db.auth.signInWithPassword({ email, password });
+  const { error } = await db.auth.signInWithPassword({
+    email, password,
+    options: { persistSession: remember }
+  });
   setLoading('btn-login', false);
   if (error) {
-    const msg = error.message.includes('Invalid login') 
-      ? 'E-Mail oder Passwort falsch.' 
+    const msg = error.message.includes('Invalid login')
+      ? 'E-Mail oder Passwort falsch.'
       : error.message;
     showMsg('login-msg', msg);
   }
   // onAuthStateChange handles the redirect
+}
+
+function togglePasswordVisibility(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById('eyeIcon-' + inputId);
+  if (!input || !icon) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
 }
 
 async function handleRegister() {
@@ -2115,16 +2141,17 @@ function hideConfirm() {
 }
 
 function confirmLogout() {
-  // Close profile sheet if open
-  document.getElementById('profileSheet')?.remove();
-  document.body.style.overflow = '';
   showConfirm({
     icon: '👋',
     title: 'Abmelden?',
     text: 'Möchtest du dich abmelden?',
     okLabel: 'Abmelden',
     okColor: '#ef4444',
-    onOk: handleLogout
+    onOk: () => {
+      document.getElementById('profileSheet')?.remove();
+      document.body.style.overflow = '';
+      handleLogout();
+    }
   });
 }
 
@@ -3620,11 +3647,12 @@ function updateA11yProfileToggle() {
   const t = document.getElementById('profA11yToggle');
   if (!t) return;
   const hidden = !!a11yState.hidden;
-  t.style.background = hidden ? 'var(--surface2)' : 'rgba(94,234,212,.2)';
-  t.style.borderColor = hidden ? 'var(--border)' : 'var(--accent)';
-  t.title = hidden ? 'Widget einblenden' : 'Widget ausblenden';
-  // Dot indicator
-  t.innerHTML = `<span style="position:absolute;width:14px;height:14px;border-radius:50%;background:${hidden ? 'var(--muted)' : 'var(--accent)'};top:2px;left:${hidden ? '2px' : '18px'};transition:left .2s,background .2s;"></span>`;
+  // Widget sichtbar = ON (grün), Widget versteckt = OFF (grau)
+  const isOn = !hidden;
+  t.style.background = isOn ? 'rgba(94,234,212,.2)' : '#1c2235';
+  t.style.borderColor = isOn ? '#5eead4' : 'rgba(255,255,255,0.07)';
+  t.title = isOn ? 'Widget ausblenden' : 'Widget einblenden';
+  t.innerHTML = `<span style="position:absolute;width:14px;height:14px;border-radius:50%;background:${isOn ? '#5eead4' : '#64748b'};top:2px;left:${isOn ? '18px' : '2px'};transition:left .2s,background .2s;display:block;"></span>`;
 }
 
 // Button click – via addEventListener so it always works
