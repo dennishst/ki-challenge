@@ -136,8 +136,8 @@
 
   /* ─── DAY CONTENT ─────────────────────────────────── */
   .day-header{padding:1.2rem 2rem;border-bottom:1px solid var(--border);background:rgba(12,15,26,.9);backdrop-filter:blur(12px);display:flex;align-items:center;gap:0;flex-wrap:wrap;}
-  .back-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--muted);padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;margin-right:1.5rem;}
-  .back-btn:hover{color:var(--text);border-color:var(--accent);}
+  .back-btn{background:var(--surface2);border:1px solid var(--accent);border-radius:8px;color:var(--accent);padding:.4rem .9rem;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:color .2s,border-color .2s,background .2s;white-space:nowrap;margin-right:1.5rem;}
+  .back-btn:hover{background:var(--accent);color:#0c0f1a;border-color:var(--accent);}
   .day-header-divider{width:1px;height:2rem;background:var(--border);margin-right:1.5rem;flex-shrink:0;}
   .day-header-meta .week-hint{font-size:.72rem;color:var(--accent2);letter-spacing:.08em;}
   .day-header-meta .day-title-h{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
@@ -569,20 +569,18 @@
     background: var(--accent);
     border: none;
     color: #0c0f1a;
-    font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(94,234,212,.4);
-    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 16px rgba(94,234,212,.35);
+    transition: transform .15s;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     pointer-events: all;
-    /* Contrast filter darf diesen Button nicht beeinflussen */
     isolation: isolate;
   }
-  #a11y-btn:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(94,234,212,.55); }
+  #a11y-btn:hover { transform: scale(1.08); }
   #a11y-btn:active { transform: scale(.95); }
   @media (min-width: 769px) {
     #a11y-btn { bottom: 4.5rem; }
@@ -696,9 +694,13 @@
 
 <!-- ── BARRIEREFREIHEIT ─────────────────────────────────── -->
 <button id="a11y-btn" aria-label="Barrierefreiheit" title="Barrierefreiheits-Einstellungen">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="3.5" r="1.5"/>
-    <path d="M17 7.5H7a1 1 0 000 2h3.5l-1 4L7 16.5a1 1 0 001.4 1.4l2.6-2.6 1 3.6a1 1 0 002 0l1-3.6 2.6 2.6a1 1 0 001.4-1.4l-2.5-2.5-1-4H17a1 1 0 000-2z"/>
+  <svg width="26" height="26" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <!-- Kopf -->
+    <circle cx="16" cy="5" r="3"/>
+    <!-- Körper aufrecht -->
+    <path d="M16 9c-1 0-2 .5-2.5 1.3L11 14h-2a1 1 0 000 2h3l2-3v5l-3 4a1 1 0 001.6 1.2L15 20h2l1.4 3.2A1 1 0 0020 22.6L17 18v-5l2 3h3a1 1 0 000-2h-2l-2.5-3.7C17 9.5 16.8 9 16 9z"/>
+    <!-- Arm rechts ausgestreckt (rollstuhl-style) -->
+    <path d="M19 11.5l3.5-1a1 1 0 00-.6-1.9l-4 1.2c-.5.15-.9.6-.9 1.2v.5z" opacity=".7"/>
   </svg>
 </button>
 <div id="a11y-panel" role="dialog" aria-label="Barrierefreiheits-Einstellungen">
@@ -729,6 +731,7 @@
   </div>
 
   <button class="a11y-reset" onclick="a11yReset()">↺ Zurücksetzen</button>
+  <button class="a11y-reset" onclick="a11yHideWidget()" style="margin-top:.35rem;color:#64748b;">✕ Widget ausblenden</button>
 </div>
 
 
@@ -1256,8 +1259,8 @@ const DAY_CONTENT = {
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Öffne ChatGPT, Claude oder ein KI-Tool deiner Wahl.</li>
 <li><span class="task-icon">2.</span>Denk an eine echte Aufgabe aus deinem Alltag.</li>
-<li><span class="task-icon">3.</span>Formuliere den Prompt <strong>einmal ohne Rolle</strong> – notiere die Antwort.</li>
-<li><span class="task-icon">4.</span>Formuliere denselben Prompt <strong>mit der Expertenrollen-Formel</strong> – vergleiche das Ergebnis.</li>
+<li><span class="task-icon">3.</span>Formuliere den Prompt <strong>einmal ohne Rolle</strong> , notiere die Antwort.</li>
+<li><span class="task-icon">4.</span>Formuliere denselben Prompt <strong>mit der Expertenrollen-Formel</strong> , vergleiche das Ergebnis.</li>
 <li><span class="task-icon">5.</span>Teile dein Lieblingsergebnis in der Community!</li>
 </ul></div>
 <hr class="content-divider">
@@ -1357,7 +1360,7 @@ const DAY_CONTENT = {
 <li><span class="task-icon">1.</span>Wähle ein Fachthema, das du immer schwer zu erklären findest.</li>
 <li><span class="task-icon">2.</span>Lass es dir in allen drei Stufen erklären.</li>
 <li><span class="task-icon">3.</span>Erstelle eine Version für einen Kunden ohne Fachkenntnisse.</li>
-<li><span class="task-icon">4.</span>Teste: Erkläre das Thema jemandem – nur mit dem, was du behalten hast.</li>
+<li><span class="task-icon">4.</span>Teste: Erkläre das Thema jemandem , nur mit dem, was du behalten hast.</li>
 </ul></div>
 <hr class="content-divider">
 <div class="content-card"><h3>💬 Reflexionsfrage</h3>
@@ -1401,7 +1404,7 @@ const DAY_CONTENT = {
 <div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Schreibe 5 Minuten: Welcher KI-Einsatz hat dir in Woche 1 am meisten gebracht?</li>
-<li><span class="task-icon">2.</span>Nutze den Wochenrückblick-Prompt – gib der KI deine Notizen.</li>
+<li><span class="task-icon">2.</span>Nutze den Wochenrückblick-Prompt , gib der KI deine Notizen.</li>
 <li><span class="task-icon">3.</span>Definiere 1 KI-Gewohnheit, die du ab Montag täglich einsetzt.</li>
 <li><span class="task-icon">4.</span>Teile deine #1-Erkenntnis der Woche in der Community!</li>
 </ul></div>
@@ -1476,7 +1479,7 @@ const DAY_CONTENT = {
 <div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Nimm einen echten Text aus deinem Alltag (Kundenmail, Feedback, Fallbeschreibung).</li>
-<li><span class="task-icon">2.</span>Anonymisiere ihn manuell – dann lass die KI prüfen, ob etwas übersehen wurde.</li>
+<li><span class="task-icon">2.</span>Anonymisiere ihn manuell , dann lass die KI prüfen, ob etwas übersehen wurde.</li>
 <li><span class="task-icon">3.</span>Nutze den anonymisierten Text für eine KI-Analyse.</li>
 <li><span class="task-icon">4.</span>Erstelle dein persönliches Anonymisierungs-Schema für wiederkehrende Fälle.</li>
 </ul></div>
@@ -1487,7 +1490,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(10)">✓ Tag 10 abschließen</button></div>`,
 
 11:`<div class="day-tag">📅 TAG 11 VON 28 · WOCHE 2</div>
-<h1>Urheber&#8209;recht <span>& KI</span></h1>
+<h1>Urheber&#8209;recht <span>&amp; KI</span></h1>
 <p class="day-intro">Wem gehört das Bild oder der Text, den eine KI erstellt hat? Die rechtliche Lage – klar, verständlich, praxisrelevant.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>KI-generierte Inhalte befinden sich rechtlich in einer Grauzone – aber die Grundprinzipien sind klarer als viele denken. Heute lernst du, was du bedenken musst, bevor du KI-Inhalte kommerziell nutzt.</p></div>
@@ -1499,7 +1502,7 @@ const DAY_CONTENT = {
 <div class="prompt-box"><span class="label">RECHTLICHE GRUNDLAGEN</span>Du bist Expert:in für Urheber- und Medienrecht mit Schwerpunkt auf KI-generierten Inhalten und digitalem Recht in Deutschland und der EU. Erkläre mir: Wer hält die Nutzungsrechte an KI-generierten Texten und Bildern? Was muss ich bei kommerzieller Nutzung beachten? Welche Risiken gibt es beim Einsatz von KI für Kundenprojekte? (Hinweis: Bei konkreten Rechtsfragen immer Anwalt konsultieren.)</div></div>
 <div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
 <ul class="task-list">
-<li><span class="task-icon">1.</span>Lies die AGB deines meistgenutzten KI-Tools – Fokus auf „Eigentum / Nutzungsrechte".</li>
+<li><span class="task-icon">1.</span>Lies die AGB deines meistgenutzten KI-Tools , Fokus auf „Eigentum / Nutzungsrechte".</li>
 <li><span class="task-icon">2.</span>Erstelle eine Liste: Welche KI-generierten Inhalte nutze ich bereits kommerziell?</li>
 <li><span class="task-icon">3.</span>Lass die KI die Rechtslage erklären und stelle Rückfragen.</li>
 </ul></div>
@@ -1548,7 +1551,7 @@ const DAY_CONTENT = {
 <div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Bitte die KI, dir 5 Fakten zu einem Fachthema aus deiner Branche zu nennen.</li>
-<li><span class="task-icon">2.</span>Überprüfe alle 5 Fakten extern – wie viele sind korrekt?</li>
+<li><span class="task-icon">2.</span>Überprüfe alle 5 Fakten extern , wie viele sind korrekt?</li>
 <li><span class="task-icon">3.</span>Entwickle deine persönliche Faktencheck-Routine.</li>
 <li><span class="task-icon">4.</span>Erstelle die Checkliste mit der Vorlage oben.</li>
 </ul></div>
@@ -1574,9 +1577,9 @@ const DAY_CONTENT = {
 <div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Erstelle deinen persönlichen KI-Kodex mit dem Prompt oben.</li>
-<li><span class="task-icon">2.</span>Überarbeite ihn in deinen eigenen Worten – er soll sich nach dir anfühlen.</li>
+<li><span class="task-icon">2.</span>Überarbeite ihn in deinen eigenen Worten , er soll sich nach dir anfühlen.</li>
 <li><span class="task-icon">3.</span>Speichere ihn an einem Ort, den du regelmäßig siehst.</li>
-<li><span class="task-icon">4.</span>Teile Auszüge in der Community – du inspirierst damit andere!</li>
+<li><span class="task-icon">4.</span>Teile Auszüge in der Community , du inspirierst damit andere!</li>
 </ul></div>
 <hr class="content-divider">
 <div class="content-card"><h3>💬 Reflexionsfrage</h3>
@@ -1628,7 +1631,7 @@ const DAY_CONTENT = {
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Wähle ein aktuelles Social-Media-Thema.</li>
 <li><span class="task-icon">2.</span>Generiere 3 Bildvarianten mit unterschiedlichen Stilen.</li>
-<li><span class="task-icon">3.</span>Füge in Canva einen Text über das Bild – teste den Overlay.</li>
+<li><span class="task-icon">3.</span>Füge in Canva einen Text über das Bild , teste den Overlay.</li>
 <li><span class="task-icon">4.</span>Vergleiche: Stockfoto vs. KI-Bild für dasselbe Thema.</li>
 </ul></div>
 <hr class="content-divider">
@@ -1654,7 +1657,7 @@ const DAY_CONTENT = {
 <li><span class="task-icon">1.</span>Wähle eine kommende Präsentation oder denk dir ein Thema aus.</li>
 <li><span class="task-icon">2.</span>Erstelle den kompletten Folienplan.</li>
 <li><span class="task-icon">3.</span>Arbeite 2–3 Folien vollständig aus.</li>
-<li><span class="task-icon">4.</span>Optional: Probiere Gamma.app – direkt aus Text zur fertigen Präsentation.</li>
+<li><span class="task-icon">4.</span>Optional: Probiere Gamma.app , direkt aus Text zur fertigen Präsentation.</li>
 </ul></div>
 <hr class="content-divider">
 <div class="content-card"><h3>💬 Reflexionsfrage</h3>
@@ -1702,7 +1705,7 @@ const DAY_CONTENT = {
 <div class="content-card"><h3>🎯 Heutige Aufgaben</h3>
 <ul class="task-list">
 <li><span class="task-icon">1.</span>Suche ein PDF aus deinem Alltag (Vertrag, Anleitung, Report).</li>
-<li><span class="task-icon">2.</span>Lade es in ChatGPT oder Claude hoch – teste alle drei Fragetechniken.</li>
+<li><span class="task-icon">2.</span>Lade es in ChatGPT oder Claude hoch , teste alle drei Fragetechniken.</li>
 <li><span class="task-icon">3.</span>Teste NotebookLM mit 2 verschiedenen Quellen zum gleichen Thema.</li>
 </ul></div>
 <hr class="content-divider">
@@ -1766,7 +1769,7 @@ const DAY_CONTENT = {
 <h1>Der perfekte <span>LinkedIn-Post</span></h1>
 <p class="day-intro">Willkommen in Woche 4! LinkedIn-Posts, die wirklich gelesen werden – Struktur, Hooks und die Kunst des ersten Satzes.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
-<p>LinkedIn belohnt Posts, die Menschen in den ersten 2 Zeilen zum Weiterlesen bringen. Der Hook – der erste Satz – entscheidet alles. Danach zählen kurze Absätze, klarer Mehrwert und ein konkreter Call-to-Action.</p></div>
+<p>LinkedIn belohnt Posts, die Menschen in den ersten 2 Zeilen zum Weiterlesen bringen. Der Hook, der erste Satz, entscheidet alles. Danach zählen kurze Absätze, klarer Mehrwert und ein konkreter Call-to-Action.</p></div>
 <div class="content-card"><h3>💡 Anatomie eines erfolgreichen Posts</h3>
 <div class="highlight-box"><strong>Hook (Zeile 1–2)</strong>Provokante These, überraschende Zahl, persönliche Story oder kontraintuitiver Gedanke. Ziel: „Mehr anzeigen" klicken.</div>
 <div class="highlight-box"><strong>Inhalt (3–8 kurze Absätze)</strong>Wert liefern. Eine Idee pro Absatz. Leerzeilen. Keine Textwand.</div>
@@ -1791,7 +1794,7 @@ const DAY_CONTENT = {
 <h1><span>Content-Recycling</span></h1>
 <p class="day-intro">Einmal schreiben, zehnmal nutzen. Aus einer E-Mail wird ein Blogpost, ein LinkedIn-Post, eine Story und mehr.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
-<p>Die meisten Menschen produzieren täglich wertvolle Inhalte – in E-Mails, Gesprächen, Berichten – und veröffentlichen nichts davon. Content-Recycling bedeutet: Du nimmst einen bestehenden Inhalt und verwandelst ihn in mehrere Formate für mehrere Kanäle.</p></div>
+<p>Die meisten Menschen produzieren täglich wertvolle Inhalte , in E-Mails, Gesprächen, Berichten, und veröffentlichen nichts davon. Content-Recycling bedeutet: Du nimmst einen bestehenden Inhalt und verwandelst ihn in mehrere Formate für mehrere Kanäle.</p></div>
 <div class="content-card"><h3>💡 Der Content-Multiplikator</h3>
 <div class="highlight-box"><strong>Aus 1 mach 7</strong>1 Blogartikel → LinkedIn-Post → 3 Tweets → Instagram-Karussell → Newsletter-Abschnitt → Podcast-Thema → FAQ-Seite</div></div>
 <div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
@@ -1834,7 +1837,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(24)">✓ Tag 24 abschließen</button></div>`,
 
 25:`<div class="day-tag">📅 TAG 25 VON 28 · WOCHE 4</div>
-<h1>Einwands&#8209;Check: <span>Verkaufs&#8203;args prüfen</span></h1>
+<h1>Einwands&#8209;Check: <span>Verkaufs&#8203;argumente prüfen</span></h1>
 <p class="day-intro">Lass die KI deine Argumente zerlegen – bevor es dein Kunde tut. Der härteste und nützlichste Feedback-Geber.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Die stärksten Verkaufsargumente entstehen nicht im leeren Raum, sondern im Dialog mit Einwänden. Wenn du weißt, was dein Gegenüber einwenden wird, kannst du deine Botschaft so formulieren, dass sie diese Einwände schon vorwegnimmt.</p></div>
@@ -1861,7 +1864,7 @@ const DAY_CONTENT = {
 <h1>Newsletter-Ideen für <span>einen Monat</span></h1>
 <p class="day-intro">Nie wieder vor dem leeren Newsletter sitzen. Die KI generiert in 10 Minuten 30 Tage Content-Ideen – inklusive Betreffzeilen.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
-<p>Der größte Feind regelmäßiger Newsletter ist nicht mangelndes Wissen – sondern das leere Blatt. Die KI löst dieses Problem, indem sie dir einen ganzen Monat an Themen, Winkeln und Ideen liefert.</p></div>
+<p>Der größte Feind regelmäßiger Newsletter ist nicht mangelndes Wissen, sondern das leere Blatt. Die KI löst dieses Problem, indem sie dir einen ganzen Monat an Themen, Blickwinkeln und Ideen liefert.</p></div>
 <div class="content-card"><h3>💡 Strategie-first-Ansatz</h3>
 <div class="highlight-box"><strong>Erst Strategie, dann Ideen</strong>Definiere: Wer liest deinen Newsletter? Was ist ihr größtes Problem? Was ist dein einzigartiger Blickwinkel? Diese 3 Antworten sind dein Prompt-Input.</div></div>
 <div class="content-card"><h3>📝 Prompt-Vorlagen</h3>
@@ -1872,7 +1875,7 @@ const DAY_CONTENT = {
 <li><span class="task-icon">1.</span>Definiere deine Newsletter-Zielgruppe und deinen Blickwinkel in 2–3 Sätzen.</li>
 <li><span class="task-icon">2.</span>Generiere einen 4-Wochen-Content-Plan.</li>
 <li><span class="task-icon">3.</span>Schreibe die Eröffnung für dein Lieblingsthema.</li>
-<li><span class="task-icon">4.</span>Teste 2 Betreffzeilen – welche würdest du öffnen?</li>
+<li><span class="task-icon">4.</span>Teste 2 Betreffzeilen , welche würdest du öffnen?</li>
 </ul></div>
 <hr class="content-divider">
 <div class="content-card"><h3>💬 Reflexionsfrage</h3>
@@ -1981,7 +1984,7 @@ const WEEKS = [
     {num:22, title:'Der perfekte LinkedIn-Post',             short:'LinkedIn'},
     {num:23, title:'Content-Recycling',                      short:'Recycling'},
     {num:24, title:'Kunden-Personas simulieren',             short:'Personas'},
-    {num:25, title:'Einwands-Check: Verkaufsargs',           short:'Einwände'},
+    {num:25, title:'Einwands-Check: Verkaufsargumente prüfen', short:'Einwände'},
     {num:26, title:'Newsletter-Ideen für 1 Monat',          short:'Newsletter'},
     {num:27, title:'Hashtags & SEO ohne Experten',          short:'Hashtags & SEO'},
     {num:28, title:'Abschluss: Social-Media-Plan & Resümee 🎓', short:'Abschluss'},
@@ -3126,6 +3129,10 @@ async function showProfileSheet(name, done, pct) {
         <span style="color:#334155;font-size:.75rem;">·</span>
         <button onclick="document.getElementById('profileSheet').remove();document.body.style.overflow='';setTimeout(()=>showLegal('imprint'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Impressum</button>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem .2rem 0;margin-top:.5rem;border-top:1px solid rgba(255,255,255,.04);">
+        <span style="font-size:.75rem;color:#475569;font-family:'DM Sans',sans-serif;">Barrierefreiheits-Widget</span>
+        <button id="profA11yToggle" onclick="a11yToggleWidget()" style="width:36px;height:20px;border-radius:10px;border:1px solid var(--border);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;" aria-label="Widget ein/aus"></button>
+      </div>
     </div>`;
   sheet.addEventListener('click', (e) => {
     if (e.target === sheet) {
@@ -3577,6 +3584,11 @@ function applyA11y() {
   document.getElementById('a11yAnimToggle')?.classList.toggle('on',     !!a11yState.anim);
 
   localStorage.setItem(A11Y_KEY, JSON.stringify(a11yState));
+
+  // Widget-Sichtbarkeit
+  const btn = document.getElementById('a11y-btn');
+  if (btn) btn.style.display = a11yState.hidden ? 'none' : 'flex';
+  updateA11yProfileToggle();
 }
 
 function toggleA11yPanel() {
@@ -3587,7 +3599,33 @@ function toggleA11yPanel() {
 function a11yFontUp()   { if (a11yState.font < 2) { a11yState.font++; applyA11y(); } }
 function a11yFontDown() { if (a11yState.font > 0) { a11yState.font--; applyA11y(); } }
 function a11yToggle(key) { a11yState[key] = !a11yState[key]; applyA11y(); }
-function a11yReset() { a11yState = { font:0, contrast:false, readable:false, anim:false }; applyA11y(); }
+function a11yReset() { a11yState = { font:0, contrast:false, readable:false, anim:false, hidden: a11yState.hidden }; applyA11y(); }
+
+function a11yHideWidget() {
+  a11yState.hidden = true;
+  localStorage.setItem(A11Y_KEY, JSON.stringify(a11yState));
+  document.getElementById('a11y-btn').style.display = 'none';
+  document.getElementById('a11y-panel').classList.remove('open');
+  updateA11yProfileToggle();
+}
+
+function a11yToggleWidget() {
+  a11yState.hidden = !a11yState.hidden;
+  localStorage.setItem(A11Y_KEY, JSON.stringify(a11yState));
+  document.getElementById('a11y-btn').style.display = a11yState.hidden ? 'none' : 'flex';
+  updateA11yProfileToggle();
+}
+
+function updateA11yProfileToggle() {
+  const t = document.getElementById('profA11yToggle');
+  if (!t) return;
+  const hidden = !!a11yState.hidden;
+  t.style.background = hidden ? 'var(--surface2)' : 'rgba(94,234,212,.2)';
+  t.style.borderColor = hidden ? 'var(--border)' : 'var(--accent)';
+  t.title = hidden ? 'Widget einblenden' : 'Widget ausblenden';
+  // Dot indicator
+  t.innerHTML = `<span style="position:absolute;width:14px;height:14px;border-radius:50%;background:${hidden ? 'var(--muted)' : 'var(--accent)'};top:2px;left:${hidden ? '2px' : '18px'};transition:left .2s,background .2s;"></span>`;
+}
 
 // Button click – via addEventListener so it always works
 document.addEventListener('DOMContentLoaded', () => {
