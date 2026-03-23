@@ -557,9 +557,170 @@
   .pill-btn.ki-pill-btn { color: #818cf8; }
   .pill-btn.ki-pill-btn:hover { background: rgba(129,140,248,.1); }
 
+  /* ─── BARRIEREFREIHEIT ──────────────────────────────── */
+  #a11y-btn {
+    position: fixed;
+    bottom: 5.5rem;
+    right: 1.25rem;
+    z-index: 300;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4);
+    transition: border-color .2s, color .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #a11y-btn:hover { border-color: var(--accent); color: var(--accent); }
+  @media (min-width: 769px) {
+    #a11y-btn { bottom: 4.5rem; }
+  }
+  #a11y-panel {
+    display: none;
+    position: fixed;
+    bottom: 10rem;
+    right: 1.25rem;
+    z-index: 300;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    width: 220px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    animation: fadeUp .2s ease;
+  }
+  #a11y-panel.open { display: block; }
+  .a11y-label {
+    font-family: 'Syne', sans-serif;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: .6rem;
+  }
+  .a11y-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: .82rem;
+    color: var(--text);
+  }
+  .a11y-row:last-child { border-bottom: none; }
+  .a11y-row span { font-family: 'DM Sans', sans-serif; }
+  .a11y-controls { display: flex; align-items: center; gap: .35rem; }
+  .a11y-ctrl-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: .9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .a11y-ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .a11y-toggle {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+    transition: background .2s;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+  .a11y-toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--muted);
+    top: 2px;
+    left: 2px;
+    transition: left .2s, background .2s;
+  }
+  .a11y-toggle.on { background: rgba(94,234,212,.2); border-color: var(--accent); }
+  .a11y-toggle.on::after { left: 18px; background: var(--accent); }
+  .a11y-reset {
+    width: 100%;
+    margin-top: .75rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .78rem;
+    padding: .4rem;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .a11y-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Barrierefreiheit-Klassen */
+  body.a11y-large { font-size: 110% !important; }
+  body.a11y-xlarge { font-size: 125% !important; }
+  body.a11y-contrast { filter: contrast(1.3) brightness(1.1); }
+  body.a11y-readable * { font-family: Arial, sans-serif !important; letter-spacing: .03em !important; }
+  body.a11y-no-anim *, body.a11y-no-anim *::before, body.a11y-no-anim *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
 </style>
 </head>
 <body>
+
+<!-- ── BARRIEREFREIHEIT ─────────────────────────────────── -->
+<button id="a11y-btn" onclick="toggleA11yPanel()" aria-label="Barrierefreiheit" title="Barrierefreiheit">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 22V12M8 9l4-2 4 2M8 9l-2 6h12l-2-6"/></svg>
+</button>
+<div id="a11y-panel" role="dialog" aria-label="Barrierefreiheits-Einstellungen">
+  <div class="a11y-label">♿ Barrierefreiheit</div>
+
+  <div class="a11y-row">
+    <span>Schriftgröße</span>
+    <div class="a11y-controls">
+      <button class="a11y-ctrl-btn" onclick="a11yFontDown()" aria-label="Schrift verkleinern">A−</button>
+      <span id="a11yFontLabel" style="font-size:.75rem;color:var(--muted);min-width:28px;text-align:center;">100%</span>
+      <button class="a11y-ctrl-btn" onclick="a11yFontUp()" aria-label="Schrift vergrößern">A+</button>
+    </div>
+  </div>
+
+  <div class="a11y-row">
+    <span>Hoher Kontrast</span>
+    <button class="a11y-toggle" id="a11yContrastToggle" onclick="a11yToggle('contrast')" aria-label="Hohen Kontrast ein/aus"></button>
+  </div>
+
+  <div class="a11y-row">
+    <span>Lesbare Schrift</span>
+    <button class="a11y-toggle" id="a11yReadableToggle" onclick="a11yToggle('readable')" aria-label="Lesbare Schrift ein/aus"></button>
+  </div>
+
+  <div class="a11y-row">
+    <span>Animationen aus</span>
+    <button class="a11y-toggle" id="a11yAnimToggle" onclick="a11yToggle('anim')" aria-label="Animationen ein/aus"></button>
+  </div>
+
+  <button class="a11y-reset" onclick="a11yReset()">↺ Zurücksetzen</button>
+</div>
 
 
 
@@ -3289,6 +3450,66 @@ db.auth.onAuthStateChange(async (event, session) => {
     goTo('screen-auth');
   }
 });
+
+// ════════════════════════════════════════════════════════
+// BARRIEREFREIHEIT
+// ════════════════════════════════════════════════════════
+
+const A11Y_KEY = 'a11y_settings';
+let a11yState = JSON.parse(localStorage.getItem(A11Y_KEY) || '{"font":0,"contrast":false,"readable":false,"anim":false}');
+
+function applyA11y() {
+  const b = document.body;
+  // Font size
+  b.classList.remove('a11y-large','a11y-xlarge');
+  if (a11yState.font === 1) b.classList.add('a11y-large');
+  if (a11yState.font === 2) b.classList.add('a11y-xlarge');
+  const labels = ['100%','110%','125%'];
+  const lbl = document.getElementById('a11yFontLabel');
+  if (lbl) lbl.textContent = labels[a11yState.font] || '100%';
+  // Toggles
+  b.classList.toggle('a11y-contrast', a11yState.contrast);
+  b.classList.toggle('a11y-readable', a11yState.readable);
+  b.classList.toggle('a11y-no-anim',  a11yState.anim);
+  // Toggle buttons
+  document.getElementById('a11yContrastToggle')?.classList.toggle('on', a11yState.contrast);
+  document.getElementById('a11yReadableToggle')?.classList.toggle('on', a11yState.readable);
+  document.getElementById('a11yAnimToggle')?.classList.toggle('on',     a11yState.anim);
+  localStorage.setItem(A11Y_KEY, JSON.stringify(a11yState));
+}
+
+function toggleA11yPanel() {
+  document.getElementById('a11y-panel').classList.toggle('open');
+}
+
+function a11yFontUp() {
+  if (a11yState.font < 2) { a11yState.font++; applyA11y(); }
+}
+function a11yFontDown() {
+  if (a11yState.font > 0) { a11yState.font--; applyA11y(); }
+}
+function a11yToggle(key) {
+  const map = { contrast:'contrast', readable:'readable', anim:'anim' };
+  a11yState[map[key]] = !a11yState[map[key]];
+  applyA11y();
+}
+function a11yReset() {
+  a11yState = { font:0, contrast:false, readable:false, anim:false };
+  applyA11y();
+}
+
+// Close panel on outside click
+document.addEventListener('click', e => {
+  const panel = document.getElementById('a11y-panel');
+  const btn   = document.getElementById('a11y-btn');
+  if (panel?.classList.contains('open') && !panel.contains(e.target) && e.target !== btn) {
+    panel.classList.remove('open');
+  }
+});
+
+// Apply saved settings on load
+applyA11y();
+
 
 </script>
 </body>
