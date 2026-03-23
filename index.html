@@ -694,14 +694,7 @@
 
 <!-- ── BARRIEREFREIHEIT ─────────────────────────────────── -->
 <button id="a11y-btn" aria-label="Barrierefreiheit" title="Barrierefreiheits-Einstellungen">
-  <svg width="26" height="26" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <!-- Kopf -->
-    <circle cx="16" cy="5" r="3"/>
-    <!-- Körper aufrecht -->
-    <path d="M16 9c-1 0-2 .5-2.5 1.3L11 14h-2a1 1 0 000 2h3l2-3v5l-3 4a1 1 0 001.6 1.2L15 20h2l1.4 3.2A1 1 0 0020 22.6L17 18v-5l2 3h3a1 1 0 000-2h-2l-2.5-3.7C17 9.5 16.8 9 16 9z"/>
-    <!-- Arm rechts ausgestreckt (rollstuhl-style) -->
-    <path d="M19 11.5l3.5-1a1 1 0 00-.6-1.9l-4 1.2c-.5.15-.9.6-.9 1.2v.5z" opacity=".7"/>
-  </svg>
+  <img src="a11y-icon.svg" width="26" height="26" alt="" style="display:block;pointer-events:none;">
 </button>
 <div id="a11y-panel" role="dialog" aria-label="Barrierefreiheits-Einstellungen">
   <div class="a11y-label">♿ Barrierefreiheit</div>
@@ -1088,7 +1081,7 @@
 <!-- FOOTER -->
 <footer style="position:relative;z-index:1;border-top:1px solid rgba(255,255,255,0.07);padding:1.2rem 2rem;text-align:center;background:rgba(12,15,26,0.9);">
   <p style="font-size:.78rem;color:#475569;margin:0;">
-    © 2026 28-Tage KI-Challenge &nbsp;·&nbsp;
+    © 2026 MakerPort · 28-Tage KI-Challenge · mit Hilfe von KI erstellt &nbsp;·&nbsp;
     <a href="#" onclick="showLegal('privacy');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Datenschutz</a>
     &nbsp;·&nbsp;
     <a href="#" onclick="showLegal('imprint');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Impressum</a>
@@ -1163,7 +1156,7 @@
 <!-- FOOTER -->
 <footer style="position:relative;z-index:1;border-top:1px solid rgba(255,255,255,0.07);padding:1.2rem 2rem;text-align:center;background:rgba(12,15,26,0.9);">
   <p style="font-size:.78rem;color:#475569;margin:0;">
-    © 2026 28-Tage KI-Challenge &nbsp;·&nbsp;
+    © 2026 MakerPort · 28-Tage KI-Challenge · mit Hilfe von KI erstellt &nbsp;·&nbsp;
     <a href="#" onclick="showLegal('privacy');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Datenschutz</a>
     &nbsp;·&nbsp;
     <a href="#" onclick="showLegal('imprint');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Impressum</a>
@@ -3022,13 +3015,18 @@ function shareVia(method) {
 }
 
 // Profile: show logout + user info bottom sheet
+let _profileLoading = false;
 function openProfile() {
+  if (_profileLoading) return;
+  _profileLoading = true;
+  // Sicherstellen dass overflow nicht feststeckt
+  document.body.style.overflow = '';
+  const existing = document.getElementById('profileSheet');
+  if (existing) { existing.remove(); _profileLoading = false; return; }
   const userName = currentUser?.user_metadata?.full_name || currentUser?.email || 'Dein Profil';
   const done = completedDays.size;
   const pct = Math.round(done / 28 * 100);
-
-  // Reuse toast area for simple profile info – or show a modal
-  showProfileSheet(userName, done, pct);
+  showProfileSheet(userName, done, pct).finally(() => { _profileLoading = false; });
 }
 
 async function showProfileSheet(name, done, pct) {
