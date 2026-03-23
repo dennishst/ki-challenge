@@ -3170,7 +3170,9 @@ async function showProfileSheet(name, done, pct) {
   document.body.appendChild(sheet);
   // Toggle-Status erst setzen nachdem das Sheet im DOM ist
   setTimeout(() => updateA11yProfileToggle(), 0);
-}(btn, interest) {
+}
+
+function toggleInterest(btn, interest) {
   const saved = JSON.parse(localStorage.getItem('profile_data') || '{}');
   if (!saved.interests) saved.interests = [];
   const idx = saved.interests.indexOf(interest);
