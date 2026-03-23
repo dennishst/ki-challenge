@@ -6,7 +6,7 @@
 <title>28-Tage KI-Challenge · MakerPort</title>
 
 <!-- SEO -->
-<meta name="description" content="In 28 Tagen KI-Tools meistern – von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
+<meta name="description" content="In 28 Tagen KI-Tools meistern, von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
 <meta name="author" content="MakerPort Stralsund">
 <meta name="robots" content="index, follow">
 
@@ -14,7 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ki-challenge.makerport.de/">
 <meta property="og:title" content="28-Tage KI-Challenge · MakerPort">
-<meta property="og:description" content="In 28 Tagen KI-Tools meistern – von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
+<meta property="og:description" content="In 28 Tagen KI-Tools meistern, von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
 <meta property="og:image" content="https://ki-challenge.makerport.de/preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,7 +25,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://ki-challenge.makerport.de/">
 <meta name="twitter:title" content="28-Tage KI-Challenge · MakerPort">
-<meta name="twitter:description" content="In 28 Tagen KI-Tools meistern – von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
+<meta name="twitter:description" content="In 28 Tagen KI-Tools meistern, von ChatGPT bis Bildgenerierung. Kostenlos mitmachen und täglich neue Aufgaben lösen.">
 <meta name="twitter:image" content="https://ki-challenge.makerport.de/preview.png">
 
 <!-- Favicon -->
@@ -562,39 +562,44 @@
     position: fixed;
     bottom: 5.5rem;
     right: 1.25rem;
-    z-index: 300;
-    width: 44px;
-    height: 44px;
+    z-index: 9999;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--muted);
+    background: var(--accent);
+    border: none;
+    color: #0c0f1a;
     font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,.4);
-    transition: border-color .2s, color .2s;
+    box-shadow: 0 4px 20px rgba(94,234,212,.4);
+    transition: transform .15s, box-shadow .15s;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    pointer-events: all;
+    /* Contrast filter darf diesen Button nicht beeinflussen */
+    isolation: isolate;
   }
-  #a11y-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #a11y-btn:hover { transform: scale(1.08); box-shadow: 0 6px 24px rgba(94,234,212,.55); }
+  #a11y-btn:active { transform: scale(.95); }
   @media (min-width: 769px) {
     #a11y-btn { bottom: 4.5rem; }
   }
   #a11y-panel {
     display: none;
     position: fixed;
-    bottom: 10rem;
+    bottom: 10.5rem;
     right: 1.25rem;
-    z-index: 300;
+    z-index: 9999;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(94,234,212,.25);
     border-radius: 16px;
     padding: 1rem;
-    width: 220px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.5);
-    animation: fadeUp .2s ease;
+    width: 230px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    isolation: isolate;
   }
   #a11y-panel.open { display: block; }
   .a11y-label {
@@ -675,11 +680,12 @@
   .a11y-reset:hover { border-color: var(--accent); color: var(--accent); }
 
   /* Barrierefreiheit-Klassen */
-  body.a11y-large { font-size: 110% !important; }
-  body.a11y-xlarge { font-size: 125% !important; }
-  body.a11y-contrast { filter: contrast(1.3) brightness(1.1); }
-  body.a11y-readable * { font-family: Arial, sans-serif !important; letter-spacing: .03em !important; }
-  body.a11y-no-anim *, body.a11y-no-anim *::before, body.a11y-no-anim *::after {
+  html.a11y-large { font-size: 112% !important; }
+  html.a11y-xlarge { font-size: 125% !important; }
+  /* Kontrast nur auf Seiteninhalte, nicht auf den Widget-Button */
+  body.a11y-contrast > *:not(#a11y-btn):not(#a11y-panel) { filter: contrast(1.3) brightness(1.1); }
+  body.a11y-readable *:not(#a11y-btn):not(#a11y-panel) { font-family: Arial, sans-serif !important; letter-spacing: .04em !important; line-height: 1.7 !important; }
+  body.a11y-no-anim *:not(#a11y-btn), body.a11y-no-anim *:not(#a11y-btn)::before, body.a11y-no-anim *:not(#a11y-btn)::after {
     animation: none !important;
     transition: none !important;
   }
@@ -689,8 +695,11 @@
 <body>
 
 <!-- ── BARRIEREFREIHEIT ─────────────────────────────────── -->
-<button id="a11y-btn" onclick="toggleA11yPanel()" aria-label="Barrierefreiheit" title="Barrierefreiheit">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 22V12M8 9l4-2 4 2M8 9l-2 6h12l-2-6"/></svg>
+<button id="a11y-btn" aria-label="Barrierefreiheit" title="Barrierefreiheits-Einstellungen">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="3.5" r="1.5"/>
+    <path d="M17 7.5H7a1 1 0 000 2h3.5l-1 4L7 16.5a1 1 0 001.4 1.4l2.6-2.6 1 3.6a1 1 0 002 0l1-3.6 2.6 2.6a1 1 0 001.4-1.4l-2.5-2.5-1-4H17a1 1 0 000-2z"/>
+  </svg>
 </button>
 <div id="a11y-panel" role="dialog" aria-label="Barrierefreiheits-Einstellungen">
   <div class="a11y-label">♿ Barrierefreiheit</div>
@@ -805,7 +814,18 @@
   </div>
 </div>
 
-<!-- LOADING OVERLAY -->
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:360px;width:100%;text-align:center;box-shadow:0 0 60px rgba(0,0,0,.5);">
+    <div id="confirmIcon" style="font-size:2rem;margin-bottom:.75rem;"></div>
+    <h3 id="confirmTitle" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.5rem;color:var(--text);"></h3>
+    <p id="confirmText" style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:1.5rem;"></p>
+    <div style="display:flex;gap:.75rem;">
+      <button id="confirmCancel" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:.75rem;cursor:pointer;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">Abbrechen</button>
+      <button id="confirmOk" style="flex:1;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:.75rem;cursor:pointer;"></button>
+    </div>
+  </div>
+</div>
 <div id="loadingOverlay">
   <div class="spinner"></div>
   <p>Wird geladen…</p>
@@ -902,6 +922,13 @@
       </button>
       <div class="auth-msg" id="reset-msg"></div>
     </div>
+
+    <!-- Legal links -->
+    <div style="text-align:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <button onclick="showLegal('privacy')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Datenschutz</button>
+      <span style="color:var(--muted);font-size:.78rem;">·</span>
+      <button onclick="showLegal('imprint')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Impressum</button>
+    </div>
   </div>
 </div>
 
@@ -936,7 +963,7 @@
         <span id="userNameDisplay" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <button class="btn-logout" onclick="handleLogout()">Abmelden</button>
+      <button class="btn-logout" onclick="confirmLogout()">Abmelden</button>
     </div>
   </div>
   <!-- MOBILE BOTTOM NAV -->
@@ -1943,7 +1970,7 @@ const WEEKS = [
   ]},
   { label:"Woche 3", sub:"Multimedia & Visuelle Intelligenz", days:[
     {num:15, title:'Einführung Bildgenerierung',              short:'Bilder-KI'},
-    {num:16, title:'Stockfotos ade – Social-Media-Bild',     short:'Stockfotos ade'},
+    {num:16, title:'Stockfotos ade, Social-Media-Bild',     short:'Stockfotos ade'},
     {num:17, title:'Präsentationen in Rekordzeit',            short:'Präsentationen'},
     {num:18, title:'Profilbild-Check mit KI',                short:'Profilbild'},
     {num:19, title:'PDF-Chat: Fragen stellen',               short:'PDF-Chat'},
@@ -2060,6 +2087,72 @@ async function handleReset() {
     showMsg('reset-msg', error.message);
   } else {
     showMsg('reset-msg', '✅ Reset-Link wurde gesendet. Bitte überprüfe dein Postfach.', 'success');
+  }
+}
+
+// ─── CONFIRM MODAL ──────────────────────────────────────
+function showConfirm({ icon, title, text, okLabel, okColor, onOk }) {
+  const modal = document.getElementById('confirmModal');
+  document.getElementById('confirmIcon').textContent  = icon;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmText').textContent  = text;
+  const okBtn = document.getElementById('confirmOk');
+  okBtn.textContent = okLabel;
+  okBtn.style.background = okColor;
+  okBtn.style.color = okColor === '#ef4444' ? '#fff' : '#0c0f1a';
+  okBtn.onclick = () => { hideConfirm(); onOk(); };
+  document.getElementById('confirmCancel').onclick = hideConfirm;
+  modal.style.display = 'flex';
+  modal.onclick = (e) => { if (e.target === modal) hideConfirm(); };
+  document.body.style.overflow = 'hidden';
+}
+function hideConfirm() {
+  document.getElementById('confirmModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function confirmLogout() {
+  // Close profile sheet if open
+  document.getElementById('profileSheet')?.remove();
+  document.body.style.overflow = '';
+  showConfirm({
+    icon: '👋',
+    title: 'Abmelden?',
+    text: 'Möchtest du dich abmelden?',
+    okLabel: 'Abmelden',
+    okColor: '#ef4444',
+    onOk: handleLogout
+  });
+}
+
+function confirmDeleteAccount() {
+  document.getElementById('profileSheet')?.remove();
+  document.body.style.overflow = '';
+  showConfirm({
+    icon: '⚠️',
+    title: 'Konto wirklich löschen?',
+    text: 'Möchtest du dein Konto wirklich löschen? Alle deine Fortschritte gehen verloren.',
+    okLabel: 'Konto löschen',
+    okColor: '#ef4444',
+    onOk: deleteAccount
+  });
+}
+
+async function deleteAccount() {
+  showToast('Konto wird gelöscht…', 'success');
+  try {
+    // Delete progress and profile first (RLS allows this)
+    await db.from('progress').delete().eq('user_id', currentUser.id);
+    await db.from('profiles').delete().eq('id', currentUser.id);
+    // Sign out – account deletion requires admin API, so we sign out and show info
+    await db.auth.signOut();
+    completedDays = new Set();
+    currentUser = null;
+    showToast('Deine Daten wurden gelöscht. Sende uns eine E-Mail an info@makerport.de um deinen Account vollständig zu entfernen.', 'success');
+    setTimeout(() => goTo('screen-auth'), 500);
+  } catch(e) {
+    console.error('Delete account error:', e);
+    showToast('Fehler beim Löschen. Bitte kontaktiere info@makerport.de', 'error');
   }
 }
 
@@ -2253,7 +2346,7 @@ function openDay(day) {
 
   const week = WEEKS.find(w => w.days.some(d => d.num === day.num));
   document.getElementById('weekHint').textContent    = `${week.label.toUpperCase()} · ${week.sub.toUpperCase()}`;
-  document.getElementById('dayTitleH').textContent   = `Tag ${day.num} – ${day.title}`;
+  document.getElementById('dayTitleH').textContent   = `Tag ${day.num}, ${day.title}`;
 
   const body    = document.getElementById('dayBodyContent');
 
@@ -2323,13 +2416,19 @@ function openDay(day) {
 }
 
 async function completeDay(num) {
+  // Guard: already completed
+  if (completedDays.has(num)) return;
+
   const btn = document.getElementById('completeBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Wird gespeichert…'; }
+  if (!btn || btn.disabled) return; // prevent double-tap
+  btn.disabled = true;
+  btn.textContent = 'Wird gespeichert…';
 
   const ok = await saveProgress(num);
   if (!ok) {
     showToast('Fehler beim Speichern. Bitte erneut versuchen.', 'error');
-    if (btn) { btn.disabled = false; btn.textContent = `✓ Tag ${num} abschließen`; }
+    btn.disabled = false;
+    btn.textContent = `✓ Tag ${num} abschließen`;
     return;
   }
 
@@ -2603,7 +2702,7 @@ async function shareWeekBadge() {
   downloadBadge();
   const url = encodeURIComponent('https://ki-challenge.makerport.de/');
   setTimeout(() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank'), 400);
-  showToast('Bild gespeichert – wähle es in deinem Post aus!', 'success');
+  showToast('Bild gespeichert, wähle es in deinem Post aus!', 'success');
 }
 
 // ════════════════════════════════════════════════════════
@@ -3020,7 +3119,8 @@ async function showProfileSheet(name, done, pct) {
       <div id="prof-msg" style="display:none;padding:.6rem .9rem;border-radius:8px;font-size:.82rem;margin-bottom:.75rem;"></div>
 
       <button onclick="saveProfile()" style="width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;border:none;border-radius:10px;padding:.85rem;cursor:pointer;margin-bottom:.5rem;">Profil speichern</button>
-      <button onclick="handleLogout();document.getElementById('profileSheet').remove();document.body.style.overflow='';" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;">Abmelden</button>
+      <button onclick="confirmLogout()" style="width:100%;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--error);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem;cursor:pointer;margin-bottom:.5rem;">Abmelden</button>
+      <button onclick="confirmDeleteAccount()" style="width:100%;background:none;border:1px solid rgba(248,113,113,.15);color:#64748b;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;border-radius:10px;padding:.6rem;cursor:pointer;transition:border-color .2s,color .2s;" onmouseover="this.style.borderColor='rgba(248,113,113,.4)';this.style.color='var(--error)'" onmouseout="this.style.borderColor='rgba(248,113,113,.15)';this.style.color='#64748b'">Konto löschen</button>
       <div style="text-align:center;padding-top:.75rem;margin-top:.5rem;border-top:1px solid rgba(255,255,255,.06);">
         <button onclick="document.getElementById('profileSheet').remove();document.body.style.overflow='';setTimeout(()=>showLegal('privacy'),50)" style="background:none;border:none;color:#475569;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;">Datenschutz</button>
         <span style="color:#334155;font-size:.75rem;">·</span>
@@ -3317,10 +3417,6 @@ const LEGAL_CONTENT = {
       Wasserstraße 68<br>
       18439 Stralsund</p>
 
-      <h3 style="color:#5eead4;font-family:'Syne',sans-serif;margin:1.5rem 0 .75rem;">Streitschlichtung</h3>
-      <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr" target="_blank" style="color:#818cf8;">https://ec.europa.eu/consumers/odr</a>.<br>
-      Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
-
       <h3 style="color:#5eead4;font-family:'Syne',sans-serif;margin:1.5rem 0 .75rem;">Haftung für Inhalte</h3>
       <p>Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen. Bei Bekanntwerden von Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.</p>
 
@@ -3459,50 +3555,54 @@ const A11Y_KEY = 'a11y_settings';
 let a11yState = JSON.parse(localStorage.getItem(A11Y_KEY) || '{"font":0,"contrast":false,"readable":false,"anim":false}');
 
 function applyA11y() {
-  const b = document.body;
-  // Font size
-  b.classList.remove('a11y-large','a11y-xlarge');
-  if (a11yState.font === 1) b.classList.add('a11y-large');
-  if (a11yState.font === 2) b.classList.add('a11y-xlarge');
+  const html = document.documentElement;
+  const body = document.body;
+
+  // Font size on <html> so rem values scale correctly
+  html.classList.remove('a11y-large','a11y-xlarge');
+  if (a11yState.font === 1) html.classList.add('a11y-large');
+  if (a11yState.font === 2) html.classList.add('a11y-xlarge');
   const labels = ['100%','110%','125%'];
   const lbl = document.getElementById('a11yFontLabel');
   if (lbl) lbl.textContent = labels[a11yState.font] || '100%';
-  // Toggles
-  b.classList.toggle('a11y-contrast', a11yState.contrast);
-  b.classList.toggle('a11y-readable', a11yState.readable);
-  b.classList.toggle('a11y-no-anim',  a11yState.anim);
-  // Toggle buttons
-  document.getElementById('a11yContrastToggle')?.classList.toggle('on', a11yState.contrast);
-  document.getElementById('a11yReadableToggle')?.classList.toggle('on', a11yState.readable);
-  document.getElementById('a11yAnimToggle')?.classList.toggle('on',     a11yState.anim);
+
+  // Toggles on body
+  body.classList.toggle('a11y-contrast', !!a11yState.contrast);
+  body.classList.toggle('a11y-readable', !!a11yState.readable);
+  body.classList.toggle('a11y-no-anim',  !!a11yState.anim);
+
+  // Toggle button states
+  document.getElementById('a11yContrastToggle')?.classList.toggle('on', !!a11yState.contrast);
+  document.getElementById('a11yReadableToggle')?.classList.toggle('on', !!a11yState.readable);
+  document.getElementById('a11yAnimToggle')?.classList.toggle('on',     !!a11yState.anim);
+
   localStorage.setItem(A11Y_KEY, JSON.stringify(a11yState));
 }
 
 function toggleA11yPanel() {
-  document.getElementById('a11y-panel').classList.toggle('open');
+  const panel = document.getElementById('a11y-panel');
+  if (panel) panel.classList.toggle('open');
 }
 
-function a11yFontUp() {
-  if (a11yState.font < 2) { a11yState.font++; applyA11y(); }
-}
-function a11yFontDown() {
-  if (a11yState.font > 0) { a11yState.font--; applyA11y(); }
-}
-function a11yToggle(key) {
-  const map = { contrast:'contrast', readable:'readable', anim:'anim' };
-  a11yState[map[key]] = !a11yState[map[key]];
-  applyA11y();
-}
-function a11yReset() {
-  a11yState = { font:0, contrast:false, readable:false, anim:false };
-  applyA11y();
-}
+function a11yFontUp()   { if (a11yState.font < 2) { a11yState.font++; applyA11y(); } }
+function a11yFontDown() { if (a11yState.font > 0) { a11yState.font--; applyA11y(); } }
+function a11yToggle(key) { a11yState[key] = !a11yState[key]; applyA11y(); }
+function a11yReset() { a11yState = { font:0, contrast:false, readable:false, anim:false }; applyA11y(); }
+
+// Button click – via addEventListener so it always works
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('a11y-btn');
+  if (btn) {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); toggleA11yPanel(); });
+    btn.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); toggleA11yPanel(); }, { passive: false });
+  }
+});
 
 // Close panel on outside click
 document.addEventListener('click', e => {
   const panel = document.getElementById('a11y-panel');
   const btn   = document.getElementById('a11y-btn');
-  if (panel?.classList.contains('open') && !panel.contains(e.target) && e.target !== btn) {
+  if (panel?.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) {
     panel.classList.remove('open');
   }
 });
