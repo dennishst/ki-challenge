@@ -375,9 +375,16 @@
 
     /* Day header title wraps on mobile */
     .day-header { flex-wrap: wrap !important; }
-    h1, h2, h3, h4 { overflow-wrap: break-word !important; word-break: normal !important; hyphens: none !important; }
-    .welcome-banner h2 { overflow-wrap: break-word !important; }
-    .day-body h1, .day-body h2, .day-body h3 { overflow-wrap: break-word !important; word-break: normal !important; hyphens: none !important; }
+    h1, h2, h3, h4 { overflow-wrap: anywhere !important; word-break: break-word !important; hyphens: none !important; }
+    .welcome-banner h2 { overflow-wrap: anywhere !important; }
+    .day-body h1 {
+      font-size: 1.55rem !important;
+      line-height: 1.2 !important;
+      overflow-wrap: anywhere !important;
+      word-break: break-word !important;
+      hyphens: none !important;
+    }
+    .day-body h2, .day-body h3 { overflow-wrap: anywhere !important; word-break: break-word !important; hyphens: none !important; }
     .content-card, .content-card p, .day-intro, .highlight-box, .reflection-box { overflow-wrap: break-word !important; word-break: normal !important; hyphens: none !important; }
     .day-header-meta { min-width: 0; flex: 1; }
     .day-header-meta .day-title-h {
@@ -1207,10 +1214,11 @@
   <div style="background:var(--surface);border:1px solid rgba(94,234,212,.25);border-radius:28px;padding:1.5rem 1.5rem 1.5rem;max-width:420px;width:100%;text-align:center;box-shadow:0 0 80px rgba(94,234,212,.12);position:relative;margin:auto;">
     <button onclick="closeWeekBadge()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
 
-    <!-- Badge Canvas 4:3 – hidden, used for download only -->
+    <!-- Badge Canvas – hidden, used only as fallback for download -->
     <canvas id="badgeCanvas" width="1000" height="1250" style="display:none;"></canvas>
-    <!-- Preview canvas shown in modal -->
-    <canvas id="badgePreview" width="1000" height="1250" style="width:100%;max-width:360px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
+    <!-- Preview: statisches PNG aus Repo, Fallback auf Canvas -->
+    <img id="badgePreviewImg" src="" alt="Abzeichen Vorschau" style="width:100%;max-width:320px;height:auto;border-radius:14px;margin-bottom:1.25rem;display:block;margin-left:auto;margin-right:auto;">
+    <canvas id="badgePreview" width="1000" height="1250" style="display:none;width:100%;max-width:320px;height:auto;border-radius:14px;margin-bottom:1.25rem;"></canvas>
 
     <h2 id="badgeTitle" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:.4rem;"></h2>
     <p id="badgeSubtitle" style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;line-height:1.5;"></p>
@@ -2691,8 +2699,24 @@ function showWeekBadge(week) {
   const modal = document.getElementById('weekBadgeModal');
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-  setTimeout(() => drawBadge(week), 50);
   modal._week = week;
+
+  // Versuche statisches PNG aus Repo zu laden
+  const previewImg = document.getElementById('badgePreviewImg');
+  const previewCanvas = document.getElementById('badgePreview');
+  const staticUrl = `Abzeichen_${week}.png`;
+
+  previewImg.onload = () => {
+    previewImg.style.display = 'block';
+    previewCanvas.style.display = 'none';
+  };
+  previewImg.onerror = () => {
+    // Fallback: Canvas zeichnen
+    previewImg.style.display = 'none';
+    previewCanvas.style.display = 'block';
+    setTimeout(() => drawBadge(week), 50);
+  };
+  previewImg.src = staticUrl + '?v=' + Date.now(); // Cache-Buster
 }
 
 function closeWeekBadge() {
