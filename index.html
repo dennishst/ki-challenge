@@ -2748,8 +2748,8 @@ function showWeekBadge(week) {
 
   // Canvas sofort zeichnen (für Share-Blob)
   drawBadge(week);
-  // Blob im Hintergrund vorbereiten
-  setTimeout(() => prepareBadgeBlob(week), 200);
+  // Blob im Hintergrund vorbereiten – Logo braucht Zeit zum Laden
+  setTimeout(() => prepareBadgeBlob(week), 800);
 
   // Preview: statisches PNG versuchen
   const previewImg = document.getElementById('badgePreviewImg');
@@ -2763,7 +2763,7 @@ function showWeekBadge(week) {
     previewImg.style.display = 'none';
     previewCanvas.style.display = 'block';
   };
-  previewImg.src = `Abzeichen_${week}.png?v=${Date.now()}`;
+  previewImg.src = `Abzeichen_${week}.jpg?v=${Date.now()}`;
 }
 
 function closeWeekBadge() {
@@ -2773,14 +2773,14 @@ function closeWeekBadge() {
 
 function downloadBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
-  const staticUrl = `Abzeichen_${week}.png`;
+  const staticUrl = `Abzeichen_${week}.jpg`;
 
   // Versuche zuerst das statische PNG aus dem Repo
   const testImg = new Image();
   testImg.onload = () => {
     const a = document.createElement('a');
     a.href = staticUrl;
-    a.download = `Abzeichen_${week}.png`;
+    a.download = `Abzeichen_${week}.jpg`;
     a.click();
   };
   testImg.onerror = () => {
@@ -2788,7 +2788,7 @@ function downloadBadge() {
     setTimeout(() => {
       const a = document.createElement('a');
       a.href = document.getElementById('badgeCanvas').toDataURL('image/png');
-      a.download = `Abzeichen_${week}.png`;
+      a.download = `Abzeichen_${week}.jpg`;
       a.click();
     }, 300);
   };
@@ -2800,10 +2800,39 @@ let _badgeBlob = null;
 
 async function prepareBadgeBlob(week) {
   _badgeBlob = null;
-  // Canvas neu zeichnen falls nötig
-  const canvas = document.getElementById('badgeCanvas');
-  if (canvas.width < 100) drawBadge(week);
-  _badgeBlob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+
+  // 1. Versuche statisches PNG aus dem Repo (beste Qualität)
+  try {
+    const resp = await fetch(`Abzeichen_${week}.jpg`);
+    if (resp.ok) {
+      _badgeBlob = await resp.blob();
+      return;
+    }
+  } catch(e) {}
+
+  // 2. Fallback: Canvas – aber erst wenn Logo geladen ist
+  await new Promise(resolve => {
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    logoImg.onload = () => {
+      drawBadge(week); // Canvas neu mit geladenem Logo zeichnen
+      // Kurz warten damit Canvas-Render abgeschlossen ist
+      setTimeout(async () => {
+        _badgeBlob = await new Promise(res =>
+          document.getElementById('badgeCanvas').toBlob(res, 'image/png')
+        );
+        resolve();
+      }, 100);
+    };
+    logoImg.onerror = async () => {
+      // Logo nicht verfügbar, Canvas trotzdem nutzen
+      _badgeBlob = await new Promise(res =>
+        document.getElementById('badgeCanvas').toBlob(res, 'image/png')
+      );
+      resolve();
+    };
+    logoImg.src = 'https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png';
+  });
 }
 
 function shareWeekBadge() {
@@ -2816,7 +2845,7 @@ function shareWeekBadge() {
     return;
   }
 
-  const file = new File([_badgeBlob], `Abzeichen_${week}.png`, { type: 'image/png' });
+  const file = new File([_badgeBlob], `Abzeichen_${week}.jpg`, { type: 'image/jpeg' });
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     navigator.share({
