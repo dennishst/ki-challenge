@@ -2742,14 +2742,19 @@ function showWeekBadge(week) {
   previewImg.onload = () => {
     previewImg.style.display = 'block';
     previewCanvas.style.display = 'none';
+    // Blob im Hintergrund für Share vorbereiten
+    prepareBadgeBlob(week);
   };
   previewImg.onerror = () => {
-    // Fallback: Canvas zeichnen
     previewImg.style.display = 'none';
     previewCanvas.style.display = 'block';
-    setTimeout(() => drawBadge(week), 50);
+    setTimeout(() => {
+      drawBadge(week);
+      // Blob nach Canvas-Render vorbereiten
+      setTimeout(() => prepareBadgeBlob(week), 500);
+    }, 50);
   };
-  previewImg.src = staticUrl + '?v=' + Date.now(); // Cache-Buster
+  previewImg.src = staticUrl + '?v=' + Date.now();
 }
 
 function closeWeekBadge() {
@@ -2781,37 +2786,43 @@ function downloadBadge() {
   testImg.src = staticUrl;
 }
 
+// Badge-Blob wird beim Öffnen des Modals vorbereitet
+let _badgeBlob = null;
+
+async function prepareBadgeBlob(week) {
+  _badgeBlob = null;
+  try {
+    const resp = await fetch(`Abzeichen_${week}.png`);
+    if (resp.ok) { _badgeBlob = await resp.blob(); return; }
+  } catch(e) {}
+  // Fallback: Canvas
+  _badgeBlob = await new Promise(res =>
+    document.getElementById('badgeCanvas').toBlob(res, 'image/png')
+  );
+}
+
 async function shareWeekBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
   const shareText = `Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI\nhttps://ki-challenge.makerport.de/`;
 
-  // Bild aus statischem PNG oder Canvas
-  let file;
-  try {
-    const staticUrl = `Abzeichen_${week}.png`;
-    const resp = await fetch(staticUrl);
-    if (resp.ok) {
-      const blob = await resp.blob();
-      file = new File([blob], `Abzeichen_${week}.png`, { type: 'image/png' });
-    }
-  } catch(e) {}
+  // Blob bereit?
+  const blob = _badgeBlob || await new Promise(res =>
+    document.getElementById('badgeCanvas').toBlob(res, 'image/png')
+  );
+  const file = new File([blob], `Abzeichen_${week}.png`, { type: 'image/png' });
 
-  if (!file) {
-    const canvas = document.getElementById('badgeCanvas');
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
-    file = new File([blob], `Abzeichen_${week}.png`, { type: 'image/png' });
-  }
-
-  // Native Share Sheet (iOS/Android)
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: `Woche ${week} geschafft! 🚀`, text: shareText });
+      await navigator.share({
+        files: [file],
+        title: `Woche ${week} der KI-Challenge geschafft! 🚀`,
+        text: shareText
+      });
       return;
     } catch(e) {
       if (e.name === 'AbortError') return;
     }
   }
-
   // Desktop-Fallback
   downloadBadge();
   showToast('Bild gespeichert, teile es in deinem Post!', 'success');
