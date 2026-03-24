@@ -2159,6 +2159,9 @@ function showConfirm({ icon, title, text, okLabel, okColor, onOk }) {
 function hideConfirm() {
   document.getElementById('confirmModal').style.display = 'none';
   document.body.style.overflow = '';
+  // Cancel-Button immer wieder einblenden
+  const cancelBtn = document.getElementById('confirmCancel');
+  if (cancelBtn) cancelBtn.style.display = '';
 }
 
 function confirmLogout() {
@@ -2192,15 +2195,23 @@ function confirmDeleteAccount() {
 async function deleteAccount() {
   showToast('Konto wird gelöscht…', 'success');
   try {
-    // Delete progress and profile first (RLS allows this)
     await db.from('progress').delete().eq('user_id', currentUser.id);
     await db.from('profiles').delete().eq('id', currentUser.id);
-    // Sign out – account deletion requires admin API, so we sign out and show info
     await db.auth.signOut();
     completedDays = new Set();
     currentUser = null;
-    showToast('Deine Daten wurden gelöscht. Sende uns eine E-Mail an info@makerport.de um deinen Account vollständig zu entfernen.', 'success');
-    setTimeout(() => goTo('screen-auth'), 500);
+    // Bestätigungsmodal anzeigen
+    showConfirm({
+      icon: '✅',
+      title: 'Konto gelöscht',
+      text: 'Dein Konto und alle Fortschritte wurden erfolgreich gelöscht. Auf Wiedersehen!',
+      okLabel: 'Schließen',
+      okColor: '#5eead4',
+      onOk: () => goTo('screen-auth')
+    });
+    // Cancel-Button ausblenden da keine Wahl nötig
+    const cancelBtn = document.getElementById('confirmCancel');
+    if (cancelBtn) cancelBtn.style.display = 'none';
   } catch(e) {
     console.error('Delete account error:', e);
     showToast('Fehler beim Löschen. Bitte kontaktiere info@makerport.de', 'error');
@@ -2512,8 +2523,8 @@ async function completeDay(num) {
     document.getElementById('nextTitle').textContent    = nxt.title;
     document.getElementById('countdown').style.display = 'block';
   } else {
-    document.getElementById('nextLabel').textContent    = '🎓 Challenge vollständig abgeschlossen!';
-    document.getElementById('nextTitle').textContent    = 'Beantrage jetzt dein Zertifikat in der Community.';
+    document.getElementById('nextLabel').textContent    = '';
+    document.getElementById('nextTitle').textContent    = '';
     document.getElementById('countdown').style.display = 'none';
   }
 
@@ -2733,28 +2744,26 @@ function showWeekBadge(week) {
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
   modal._week = week;
+  _badgeBlob = null;
 
-  // Versuche statisches PNG aus Repo zu laden
+  // Canvas sofort zeichnen (für Share-Blob)
+  drawBadge(week);
+  // Blob im Hintergrund vorbereiten
+  setTimeout(() => prepareBadgeBlob(week), 200);
+
+  // Preview: statisches PNG versuchen
   const previewImg = document.getElementById('badgePreviewImg');
   const previewCanvas = document.getElementById('badgePreview');
-  const staticUrl = `Abzeichen_${week}.png`;
 
   previewImg.onload = () => {
     previewImg.style.display = 'block';
     previewCanvas.style.display = 'none';
-    // Blob im Hintergrund für Share vorbereiten
-    prepareBadgeBlob(week);
   };
   previewImg.onerror = () => {
     previewImg.style.display = 'none';
     previewCanvas.style.display = 'block';
-    setTimeout(() => {
-      drawBadge(week);
-      // Blob nach Canvas-Render vorbereiten
-      setTimeout(() => prepareBadgeBlob(week), 500);
-    }, 50);
   };
-  previewImg.src = staticUrl + '?v=' + Date.now();
+  previewImg.src = `Abzeichen_${week}.png?v=${Date.now()}`;
 }
 
 function closeWeekBadge() {
@@ -2791,41 +2800,40 @@ let _badgeBlob = null;
 
 async function prepareBadgeBlob(week) {
   _badgeBlob = null;
-  try {
-    const resp = await fetch(`Abzeichen_${week}.png`);
-    if (resp.ok) { _badgeBlob = await resp.blob(); return; }
-  } catch(e) {}
-  // Fallback: Canvas
-  _badgeBlob = await new Promise(res =>
-    document.getElementById('badgeCanvas').toBlob(res, 'image/png')
-  );
+  // Canvas neu zeichnen falls nötig
+  const canvas = document.getElementById('badgeCanvas');
+  if (canvas.width < 100) drawBadge(week);
+  _badgeBlob = await new Promise(res => canvas.toBlob(res, 'image/png'));
 }
 
-async function shareWeekBadge() {
+function shareWeekBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
   const shareText = `Ich habe Woche ${week} der 28-Tage KI-Challenge abgeschlossen! 🚀 #KIChallenge #makerport #28TageKI\nhttps://ki-challenge.makerport.de/`;
 
-  // Blob bereit?
-  const blob = _badgeBlob || await new Promise(res =>
-    document.getElementById('badgeCanvas').toBlob(res, 'image/png')
-  );
-  const file = new File([blob], `Abzeichen_${week}.png`, { type: 'image/png' });
+  if (!_badgeBlob) {
+    showToast('Bild wird vorbereitet, bitte nochmal tippen…', 'success');
+    prepareBadgeBlob(week);
+    return;
+  }
+
+  const file = new File([_badgeBlob], `Abzeichen_${week}.png`, { type: 'image/png' });
 
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({
-        files: [file],
-        title: `Woche ${week} der KI-Challenge geschafft! 🚀`,
-        text: shareText
-      });
-      return;
-    } catch(e) {
-      if (e.name === 'AbortError') return;
-    }
+    navigator.share({
+      files: [file],
+      title: `Woche ${week} der KI-Challenge geschafft! 🚀`,
+      text: shareText
+    }).catch(e => {
+      if (e.name !== 'AbortError') {
+        downloadBadge();
+        showToast('Bild gespeichert, teile es in deinem Post!', 'success');
+      }
+    });
+  } else {
+    // Desktop-Fallback
+    downloadBadge();
+    showToast('Bild gespeichert, teile es in deinem Post!', 'success');
   }
-  // Desktop-Fallback
-  downloadBadge();
-  showToast('Bild gespeichert, teile es in deinem Post!', 'success');
 }
 
 // ════════════════════════════════════════════════════════
@@ -3706,6 +3714,11 @@ db.auth.onAuthStateChange(async (event, session) => {
     goTo(session?.user ? 'screen-dashboard' : 'screen-auth');
     appReady = true;
 
+  } else if (event === 'PASSWORD_RECOVERY') {
+    // Magic Link wurde geklickt – Passwort-Änderung anfordern
+    overlay.classList.add('hidden');
+    showPasswordResetForm();
+
   } else if (event === 'SIGNED_IN' && appReady) {
     // User just logged in
     currentUser = session.user;
@@ -3720,6 +3733,70 @@ db.auth.onAuthStateChange(async (event, session) => {
     goTo('screen-auth');
   }
 });
+
+function showPasswordResetForm() {
+  // Overlay-Dialog für neues Passwort
+  const existing = document.getElementById('pwResetOverlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'pwResetOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:flex;align-items:center;justify-content:center;padding:1.5rem;';
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid rgba(94,234,212,.25);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center;">
+      <div style="font-size:2rem;margin-bottom:.75rem;">🔑</div>
+      <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--text);margin:0 0 .5rem;">Neues Passwort vergeben</h3>
+      <p style="color:var(--muted);font-size:.85rem;margin:0 0 1.25rem;line-height:1.5;">Bitte vergib jetzt dein neues Passwort.</p>
+      <div style="position:relative;margin-bottom:.75rem;">
+        <input type="password" id="pwResetInput" placeholder="Neues Passwort (min. 8 Zeichen)"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;box-sizing:border-box;transition:border-color .2s;">
+        <button type="button" onclick="togglePasswordVisibility('pwResetInput',this)"
+          style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;">
+          <svg id="eyeIcon-pwResetInput" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div id="pwResetMsg" style="display:none;padding:.6rem .9rem;border-radius:8px;font-size:.82rem;margin-bottom:.75rem;"></div>
+      <button onclick="submitNewPassword()"
+        style="width:100%;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;border:none;border-radius:10px;padding:.85rem;cursor:pointer;">
+        Passwort speichern →
+      </button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+async function submitNewPassword() {
+  const input = document.getElementById('pwResetInput');
+  const msg   = document.getElementById('pwResetMsg');
+  const pw    = input?.value || '';
+
+  if (pw.length < 8) {
+    msg.style.cssText = 'display:block;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:#f87171;';
+    msg.textContent = 'Passwort muss mindestens 8 Zeichen haben.';
+    return;
+  }
+
+  const { error } = await db.auth.updateUser({ password: pw });
+  if (error) {
+    msg.style.cssText = 'display:block;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:#f87171;';
+    msg.textContent = 'Fehler: ' + error.message;
+    return;
+  }
+
+  document.getElementById('pwResetOverlay')?.remove();
+  showToast('Passwort erfolgreich gespeichert! ✓', 'success');
+  // Weiterleitung zum Dashboard falls eingeloggt
+  if (db.auth.getSession) {
+    const { data } = await db.auth.getSession();
+    if (data?.session?.user) {
+      currentUser = data.session.user;
+      await loadProgress();
+      buildDashboard();
+      goTo('screen-dashboard');
+    } else {
+      goTo('screen-auth');
+    }
+  }
+}
 
 // ════════════════════════════════════════════════════════
 // BARRIEREFREIHEIT
