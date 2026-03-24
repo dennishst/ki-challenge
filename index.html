@@ -857,12 +857,36 @@
     </h1>
     <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um an der Challenge teilzunehmen.</p>
 
-    <div class="auth-tabs">
+    <!-- LAUNCH COUNTDOWN – wird automatisch ausgeblendet nach 01.04.2026 -->
+    <div id="launchCountdown" style="background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(129,140,248,.06));border:1px solid rgba(94,234,212,.2);border-radius:16px;padding:1.1rem 1rem;margin-bottom:1.25rem;text-align:center;">
+      <p style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;margin:0 0 .6rem;">Die MakerPort 28-Tage KI-Challenge startet in</p>
+      <div style="display:flex;justify-content:center;gap:.5rem;">
+        <div style="text-align:center;min-width:52px;">
+          <div id="cd-days" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--text);line-height:1;">--</div>
+          <div style="font-size:.62rem;color:var(--muted);margin-top:.15rem;text-transform:uppercase;letter-spacing:.08em;">Tage</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--muted);line-height:1;padding-top:0;">:</div>
+        <div style="text-align:center;min-width:52px;">
+          <div id="cd-hours" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--text);line-height:1;">--</div>
+          <div style="font-size:.62rem;color:var(--muted);margin-top:.15rem;text-transform:uppercase;letter-spacing:.08em;">Stunden</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--muted);line-height:1;padding-top:0;">:</div>
+        <div style="text-align:center;min-width:52px;">
+          <div id="cd-minutes" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--text);line-height:1;">--</div>
+          <div style="font-size:.62rem;color:var(--muted);margin-top:.15rem;text-transform:uppercase;letter-spacing:.08em;">Minuten</div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--muted);line-height:1;padding-top:0;">:</div>
+        <div style="text-align:center;min-width:52px;">
+          <div id="cd-seconds" style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--accent);line-height:1;">--</div>
+          <div style="font-size:.62rem;color:var(--muted);margin-top:.15rem;text-transform:uppercase;letter-spacing:.08em;">Sekunden</div>
+        </div>
+      </div>
+    </div>
       <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
       <button class="auth-tab" onclick="switchTab('register')">Registrieren</button>
     </div>
 
-    <!-- LOGIN FORM -->
+    <div class="auth-tabs">
     <div class="auth-form active" id="form-login">
       <div class="form-field">
         <label>E-Mail</label>
@@ -4006,6 +4030,42 @@ document.addEventListener('click', e => {
     panel.classList.remove('open');
   }
 });
+
+// ════════════════════════════════════════════════════════
+// LAUNCH COUNTDOWN – 01.04.2026 00:00 Uhr Deutsche Zeit
+// ════════════════════════════════════════════════════════
+(function() {
+  // 01. April 2026, 00:00:00 Uhr MESZ (UTC+2 im Sommer → UTC 22:00 am 31.03.)
+  const LAUNCH = new Date('2026-03-31T22:00:00Z');
+
+  function updateCountdown() {
+    const box = document.getElementById('launchCountdown');
+    if (!box) return;
+
+    const now  = new Date();
+    const diff = LAUNCH - now;
+
+    if (diff <= 0) {
+      // Launch-Zeit erreicht – Countdown ausblenden
+      box.style.display = 'none';
+      return;
+    }
+
+    const days    = Math.floor(diff / 86400000);
+    const hours   = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000)  / 60000);
+    const seconds = Math.floor((diff % 60000)    / 1000);
+
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('cd-days').textContent    = days;
+    document.getElementById('cd-hours').textContent   = pad(hours);
+    document.getElementById('cd-minutes').textContent = pad(minutes);
+    document.getElementById('cd-seconds').textContent = pad(seconds);
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+})();
 
 // Apply saved settings on load
 applyA11y();
