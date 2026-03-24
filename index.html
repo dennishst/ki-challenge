@@ -2285,11 +2285,22 @@ function goTo(screenId) {
 }
 
 function getActiveDay() {
-  // TESTMODUS: nächster Tag wird sofort nach Abschluss freigeschaltet
+  const today = new Date().toDateString();
+
   for (let i = 1; i <= 28; i++) {
-    if (!completedDays.has(i)) return i;
+    if (!completedDays.has(i)) {
+      if (i === 1) return 1; // Tag 1 immer freigeschaltet
+      const prevCompleted = window.completionDates && window.completionDates[i - 1];
+      if (!prevCompleted) return i - 1; // Vortag noch nicht abgeschlossen
+      const prevDate = new Date(prevCompleted).toDateString();
+      if (prevDate === today) {
+        // Vortag heute abgeschlossen – nächster Tag erst morgen
+        return i - 1;
+      }
+      return i; // Vortag an einem früheren Tag abgeschlossen – freigeschaltet
+    }
   }
-  return 28; // alle abgeschlossen
+  return 28; // Alle abgeschlossen
 }
 
 function buildDashboard() {
