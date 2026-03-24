@@ -763,13 +763,13 @@
 </div>
 
 <!-- LEGAL MODAL -->
-<div id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;overflow-y:auto;padding:2rem 1rem;">
-  <div style="max-width:700px;margin:0 auto;background:#141828;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:2.5rem;">
+<div id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;overflow-y:auto;padding:1rem;">
+  <div style="max-width:700px;margin:0 auto;background:#141828;border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:2rem 1.5rem;overflow:hidden;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
       <h2 id="legalTitle" style="font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#e2e8f0;margin:0;"></h2>
       <button onclick="hideLegal()" style="background:none;border:none;color:#64748b;font-size:1.5rem;cursor:pointer;line-height:1;">×</button>
     </div>
-    <div id="legalContent" style="color:#94a3b8;font-size:.9rem;line-height:1.8;overflow-wrap:break-word;word-break:normal;hyphens:auto;"></div>
+    <div id="legalContent" style="color:#94a3b8;font-size:.9rem;line-height:1.8;overflow-wrap:break-word;word-break:break-word;hyphens:auto;max-width:100%;"></div>
     <div style="text-align:center;margin-top:2rem;">
       <button onclick="hideLegal()" style="background:var(--surface2);border:1px solid rgba(255,255,255,0.07);color:#e2e8f0;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;border-radius:10px;padding:.75rem 2rem;cursor:pointer;">Schließen</button>
     </div>
@@ -1352,7 +1352,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(4)">✓ Tag 4 abschließen</button></div>`,
 
 5:`<div class="day-tag">📅 TAG 5 VON 28 · WOCHE 1</div>
-<h1>Die <span>"Erkläre wie 5"</span>-Methode</h1>
+<h1>Die <span>„Erkläre&#160;wie&#160;5"</span>&#8209;Methode</h1>
 <p class="day-intro">Komplexe Fachthemen sofort verstehen – und anderen erklären können. Der schnellste Weg zu echtem Verständnis.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Richard Feynman sagte: Wenn du etwas nicht einfach erklären kannst, hast du es nicht wirklich verstanden. Die Methode ist nicht nur zum Lernen – sie ist das mächtigste Werkzeug, um Wissen in Präsentationen, mit Kunden oder im Team zu vermitteln.</p></div>
@@ -1498,7 +1498,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(10)">✓ Tag 10 abschließen</button></div>`,
 
 11:`<div class="day-tag">📅 TAG 11 VON 28 · WOCHE 2</div>
-<h1>Urheber&#8209;recht <span>&amp; KI</span></h1>
+<h1>Urheberrecht <span>&amp; KI</span></h1>
 <p class="day-intro">Wem gehört das Bild oder der Text, den eine KI erstellt hat? Die rechtliche Lage – klar, verständlich, praxisrelevant.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>KI-generierte Inhalte befinden sich rechtlich in einer Grauzone – aber die Grundprinzipien sind klarer als viele denken. Heute lernst du, was du bedenken musst, bevor du KI-Inhalte kommerziell nutzt.</p></div>
@@ -1521,7 +1521,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(11)">✓ Tag 11 abschließen</button></div>`,
 
 12:`<div class="day-tag">📅 TAG 12 VON 28 · WOCHE 2</div>
-<h1>KI-Richtlinien <span>im Job</span></h1>
+<h1>KI&#8209;Richtlinien <span>im Job</span></h1>
 <p class="day-intro">Wie kommunizierst du KI-Nutzung gegenüber Kunden, Chefs und Teams? Leitlinien für professionellen, transparenten Umgang.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>KI im Job wirft Fragen auf: Muss ich Kunden sagen, dass ich KI nutze? Was, wenn mein Arbeitgeber keine Richtlinie hat? Wie erkläre ich dem Team, was erlaubt ist? Heute entwickelst du deinen persönlichen KI-Verhaltenskodex für den Berufsalltag.</p></div>
@@ -1570,7 +1570,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(13)">✓ Tag 13 abschließen</button></div>`,
 
 14:`<div class="day-tag">📅 TAG 14 VON 28 · WOCHE 2</div>
-<h1>Wochen-Review: <span>Dein KI-Kodex</span></h1>
+<h1>Wochen&#8209;Review: <span>Dein KI&#8209;Kodex</span></h1>
 <p class="day-intro">Woche 2 endet mit dem wichtigsten Dokument: deinem persönlichen KI-Kodex – dein Fundament für ethischen KI-Einsatz.</p>
 <div class="content-card"><h3>🧠 Was ein KI-Kodex ist</h3>
 <p>Ein Kodex ist kein Regelwerk, das jemand anderes für dich schreibt. Es ist eine bewusste Entscheidung, wie du mit KI umgehst – basierend auf deinen Werten, deiner Arbeit und dem, was du in Woche 2 gelernt hast.</p></div>
@@ -1674,7 +1674,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(17)">✓ Tag 17 abschließen</button></div>`,
 
 18:`<div class="day-tag">📅 TAG 18 VON 28 · WOCHE 3</div>
-<h1>Profilbild-Check <span>mit KI</span></h1>
+<h1>Profilbild&#8209;Check <span>mit KI</span></h1>
 <p class="day-intro">Dein Profilbild ist dein digitaler erster Eindruck. KI-Tools helfen dir, es professionell zu optimieren – ohne Fotoshooting.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Ein professionelles Headshot kann Hunderte Euro kosten. KI-Tools wie Aragon AI, Remini oder Canva ermöglichen es, aus einem einfachen Selfie ein LinkedIn-würdiges Profilbild zu machen.</p></div>
@@ -1698,7 +1698,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(18)">✓ Tag 18 abschließen</button></div>`,
 
 19:`<div class="day-tag">📅 TAG 19 VON 28 · WOCHE 3</div>
-<h1>PDF-Chat: <span>Fragen stellen</span></h1>
+<h1>PDF&#8209;Chat: <span>Fragen stellen</span></h1>
 <p class="day-intro">Verträge, Reports, Handbücher – du musst sie nie wieder komplett lesen. Die KI liest für dich und beantwortet deine Fragen.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>„PDF-Chat" bedeutet: Du lädst ein Dokument hoch und kannst der KI Fragen dazu stellen. Das ist eine der praktischsten KI-Fähigkeiten – besonders für juristische Texte, technische Dokumentationen oder lange Berichte.</p></div>
@@ -1723,7 +1723,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(19)">✓ Tag 19 abschließen</button></div>`,
 
 20:`<div class="day-tag">📅 TAG 20 VON 28 · WOCHE 3</div>
-<h1>Voice-to-Text & <span>Diktieren</span></h1>
+<h1>Voice&#8209;to&#8209;Text &amp; <span>Diktieren</span></h1>
 <p class="day-intro">Gedanken sprechen, KI sortiert. Aus dem chaotischen Diktiergerät wird ein strukturiertes Dokument.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Viele Menschen denken schneller, als sie tippen. Voice-to-Text erlaubt es, Ideen frei zu sprechen – und die KI wandelt sie in strukturierten, lesbaren Content um. Das spart nicht nur Zeit, es entsperrt auch Ideen, die beim Tippen verloren gehen würden.</p></div>
@@ -1747,7 +1747,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(20)">✓ Tag 20 abschließen</button></div>`,
 
 21:`<div class="day-tag">📅 TAG 21 VON 28 · WOCHE 3</div>
-<h1>Kreativ-Check: <span>Logo erstellen</span></h1>
+<h1>Kreativ&#8209;Check: <span>Logo erstellen</span></h1>
 <p class="day-intro">Woche 3 endet kreativ. Erstelle heute ein Logo für ein fiktives Projekt – und erlebe, wie schnell Markenidentität entsteht.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Ein Logo zu entwerfen war lange ein Job für Grafikdesigner. Mit KI-Tools kannst du heute in 20 Minuten eine vollständige Logo-Idee erstellen, variieren und exportieren. Ideal für frühe Konzepte, persönliche Projekte oder schnelle Mockups.</p></div>
@@ -1774,7 +1774,7 @@ const DAY_CONTENT = {
 // ════════════════════════════════════════
 
 22:`<div class="day-tag">📅 TAG 22 VON 28 · WOCHE 4</div>
-<h1>Der perfekte <span>LinkedIn-Post</span></h1>
+<h1>Der perfekte <span>LinkedIn&#8209;Post</span></h1>
 <p class="day-intro">Willkommen in Woche 4! LinkedIn-Posts, die wirklich gelesen werden – Struktur, Hooks und die Kunst des ersten Satzes.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>LinkedIn belohnt Posts, die Menschen in den ersten 2 Zeilen zum Weiterlesen bringen. Der Hook, der erste Satz, entscheidet alles. Danach zählen kurze Absätze, klarer Mehrwert und ein konkreter Call-to-Action.</p></div>
@@ -1799,7 +1799,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(22)">✓ Tag 22 abschließen</button></div>`,
 
 23:`<div class="day-tag">📅 TAG 23 VON 28 · WOCHE 4</div>
-<h1><span>Content-Recycling</span></h1>
+<h1><span>Content&#8209;Recycling</span></h1>
 <p class="day-intro">Einmal schreiben, zehnmal nutzen. Aus einer E-Mail wird ein Blogpost, ein LinkedIn-Post, eine Story und mehr.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Die meisten Menschen produzieren täglich wertvolle Inhalte , in E-Mails, Gesprächen, Berichten, und veröffentlichen nichts davon. Content-Recycling bedeutet: Du nimmst einen bestehenden Inhalt und verwandelst ihn in mehrere Formate für mehrere Kanäle.</p></div>
@@ -1869,7 +1869,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(25)">✓ Tag 25 abschließen</button></div>`,
 
 26:`<div class="day-tag">📅 TAG 26 VON 28 · WOCHE 4</div>
-<h1>Newsletter-Ideen für <span>einen Monat</span></h1>
+<h1>Newsletter&#8209;Ideen für <span>einen Monat</span></h1>
 <p class="day-intro">Nie wieder vor dem leeren Newsletter sitzen. Die KI generiert in 10 Minuten 30 Tage Content-Ideen – inklusive Betreffzeilen.</p>
 <div class="content-card"><h3>🧠 Was du heute lernst</h3>
 <p>Der größte Feind regelmäßiger Newsletter ist nicht mangelndes Wissen, sondern das leere Blatt. Die KI löst dieses Problem, indem sie dir einen ganzen Monat an Themen, Blickwinkeln und Ideen liefert.</p></div>
@@ -1916,7 +1916,7 @@ const DAY_CONTENT = {
 <button class="btn-complete" id="completeBtn" onclick="completeDay(27)">✓ Tag 27 abschließen</button></div>`,
 
 28:`<div class="day-tag">📅 TAG 28 VON 28 · ABSCHLUSS 🎓</div>
-<h1>Social-Media-Plan & <span>Challenge-Resümee</span></h1>
+<h1>Social&#8209;Media&#8209;Plan &amp; <span>Challenge&#8209;Resümee</span></h1>
 <p class="day-intro">Tag 28. Du hast es geschafft. Heute planst du deinen Social-Media-Auftritt für die nächste Woche – und ziehst dein persönliches Fazit.</p>
 <div class="content-card"><h3>🧠 Was du heute abschließt</h3>
 <p>28 Tage. 4 Wochen. 28 neue Fähigkeiten. Von der ersten Expertenrolle bis zur vollständigen Content-Strategie. Heute planst du, wie du das Gelernte in deinen Alltag integrierst – dauerhaft, nicht nur für die Challenge.</p></div>
@@ -2702,13 +2702,26 @@ function closeWeekBadge() {
 
 function downloadBadge() {
   const week = document.getElementById('weekBadgeModal')._week || 1;
-  // Wait a tick so logo image has time to load
-  setTimeout(() => {
+  const staticUrl = `Abzeichen_${week}.png`;
+
+  // Versuche zuerst das statische PNG aus dem Repo
+  const testImg = new Image();
+  testImg.onload = () => {
     const a = document.createElement('a');
-    a.href = document.getElementById('badgeCanvas').toDataURL('image/png');
-    a.download = `ki-challenge-woche-${week}-abzeichen.png`;
+    a.href = staticUrl;
+    a.download = `Abzeichen_${week}.png`;
     a.click();
-  }, 300);
+  };
+  testImg.onerror = () => {
+    // Fallback: Canvas-generiertes Bild
+    setTimeout(() => {
+      const a = document.createElement('a');
+      a.href = document.getElementById('badgeCanvas').toDataURL('image/png');
+      a.download = `Abzeichen_${week}.png`;
+      a.click();
+    }, 300);
+  };
+  testImg.src = staticUrl;
 }
 
 async function shareWeekBadge() {
