@@ -2530,9 +2530,9 @@ async function completeDay(num) {
   }
 
   if (nxt) {
-    document.getElementById('nextLabel').textContent    = `⏳ Tag ${nxt.num} wird freigeschaltet in`;
+    document.getElementById('nextLabel').textContent    = `🌙 Tag ${nxt.num} wird morgen freigeschaltet`;
     document.getElementById('nextTitle').textContent    = nxt.title;
-    document.getElementById('countdown').style.display = 'block';
+    document.getElementById('countdown').style.display = 'none';
   } else {
     document.getElementById('nextLabel').textContent    = '';
     document.getElementById('nextTitle').textContent    = '';
