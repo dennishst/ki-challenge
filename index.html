@@ -859,27 +859,27 @@
     </h1>
 
     <!-- COUNTDOWN – nur vor Launch sichtbar -->
-    <div id="launchCountdown" style="display:none;background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(129,140,248,.06));border:1px solid rgba(94,234,212,.2);border-radius:16px;padding:1.4rem 1rem 1.2rem;margin:1rem 0;text-align:center;">
-      <p style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;margin:0 0 .75rem;">Die Challenge startet in</p>
-      <div style="display:flex;justify-content:center;align-items:flex-start;gap:.25rem;flex-wrap:nowrap;">
-        <div style="text-align:center;flex:1;min-width:0;">
-          <div id="cd-days" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--text);line-height:1;">--</div>
-          <div style="font-size:clamp(.5rem,.6rem,.65rem);color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.06em;">Tage</div>
+    <div id="launchCountdown" style="display:none;background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(129,140,248,.06));border:1px solid rgba(94,234,212,.2);border-radius:16px;padding:1.25rem .75rem 1rem;margin:1rem 0;text-align:center;">
+      <p style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin:0 0 .75rem;">Die 28 Tage KI Challenge startet in</p>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:start;gap:0;width:100%;">
+        <div style="text-align:center;">
+          <div id="cd-days" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--text);line-height:1;">--</div>
+          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Tage</div>
         </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--muted);line-height:1;margin-top:2px;padding:0 .1rem;">:</div>
-        <div style="text-align:center;flex:1;min-width:0;">
-          <div id="cd-hours" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--text);line-height:1;">--</div>
-          <div style="font-size:clamp(.5rem,.6rem,.65rem);color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.06em;">Std</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--muted);line-height:1;padding:0 2px;margin-top:1px;">:</div>
+        <div style="text-align:center;">
+          <div id="cd-hours" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--text);line-height:1;">--</div>
+          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Std</div>
         </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--muted);line-height:1;margin-top:2px;padding:0 .1rem;">:</div>
-        <div style="text-align:center;flex:1;min-width:0;">
-          <div id="cd-minutes" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--text);line-height:1;">--</div>
-          <div style="font-size:clamp(.5rem,.6rem,.65rem);color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.06em;">Min</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--muted);line-height:1;padding:0 2px;margin-top:1px;">:</div>
+        <div style="text-align:center;">
+          <div id="cd-minutes" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--text);line-height:1;">--</div>
+          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Min</div>
         </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--muted);line-height:1;margin-top:2px;padding:0 .1rem;">:</div>
-        <div style="text-align:center;flex:1;min-width:0;">
-          <div id="cd-seconds" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.2rem,7vw,1.75rem);color:var(--accent);line-height:1;">--</div>
-          <div style="font-size:clamp(.5rem,.6rem,.65rem);color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.06em;">Sek</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--muted);line-height:1;padding:0 2px;margin-top:1px;">:</div>
+        <div style="text-align:center;">
+          <div id="cd-seconds" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--accent);line-height:1;">--</div>
+          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Sek</div>
         </div>
       </div>
     </div>
