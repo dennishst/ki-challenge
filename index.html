@@ -49,8 +49,7 @@
 
 
   .screen{display:none;position:relative;z-index:1;}
-  #screen-auth.active{display:flex;flex-direction:column;min-height:100vh;}
-  #screen-auth .auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;}
+  #screen-auth.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:2rem;}
   #screen-dashboard.active{display:flex;flex-direction:column;min-height:100vh;}
   #screen-day.active{display:flex;flex-direction:column;min-height:100vh;}
   #screen-success.active{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:2rem;text-align:center;}
@@ -842,10 +841,7 @@
 <!-- AUTH SCREEN                                     -->
 <!-- ═══════════════════════════════════════════════ -->
 <div id="screen-auth" class="screen">
-  <div class="auth-wrap">
   <div class="auth-card">
-
-    <!-- LOGO & HEADLINE – immer sichtbar -->
     <div style="text-align:center;margin-bottom:1.2rem;">
       <div class="auth-logo" style="flex-direction:column;gap:.5rem;">
         <img src="https://makerport.de/wp-content/uploads/2025/01/Logo_dmv_makerport_neg_RGB-1-1-e1736245084994.png" alt="Makerport Logo" style="height:64px;width:auto;object-fit:contain;">
@@ -859,141 +855,95 @@
       <span style="color:var(--text);">zur MakerPort</span><br>
       <span>KI Challenge</span>
     </h1>
+    <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um an der Challenge teilzunehmen.</p>
 
-    <!-- COUNTDOWN – nur vor Launch sichtbar -->
-    <div id="launchCountdown" style="display:none;background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(129,140,248,.06));border:1px solid rgba(94,234,212,.2);border-radius:16px;padding:1.25rem .75rem 1rem;margin:1rem 0;text-align:center;">
-      <p style="font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin:0 0 .75rem;">Die 28 Tage KI Challenge startet in</p>
-      <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:start;gap:0;width:100%;">
-        <div style="text-align:center;">
-          <div id="cd-days" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--text);line-height:1;">--</div>
-          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Tage</div>
-        </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--muted);line-height:1;padding:0 2px;margin-top:1px;">:</div>
-        <div style="text-align:center;">
-          <div id="cd-hours" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--text);line-height:1;">--</div>
-          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Std</div>
-        </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--muted);line-height:1;padding:0 2px;margin-top:1px;">:</div>
-        <div style="text-align:center;">
-          <div id="cd-minutes" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--text);line-height:1;">--</div>
-          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Min</div>
-        </div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--muted);line-height:1;padding:0 2px;margin-top:1px;">:</div>
-        <div style="text-align:center;">
-          <div id="cd-seconds" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1rem,5.5vw,1.6rem);color:var(--accent);line-height:1;">--</div>
-          <div style="font-size:.55rem;color:var(--muted);margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;">Sek</div>
-        </div>
-      </div>
-      <p style="font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:var(--muted);margin:.75rem 0 0;">01. April 2026</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
+      <button class="auth-tab" onclick="switchTab('register')">Registrieren</button>
     </div>
 
-    <!-- AUTH FORMS – nur nach Launch sichtbar -->
-    <div id="authForms">
-      <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um an der Challenge teilzunehmen.</p>
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchTab('login')">Anmelden</button>
-        <button class="auth-tab" onclick="switchTab('register')">Registrieren</button>
+    <!-- LOGIN FORM -->
+    <div class="auth-form active" id="form-login">
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="login-email" placeholder="deine@email.de" autocomplete="email">
       </div>
-
-      <!-- LOGIN FORM -->
-      <div class="auth-form active" id="form-login">
-        <div class="form-field">
-          <label>E-Mail</label>
-          <input type="email" id="login-email" placeholder="deine@email.de" autocomplete="email">
+      <div class="form-field">
+        <label>Passwort</label>
+        <div style="position:relative;">
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;box-sizing:border-box;">
+          <button type="button" onclick="togglePasswordVisibility('login-password', this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:.2rem;display:flex;align-items:center;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'" title="Passwort anzeigen">
+            <svg id="eyeIcon-login-password" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
         </div>
-        <div class="form-field">
-          <label>Passwort</label>
-          <div style="position:relative;">
-            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;box-sizing:border-box;">
-            <button type="button" onclick="togglePasswordVisibility('login-password', this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:.2rem;display:flex;align-items:center;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'" title="Passwort anzeigen">
-              <svg id="eyeIcon-login-password" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin:.25rem 0 .75rem;">
-          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.82rem;color:var(--muted);">
-            <input type="checkbox" id="login-remember" style="accent-color:var(--accent);width:14px;height:14px;">
-            Angemeldet bleiben
-          </label>
-          <button onclick="switchTab('reset')" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='var(--muted)'">Passwort vergessen?</button>
-        </div>
-        <button class="btn-primary" onclick="handleLogin()" id="btn-login">
-          <span>Einloggen →</span>
-        </button>
-        <div class="auth-msg" id="login-msg"></div>
       </div>
-
-      <!-- REGISTER FORM -->
-      <div class="auth-form" id="form-register">
-        <div class="form-field">
-          <label>Dein Name</label>
-          <input type="text" id="reg-name" placeholder="Anna Beispiel" autocomplete="name">
-        </div>
-        <div class="form-field">
-          <label>E-Mail</label>
-          <input type="email" id="reg-email" placeholder="deine@email.de" autocomplete="email">
-        </div>
-        <div class="form-field">
-          <label>Passwort <span style="color:var(--muted);font-size:.75rem">(min. 8 Zeichen)</span></label>
-          <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.75rem 0 .25rem;">
-          <input type="checkbox" id="reg-privacy" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
-          <label for="reg-privacy" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
-            Ich habe die <a href="#" onclick="showLegal('privacy');return false;" style="color:var(--accent);text-decoration:none;">Datenschutzerklärung</a> gelesen und stimme zu.
-          </label>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.25rem 0 .75rem;">
-          <input type="checkbox" id="reg-marketing" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
-          <label for="reg-marketing" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
-            Neue Challenges, Tipps & Updates bequem per Mail erhalten. (Optional)
-          </label>
-        </div>
-        <button class="btn-primary" onclick="handleRegister()" id="btn-register">
-          <span>Kostenlosen Account erstellen →</span>
-        </button>
-        <div class="auth-msg" id="register-msg"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:.25rem 0 .75rem;">
+        <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.82rem;color:var(--muted);">
+          <input type="checkbox" id="login-remember" style="accent-color:var(--accent);width:14px;height:14px;">
+          Angemeldet bleiben
+        </label>
+        <button onclick="switchTab('reset')" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='var(--muted)'">Passwort vergessen?</button>
       </div>
+      <button class="btn-primary" onclick="handleLogin()" id="btn-login">
+        <span>Einloggen →</span>
+      </button>
+      <div class="auth-msg" id="login-msg"></div>
+    </div>
 
-      <!-- RESET FORM -->
-      <div class="auth-form" id="form-reset">
-        <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;line-height:1.6">Gib deine E-Mail ein. Du bekommst einen Link, um dein Passwort zurückzusetzen.</p>
-        <div class="form-field">
-          <label>E-Mail</label>
-          <input type="email" id="reset-email" placeholder="deine@email.de" autocomplete="email">
-        </div>
-        <button class="btn-primary" onclick="handleReset()" id="btn-reset">
-          <span>Reset-Link senden →</span>
-        </button>
-        <div class="auth-msg" id="reset-msg"></div>
+    <!-- REGISTER FORM -->
+    <div class="auth-form" id="form-register">
+      <div class="form-field">
+        <label>Dein Name</label>
+        <input type="text" id="reg-name" placeholder="Anna Beispiel" autocomplete="name">
       </div>
-
-      <!-- Legal links -->
-      <div style="text-align:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
-        <button onclick="showLegal('privacy')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Datenschutz</button>
-        <span style="color:var(--muted);font-size:.78rem;">·</span>
-        <button onclick="showLegal('imprint')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Impressum</button>
-        <span style="color:var(--muted);font-size:.78rem;">·</span>
-        <button onclick="showLegal('agb')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">AGB</button>
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="reg-email" placeholder="deine@email.de" autocomplete="email">
       </div>
-    </div><!-- end authForms -->
+      <div class="form-field">
+        <label>Passwort <span style="color:var(--muted);font-size:.75rem">(min. 8 Zeichen)</span></label>
+        <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.75rem 0 .25rem;">
+        <input type="checkbox" id="reg-privacy" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
+        <label for="reg-privacy" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
+          Ich habe die <a href="#" onclick="showLegal('privacy');return false;" style="color:var(--accent);text-decoration:none;">Datenschutzerklärung</a> gelesen und stimme zu.
+        </label>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.25rem 0 .75rem;">
+        <input type="checkbox" id="reg-marketing" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
+        <label for="reg-marketing" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
+          Neue Challenges, Tipps & Updates bequem per Mail erhalten. (Optional)
+        </label>
+      </div>
+      <button class="btn-primary" onclick="handleRegister()" id="btn-register">
+        <span>Kostenlosen Account erstellen →</span>
+      </button>
+      <div class="auth-msg" id="register-msg"></div>
+    </div>
 
+    <!-- RESET FORM -->
+    <div class="auth-form" id="form-reset">
+      <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;line-height:1.6">Gib deine E-Mail ein. Du bekommst einen Link, um dein Passwort zurückzusetzen.</p>
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="reset-email" placeholder="deine@email.de" autocomplete="email">
+      </div>
+      <button class="btn-primary" onclick="handleReset()" id="btn-reset">
+        <span>Reset-Link senden →</span>
+      </button>
+      <div class="auth-msg" id="reset-msg"></div>
+    </div>
+
+    <!-- Legal links -->
+    <div style="text-align:center;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);">
+      <button onclick="showLegal('privacy')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Datenschutz</button>
+      <span style="color:var(--muted);font-size:.78rem;">·</span>
+      <button onclick="showLegal('imprint')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Impressum</button>
+      <span style="color:var(--muted);font-size:.78rem;">·</span>
+      <button onclick="showLegal('agb')" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:.2rem .4rem;transition:color .2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">AGB</button>
+    </div>
   </div>
-  </div><!-- end auth-wrap -->
-
-  <!-- FOOTER AUTH SCREEN -->
-  <footer style="position:relative;z-index:1;border-top:1px solid rgba(255,255,255,0.07);padding:1.2rem 2rem;text-align:center;background:rgba(12,15,26,0.9);">
-    <p style="font-size:.78rem;color:#64748b;margin:0 0 .3rem;">
-      <a href="#" onclick="showLegal('privacy');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Datenschutz</a>
-      &nbsp;·&nbsp;
-      <a href="#" onclick="showLegal('imprint');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">Impressum</a>
-      &nbsp;·&nbsp;
-      <a href="#" onclick="showLegal('agb');return false;" style="color:#64748b;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#5eead4'" onmouseout="this.style.color='#64748b'">AGB</a>
-    </p>
-    <p style="font-size:.75rem;color:#475569;margin:0;">© 2026 MakerPort Stralsund &nbsp;·&nbsp; 28-Tage KI-Challenge &nbsp;·&nbsp; mit Hilfe von KI erstellt</p>
-  </footer>
-
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
@@ -4056,47 +4006,6 @@ document.addEventListener('click', e => {
     panel.classList.remove('open');
   }
 });
-
-// ════════════════════════════════════════════════════════
-// LAUNCH COUNTDOWN – 01.04.2026 00:00 Uhr Deutsche Zeit (MESZ = UTC+2)
-// ════════════════════════════════════════════════════════
-(function() {
-  const LAUNCH = new Date('2026-03-31T22:00:00Z'); // 01.04.2026 00:00 MESZ
-
-  function updateCountdown() {
-    const now  = new Date();
-    const diff = LAUNCH - now;
-
-    const cdBox   = document.getElementById('launchCountdown');
-    const forms   = document.getElementById('authForms');
-
-    if (diff <= 0) {
-      // Launch erreicht – Countdown ausblenden, Forms einblenden
-      if (cdBox)  cdBox.style.display  = 'none';
-      if (forms)  forms.style.display  = '';
-      return;
-    }
-
-    // Vor Launch: Countdown zeigen, Forms verstecken
-    if (cdBox)  cdBox.style.display  = 'block';
-    if (forms)  forms.style.display  = 'none';
-
-    const days    = Math.floor(diff / 86400000);
-    const hours   = Math.floor((diff % 86400000) / 3600000);
-    const minutes = Math.floor((diff % 3600000)  / 60000);
-    const seconds = Math.floor((diff % 60000)    / 1000);
-
-    const pad = n => String(n).padStart(2, '0');
-    const el = id => document.getElementById(id);
-    if (el('cd-days'))    el('cd-days').textContent    = days;
-    if (el('cd-hours'))   el('cd-hours').textContent   = pad(hours);
-    if (el('cd-minutes')) el('cd-minutes').textContent = pad(minutes);
-    if (el('cd-seconds')) el('cd-seconds').textContent = pad(seconds);
-  }
-
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-})();
 
 // Apply saved settings on load
 applyA11y();
