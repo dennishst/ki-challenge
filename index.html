@@ -887,6 +887,76 @@
       <p style="font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:var(--muted);margin:.75rem 0 0;">06. April 2026</p>
     </div>
 
+    <!-- PRE-LAUNCH REGISTRIERUNG – nur vor Launch sichtbar -->
+    <div id="preLaunchReg">
+      <p style="text-align:center;color:var(--muted);font-size:.85rem;line-height:1.5;margin:1rem 0 .75rem;">Jetzt kostenlos registrieren und am 06. April direkt durchstarten!</p>
+
+      <div class="form-field">
+        <label>Dein Name</label>
+        <input type="text" id="pre-name" placeholder="Anna Beispiel" autocomplete="name">
+      </div>
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="pre-email" placeholder="deine@email.de" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label>Passwort <span style="color:var(--muted);font-size:.75rem;">(min. 8 Zeichen)</span></label>
+        <div style="position:relative;">
+          <input type="password" id="pre-password" placeholder="••••••••" autocomplete="new-password" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;box-sizing:border-box;">
+          <button type="button" onclick="togglePasswordVisibility('pre-password',this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;">
+            <svg id="eyeIcon-pre-password" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.75rem 0 .25rem;">
+        <input type="checkbox" id="pre-privacy" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
+        <label for="pre-privacy" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
+          Ich habe die <a href="#" onclick="showLegal('privacy');return false;" style="color:var(--accent);text-decoration:none;">Datenschutzerklärung</a> gelesen und stimme zu.
+        </label>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:.6rem;margin:.25rem 0 1rem;">
+        <input type="checkbox" id="pre-marketing" style="margin-top:3px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;cursor:pointer;">
+        <label for="pre-marketing" style="font-size:.82rem;color:var(--muted);line-height:1.5;cursor:pointer;">
+          Tipps & Updates per Mail erhalten. (Optional)
+        </label>
+      </div>
+      <button class="btn-primary" onclick="handlePreLaunchRegister()" id="btn-pre-register">
+        <span>Jetzt registrieren →</span>
+      </button>
+      <div class="auth-msg" id="pre-register-msg"></div>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <span style="color:var(--muted);font-size:.82rem;">Bereits registriert? </span>
+        <button onclick="showPreLaunchLogin()" style="background:none;border:none;color:var(--accent);font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0;">Anmelden</button>
+      </div>
+    </div>
+
+    <!-- PRE-LAUNCH LOGIN – versteckt, bei Bedarf einblendbar -->
+    <div id="preLaunchLogin" style="display:none;">
+      <p style="text-align:center;color:var(--muted);font-size:.85rem;line-height:1.5;margin:1rem 0 .75rem;">Bereits registriert? Melde dich an.</p>
+      <div class="form-field">
+        <label>E-Mail</label>
+        <input type="email" id="pre-login-email" placeholder="deine@email.de" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label>Passwort</label>
+        <div style="position:relative;">
+          <input type="password" id="pre-login-password" placeholder="••••••••" autocomplete="current-password" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.75rem 3rem .75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;box-sizing:border-box;">
+          <button type="button" onclick="togglePasswordVisibility('pre-login-password',this)" style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;display:flex;align-items:center;">
+            <svg id="eyeIcon-pre-login-password" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="handlePreLaunchLogin()" id="btn-pre-login">
+        <span>Einloggen →</span>
+      </button>
+      <div class="auth-msg" id="pre-login-msg"></div>
+      <div style="text-align:center;margin-top:1rem;">
+        <span style="color:var(--muted);font-size:.82rem;">Noch kein Account? </span>
+        <button onclick="showPreLaunchReg()" style="background:none;border:none;color:var(--accent);font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0;">Registrieren</button>
+      </div>
+    </div>
+
     <!-- AUTH FORMS – nur nach Launch sichtbar -->
     <div id="authForms">
       <p class="auth-sub" style="text-align:center;">Melde dich an oder erstelle einen kostenlosen Account, um an der Challenge teilzunehmen.</p>
@@ -4057,6 +4127,55 @@ document.addEventListener('click', e => {
   }
 });
 
+function showPreLaunchLogin() {
+  document.getElementById('preLaunchReg').style.display   = 'none';
+  document.getElementById('preLaunchLogin').style.display = 'block';
+}
+function showPreLaunchReg() {
+  document.getElementById('preLaunchLogin').style.display = 'none';
+  document.getElementById('preLaunchReg').style.display   = 'block';
+}
+
+async function handlePreLaunchRegister() {
+  const name     = document.getElementById('pre-name').value.trim();
+  const email    = document.getElementById('pre-email').value.trim();
+  const password = document.getElementById('pre-password').value;
+  const privacy  = document.getElementById('pre-privacy').checked;
+  const marketing = document.getElementById('pre-marketing').checked;
+  const msg      = document.getElementById('pre-register-msg');
+
+  if (!name || !email || !password) return showMsg('pre-register-msg', 'Bitte alle Pflichtfelder ausfüllen.');
+  if (password.length < 8)          return showMsg('pre-register-msg', 'Passwort muss mindestens 8 Zeichen haben.');
+  if (!privacy)                      return showMsg('pre-register-msg', 'Bitte Datenschutzerklärung akzeptieren.');
+
+  setLoading('btn-pre-register', true);
+  const { error } = await db.auth.signUp({
+    email, password,
+    options: {
+      data: { full_name: name, marketing_emails: marketing },
+      emailRedirectTo: 'https://ki-challenge.makerport.de/'
+    }
+  });
+  setLoading('btn-pre-register', false);
+  if (error) return showMsg('pre-register-msg', error.message);
+  msg.style.cssText = 'display:block;background:rgba(94,234,212,.1);border:1px solid rgba(94,234,212,.3);color:#5eead4;padding:.6rem .9rem;border-radius:8px;font-size:.82rem;margin-top:.75rem;';
+  msg.textContent = '✓ Registrierung erfolgreich! Bitte bestätige deine E-Mail. Am 06. April geht es los!';
+  document.getElementById('btn-pre-register').disabled = true;
+}
+
+async function handlePreLaunchLogin() {
+  const email    = document.getElementById('pre-login-email').value.trim();
+  const password = document.getElementById('pre-login-password').value;
+  if (!email || !password) return showMsg('pre-login-msg', 'Bitte E-Mail und Passwort eingeben.');
+  setLoading('btn-pre-login', true);
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  setLoading('btn-pre-login', false);
+  if (error) {
+    showMsg('pre-login-msg', error.message.includes('Invalid login') ? 'E-Mail oder Passwort falsch.' : error.message);
+  }
+  // onAuthStateChange leitet weiter sobald eingeloggt
+}
+
 // ════════════════════════════════════════════════════════
 // LAUNCH COUNTDOWN – 06.04.2026 00:00 Uhr Deutsche Zeit (MESZ = UTC+2)
 // ════════════════════════════════════════════════════════
@@ -4071,13 +4190,17 @@ document.addEventListener('click', e => {
     const forms   = document.getElementById('authForms');
 
     if (diff <= 0) {
-      // Launch erreicht – Countdown ausblenden, Forms einblenden
+      // Launch erreicht – Countdown + Pre-Launch-Forms ausblenden, Auth-Forms einblenden
       if (cdBox)  cdBox.style.display  = 'none';
       if (forms)  forms.style.display  = '';
+      const pre = document.getElementById('preLaunchReg');
+      const preL = document.getElementById('preLaunchLogin');
+      if (pre)  pre.style.display  = 'none';
+      if (preL) preL.style.display = 'none';
       return;
     }
 
-    // Vor Launch: Countdown zeigen, Forms verstecken
+    // Vor Launch: Countdown + Pre-Launch-Forms zeigen, Auth-Forms verstecken
     if (cdBox)  cdBox.style.display  = 'block';
     if (forms)  forms.style.display  = 'none';
 
