@@ -3952,11 +3952,19 @@ db.auth.onAuthStateChange(async (event, session) => {
     showPasswordResetForm();
 
   } else if (event === 'SIGNED_IN' && appReady) {
-    // User just logged in
     currentUser = session.user;
-    await loadProgress();
-    buildDashboard();
-    goTo('screen-dashboard');
+    // Nach E-Mail-Bestätigung (email_confirmed_at wird gesetzt) → Startseite
+    // Bei normalem Login → Dashboard
+    const isEmailConfirmation = session.user.email_confirmed_at &&
+      (Date.now() - new Date(session.user.email_confirmed_at).getTime()) < 10000;
+    if (isEmailConfirmation) {
+      overlay.classList.add('hidden');
+      goTo('screen-auth');
+    } else {
+      await loadProgress();
+      buildDashboard();
+      goTo('screen-dashboard');
+    }
 
   } else if (event === 'SIGNED_OUT') {
     currentUser = null;
