@@ -888,7 +888,7 @@
     </div>
 
     <!-- PRE-LAUNCH REGISTRIERUNG – nur vor Launch sichtbar -->
-    <div id="preLaunchReg">
+    <div id="preLaunchReg" style="display:none;">
       <p style="text-align:center;color:var(--muted);font-size:.85rem;line-height:1.5;margin:1rem 0 .75rem;">Jetzt kostenlos registrieren und am 06. April direkt durchstarten!</p>
 
       <div class="form-field">
@@ -924,11 +924,6 @@
         <span>Jetzt registrieren →</span>
       </button>
       <div class="auth-msg" id="pre-register-msg"></div>
-
-      <div style="text-align:center;margin-top:1rem;">
-        <span style="color:var(--muted);font-size:.82rem;">Bereits registriert? </span>
-        <button onclick="showPreLaunchLogin()" style="background:none;border:none;color:var(--accent);font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;padding:0;">Anmelden</button>
-      </div>
     </div>
 
     <!-- PRE-LAUNCH LOGIN – versteckt, bei Bedarf einblendbar -->
@@ -4190,19 +4185,23 @@ async function handlePreLaunchLogin() {
     const forms   = document.getElementById('authForms');
 
     if (diff <= 0) {
-      // Launch erreicht – Countdown + Pre-Launch-Forms ausblenden, Auth-Forms einblenden
+      // Launch erreicht – Countdown ausblenden, volle Auth-Forms einblenden
       if (cdBox)  cdBox.style.display  = 'none';
       if (forms)  forms.style.display  = '';
-      const pre = document.getElementById('preLaunchReg');
+      const pre  = document.getElementById('preLaunchReg');
       const preL = document.getElementById('preLaunchLogin');
       if (pre)  pre.style.display  = 'none';
       if (preL) preL.style.display = 'none';
       return;
     }
 
-    // Vor Launch: Countdown + Pre-Launch-Forms zeigen, Auth-Forms verstecken
+    // Vor Launch: Countdown + Registrierung zeigen, Login + Auth-Forms verstecken
     if (cdBox)  cdBox.style.display  = 'block';
     if (forms)  forms.style.display  = 'none';
+    const pre  = document.getElementById('preLaunchReg');
+    const preL = document.getElementById('preLaunchLogin');
+    if (pre)  pre.style.display  = 'block';
+    if (preL) preL.style.display = 'none';
 
     const days    = Math.floor(diff / 86400000);
     const hours   = Math.floor((diff % 86400000) / 3600000);
