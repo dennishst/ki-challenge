@@ -3935,15 +3935,19 @@ db.auth.onAuthStateChange(async (event, session) => {
   const overlay = document.getElementById('loadingOverlay');
 
   if (event === 'INITIAL_SESSION') {
-    // First load - check if user is already logged in
-    if (session?.user) {
+    const LAUNCH = new Date('2026-04-05T22:00:00Z');
+    const beforeLaunch = new Date() < LAUNCH;
+
+    if (session?.user && !beforeLaunch) {
       currentUser = session.user;
       overlay.querySelector('p').textContent = 'Fortschritt wird geladen…';
       await loadProgress();
       buildDashboard();
+    } else if (session?.user && beforeLaunch) {
+      currentUser = session.user;
     }
     overlay.classList.add('hidden');
-    goTo(session?.user ? 'screen-dashboard' : 'screen-auth');
+    goTo((session?.user && !beforeLaunch) ? 'screen-dashboard' : 'screen-auth');
     appReady = true;
 
   } else if (event === 'PASSWORD_RECOVERY') {
@@ -3953,13 +3957,14 @@ db.auth.onAuthStateChange(async (event, session) => {
 
   } else if (event === 'SIGNED_IN' && appReady) {
     currentUser = session.user;
-    // Nach E-Mail-Bestätigung (email_confirmed_at wird gesetzt) → Startseite
-    // Bei normalem Login → Dashboard
-    const isEmailConfirmation = session.user.email_confirmed_at &&
-      (Date.now() - new Date(session.user.email_confirmed_at).getTime()) < 10000;
-    if (isEmailConfirmation) {
+    const LAUNCH = new Date('2026-04-05T22:00:00Z'); // 06.04.2026 00:00 MESZ
+    const beforeLaunch = new Date() < LAUNCH;
+
+    if (beforeLaunch) {
+      // Vor Launch: zurück zur Startseite mit Countdown
       overlay.classList.add('hidden');
       goTo('screen-auth');
+      showToast('Die Challenge startet am 06. April 2026!', 'success');
     } else {
       await loadProgress();
       buildDashboard();
