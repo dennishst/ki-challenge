@@ -2085,7 +2085,7 @@ const DAY_CONTENT = {
 // ⚙️  KONFIGURATION – HIER DEINE SUPABASE-DATEN EINTRAGEN
 // ════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://rnedyeimsgtvhcqvbama.supabase.co'
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0'
 // ════════════════════════════════════════════════════════
 
 const { createClient } = supabase;
@@ -3077,13 +3077,24 @@ function showSocialFollowPopup() {
 // ════════════════════════════════════════════════════════
 async function loadGroupProgress() {
   try {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
 
-    // Gesamtzahl aller registrierten User aus profiles-Tabelle
-    const { count: totalUsers, error: e1 } = await db
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
-    if (e1) throw e1;
+    // Gesamtzahl: zuerst profiles, Fallback auf progress-Tabelle
+    let totalUsers = 0;
+    try {
+      const { count, error } = await db
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+      if (!error && count !== null) {
+        totalUsers = count;
+      } else {
+        throw error;
+      }
+    } catch {
+      // Fallback: distinct users aus progress-Tabelle
+      const { data: allUsers } = await db.from('progress').select('user_id');
+      totalUsers = allUsers ? new Set(allUsers.map(r => r.user_id)).size : 0;
+    }
 
     // User die heute mindestens einen Tag abgeschlossen haben
     const { data: todayData, error: e2 } = await db
@@ -3093,20 +3104,19 @@ async function loadGroupProgress() {
       .lte('completed_at', today + 'T23:59:59.999Z');
     if (e2) throw e2;
 
-    const todayUsers = new Set(todayData.map(r => r.user_id)).size;
+    const todayUsers = new Set((todayData || []).map(r => r.user_id)).size;
     const pct = totalUsers > 0 ? Math.round(todayUsers / totalUsers * 100) : 0;
 
     // Update UI
-    document.getElementById('statParticipants').textContent = totalUsers ?? 0;
+    document.getElementById('statParticipants').textContent = totalUsers;
     const pb = document.getElementById('statParticipantsBadge');
-    if (pb) pb.textContent = (totalUsers ?? 0) + ' 👥';
+    if (pb) pb.textContent = totalUsers + ' 👥';
 
-    // Update banner group block
     const pctEl  = document.getElementById('groupBannerPct');
     const textEl = document.getElementById('groupBannerText');
     const barEl  = document.getElementById('groupBannerBar');
     if (pctEl)  pctEl.textContent  = pct + '%';
-    if (textEl) textEl.textContent = `${todayUsers} von ${totalUsers ?? 0} aktiv`;
+    if (textEl) textEl.textContent = `${todayUsers} von ${totalUsers} aktiv`;
     if (barEl)  setTimeout(() => { barEl.style.width = pct + '%'; }, 400);
 
   } catch(e) {
@@ -3927,6 +3937,15 @@ document.getElementById('legalModal').addEventListener('click', function(e) {
 // ════════════════════════════════════════════════════════
 // Single auth handler - no parallel calls
 let appReady = false;
+
+// Sicherheitsnetz: Ladescreen nach 8 Sekunden immer ausblenden
+setTimeout(() => {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay && !overlay.classList.contains('hidden')) {
+    overlay.classList.add('hidden');
+    goTo('screen-auth');
+  }
+}, 8000);
 
 db.auth.onAuthStateChange(async (event, session) => {
   const overlay = document.getElementById('loadingOverlay');
