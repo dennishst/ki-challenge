@@ -1361,11 +1361,11 @@
     <div id="completionBox" style="display:none;background:linear-gradient(135deg,rgba(94,234,212,.1),rgba(129,140,248,.08));border:1px solid rgba(94,234,212,.3);border-radius:16px;padding:1.5rem;margin:1rem 0;text-align:left;">
       <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);margin:0 0 .75rem;">🏆 Herzlichen Glückwunsch!</p>
       <p style="font-size:.9rem;color:var(--text);line-height:1.7;margin:0 0 1rem;">Du hast die 28-Tage KI-Challenge abgeschlossen! Um dein Teilnahmezertifikat zu erhalten, sende uns bitte eine Nachricht mit deinem Namen und deinem Abschlussdatum an:</p>
-      <a href="mailto:info@makerport.de?subject=KI-Challenge%20Teilnahmezertifikat&body=Hallo%20MakerPort-Team%2C%0A%0Aich%20habe%20die%2028-Tage%20KI-Challenge%20erfolgreich%20abgeschlossen.%0A%0AMein%20Name%3A%20%5BDein%20Name%5D%0AAbschlussdatum%3A%20" id="certMailLink" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;text-decoration:none;padding:.7rem 1.25rem;border-radius:10px;margin-bottom:.75rem;">
+      <a href="/cdn-cgi/l/email-protection#86efe8e0e9c6ebe7ede3f4f6e9f4f2a8e2e3b9f5f3e4ece3e5f2bbcdcfabc5eee7eaeae3e8e1e3a3b4b6d2e3efeae8e7eeebe3fce3f4f2efe0efede7f2a0e4e9e2ffbbcee7eaeae9a3b4b6cbe7ede3f4d6e9f4f2abd2e3e7eba3b4c5a3b6c7a3b6c7efe5eea3b4b6eee7e4e3a3b4b6e2efe3a3b4b6b4beabd2e7e1e3a3b4b6cdcfabc5eee7eaeae3e8e1e3a3b4b6e3f4e0e9eae1f4e3efe5eea3b4b6e7e4e1e3f5e5eeeae9f5f5e3e8a8a3b6c7a3b6c7cbe3efe8a3b4b6c8e7ebe3a3b5c7a3b4b6a3b3c4c2e3efe8a3b4b6c8e7ebe3a3b3c2a3b6c7c7e4f5e5eeeaf3f5f5e2e7f2f3eba3b5c7a3b4b6" id="certMailLink" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--accent),#38bdf8);color:#0c0f1a;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;text-decoration:none;padding:.7rem 1.25rem;border-radius:10px;margin-bottom:.75rem;">
         ✉ E-Mail senden
       </a>
       <p style="font-size:.78rem;color:var(--muted);margin:0;line-height:1.5;">
-        <strong style="color:var(--text);">info@makerport.de</strong><br>
+        <strong style="color:var(--text);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7f161119103f121e141a0d0f100d0b511b1a">[email&#160;protected]</a></strong><br>
         Betreff: <em>KI-Challenge</em>
       </p>
     </div>
@@ -1379,7 +1379,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const DAY_CONTENT = {
 
 // ════════════════════════════════════════
@@ -2085,7 +2085,7 @@ const DAY_CONTENT = {
 // ⚙️  KONFIGURATION – HIER DEINE SUPABASE-DATEN EINTRAGEN
 // ════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://rnedyeimsgtvhcqvbama.supabase.co'
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZWR5ZWltc2d0dmhjcXZiYW1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzU3ODgsImV4cCI6MjA4NzcxMTc4OH0.KTXtZPulyIxScs0FWXT8GbQTTRcvxBAS8pvhogS66F0
 // ════════════════════════════════════════════════════════
 
 const { createClient } = supabase;
@@ -3079,16 +3079,13 @@ async function loadGroupProgress() {
   try {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // Count total distinct users in progress table
-    const { data: allUsers, error: e1 } = await db
-      .from('progress')
-      .select('user_id');
+    // Gesamtzahl aller registrierten User aus profiles-Tabelle
+    const { count: totalUsers, error: e1 } = await db
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
     if (e1) throw e1;
 
-    const uniqueUsers = new Set(allUsers.map(r => r.user_id));
-    const totalUsers = uniqueUsers.size;
-
-    // Count users who completed at least one day today
+    // User die heute mindestens einen Tag abgeschlossen haben
     const { data: todayData, error: e2 } = await db
       .from('progress')
       .select('user_id')
@@ -3100,16 +3097,16 @@ async function loadGroupProgress() {
     const pct = totalUsers > 0 ? Math.round(todayUsers / totalUsers * 100) : 0;
 
     // Update UI
-    document.getElementById('statParticipants').textContent = totalUsers;
+    document.getElementById('statParticipants').textContent = totalUsers ?? 0;
     const pb = document.getElementById('statParticipantsBadge');
-    if (pb) pb.textContent = totalUsers + ' 👥';
+    if (pb) pb.textContent = (totalUsers ?? 0) + ' 👥';
 
     // Update banner group block
-    const pctEl = document.getElementById('groupBannerPct');
+    const pctEl  = document.getElementById('groupBannerPct');
     const textEl = document.getElementById('groupBannerText');
     const barEl  = document.getElementById('groupBannerBar');
     if (pctEl)  pctEl.textContent  = pct + '%';
-    if (textEl) textEl.textContent = `${todayUsers} von ${totalUsers} aktiv`;
+    if (textEl) textEl.textContent = `${todayUsers} von ${totalUsers ?? 0} aktiv`;
     if (barEl)  setTimeout(() => { barEl.style.width = pct + '%'; }, 400);
 
   } catch(e) {
@@ -4221,22 +4218,4 @@ async function handlePreLaunchLogin() {
     const minutes = Math.floor((diff % 3600000)  / 60000);
     const seconds = Math.floor((diff % 60000)    / 1000);
 
-    const pad = n => String(n).padStart(2, '0');
-    const el = id => document.getElementById(id);
-    if (el('cd-days'))    el('cd-days').textContent    = days;
-    if (el('cd-hours'))   el('cd-hours').textContent   = pad(hours);
-    if (el('cd-minutes')) el('cd-minutes').textContent = pad(minutes);
-    if (el('cd-seconds')) el('cd-seconds').textContent = pad(seconds);
-  }
-
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-})();
-
-// Apply saved settings on load
-applyA11y();
-
-
-</script>
-</body>
-</html>
+    const pad = n => String(n).pad
